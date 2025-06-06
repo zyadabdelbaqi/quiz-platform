@@ -5,21 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>منصة الكويزات التعليمية</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     
     <style>
-        body {
-            font-family: 'Tajawal', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        h1, h2, h3, h4, h5, h6 {
-            font-family: 'Amiri', serif;
-        }
+
+       
+    body {
+        font-family: 'Tajawal', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Amiri', serif;
+    }
+    /* باقي الأنماط... */
+
+        
         #studentInfoForm {
-            max-width: 600px;
-            margin: 0 auto;
-        }
+    max-width: 600px;
+    margin: 0 auto;
+}
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         .quiz-container { max-width: 800px; margin: 0 auto; }
         .question-card { transition: all 0.3s ease; }
         .question-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
@@ -27,72 +33,9 @@
         .btn-primary:hover { background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%); }
         .student-mode { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
         .teacher-mode { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-
-        /* Custom Modal Styles */
-        .modal {
-            display: none; /* Hidden by default */
-            position: fixed; /* Stay in place */
-            z-index: 1000; /* Sit on top */
-            left: 0;
-            top: 0;
-            width: 100%; /* Full width */
-            height: 100%; /* Full height */
-            overflow: auto; /* Enable scroll if needed */
-            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background-color: #fefefe;
-            margin: auto;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            max-width: 400px;
-            text-align: center;
-        }
-        .modal-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        .loading-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(255, 255, 255, 0.8);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            font-size: 24px;
-            color: #333;
-        }
     </style>
 </head>
 <body class="bg-gray-100">
-
-    <!-- Custom Alert/Confirmation Modal -->
-    <div id="customModal" class="modal">
-        <div class="modal-content">
-            <p id="modalMessage" class="text-lg font-semibold mb-4"></p>
-            <div class="modal-buttons">
-                <button id="modalConfirmBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg hidden">تأكيد</button>
-                <button id="modalCancelBtn" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg hidden">إلغاء</button>
-                <button id="modalOkBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg hidden">موافق</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Loading Overlay -->
-    <div id="loadingOverlay" class="loading-overlay">
-        <i class="fas fa-spinner fa-spin text-4xl mr-3"></i>
-        <span>جاري التحميل...</span>
-    </div>
-
     <div id="teacherPage" class="hidden">
         <div class="teacher-mode text-white py-8">
             <div class="container mx-auto px-4">
@@ -158,6 +101,32 @@
     </div>
 
     <div id="studentPage" class="hidden">
+    <div class="student-mode text-white py-8">
+        <div class="container mx-auto px-4">
+            <h1 class="text-4xl font-bold text-center mb-2">
+                <i class="fas fa-user-graduate mr-3"></i>
+                صفحة الطالب
+            </h1>
+            <p class="text-center text-lg opacity-90">أجب على الأسئلة بعناية</p>
+        </div>
+    </div>
+
+    <div class="quiz-container px-4 py-8">
+        <div id="studentInfoForm" class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">بيانات الطالب</h2>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-semibold mb-2">اسم الطالب</label>
+                <input type="text" id="studentName" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" placeholder="أدخل اسمك الكامل">
+            </div>
+            <button onclick="startQuiz()" class="btn-primary text-white px-8 py-3 rounded-lg font-semibold transition hover:shadow-lg">
+                <i class="fas fa-play mr-2"></i>بدء الاختبار
+            </button>
+        </div>
+        <div id="quizContent" class="bg-white rounded-lg shadow-lg p-6 hidden">
+            </div>
+    </div>
+</div>
+    <div id="studentPage" class="hidden">
         <div class="student-mode text-white py-8">
             <div class="container mx-auto px-4">
                 <h1 class="text-4xl font-bold text-center mb-2">
@@ -165,23 +134,12 @@
                     صفحة الطالب
                 </h1>
                 <p class="text-center text-lg opacity-90">أجب على الأسئلة بعناية</p>
-                <p id="studentUserIdDisplay" class="text-sm opacity-80 mt-2">معرف الطالب: <span id="currentUserId"></span></p>
             </div>
         </div>
 
         <div class="quiz-container px-4 py-8">
-            <div id="studentInfoForm" class="bg-white rounded-lg shadow-lg p-6 mb-6">
-                <h2 class="text-2xl font-bold text-gray-800 mb-4">بيانات الطالب</h2>
-                <div class="mb-4">
-                    <label class="block text-gray-700 font-semibold mb-2">اسم الطالب</label>
-                    <input type="text" id="studentName" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" placeholder="أدخل اسمك الكامل">
+            <div id="quizContent" class="bg-white rounded-lg shadow-lg p-6">
                 </div>
-                <button onclick="startQuiz()" class="btn-primary text-white px-8 py-3 rounded-lg font-semibold transition hover:shadow-lg">
-                    <i class="fas fa-play mr-2"></i>بدء الاختبار
-                </button>
-            </div>
-            <div id="quizContent" class="bg-white rounded-lg shadow-lg p-6 hidden">
-            </div>
         </div>
     </div>
 
@@ -197,167 +155,51 @@
 
         <div class="quiz-container px-4 py-8">
             <div id="resultsContent" class="bg-white rounded-lg shadow-lg p-6">
-            </div>
+                </div>
         </div>
     </div>
 
-    <script type="module">
-        // Firebase imports
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Global Firebase variables
-        let app;
-        let db;
-        let auth;
-        let currentUserId = null; // Store current user ID
-
-        // App-specific variables
+    <script>
         let questions = [];
         let currentQuiz = null;
         let studentAnswers = {};
 
-        // Canvas provided global variables (MANDATORY TO USE)
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-        // Custom Modal Functions
-        function showModal(message, type = 'alert', onConfirm = null) {
-            const modal = document.getElementById('customModal');
-            const modalMessage = document.getElementById('modalMessage');
-            const modalConfirmBtn = document.getElementById('modalConfirmBtn');
-            const modalCancelBtn = document.getElementById('modalCancelBtn');
-            const modalOkBtn = document.getElementById('modalOkBtn');
-
-            modalMessage.textContent = message;
-
-            modalConfirmBtn.onclick = null;
-            modalCancelBtn.onclick = null;
-            modalOkBtn.onclick = null;
-
-            modalConfirmBtn.classList.add('hidden');
-            modalCancelBtn.classList.add('hidden');
-            modalOkBtn.classList.add('hidden');
-
-            if (type === 'confirm') {
-                modalConfirmBtn.classList.remove('hidden');
-                modalCancelBtn.classList.remove('hidden');
-                modalConfirmBtn.onclick = () => {
-                    modal.style.display = 'none';
-                    if (onConfirm) onConfirm(true);
-                };
-                modalCancelBtn.onclick = () => {
-                    modal.style.display = 'none';
-                    if (onConfirm) onConfirm(false);
-                };
-            } else { // 'alert'
-                modalOkBtn.classList.remove('hidden');
-                modalOkBtn.onclick = () => {
-                    modal.style.display = 'none';
-                    if (onConfirm) onConfirm(); // For alert, onConfirm might be a callback after OK
-                };
-            }
-            modal.style.display = 'flex'; // Use flex to center
-        }
-
-        // Loading Overlay Functions
-        function showLoading() {
-            document.getElementById('loadingOverlay').style.display = 'flex';
-        }
-
-        function hideLoading() {
-            document.getElementById('loadingOverlay').style.display = 'none';
-        }
-
-        // Initialize Firebase and Auth
-        async function initializeFirebase() {
-            try {
-                showLoading();
-                app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-
-                await new Promise(resolve => {
-                    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-                        if (user) {
-                            currentUserId = user.uid;
-                            document.getElementById('currentUserId').textContent = currentUserId;
-                        } else {
-                            // Sign in anonymously if no user is found
-                            if (initialAuthToken) {
-                                await signInWithCustomToken(auth, initialAuthToken);
-                            } else {
-                                await signInAnonymously(auth);
-                            }
-                            currentUserId = auth.currentUser?.uid || crypto.randomUUID();
-                            document.getElementById('currentUserId').textContent = currentUserId;
-                        }
-                        unsubscribe(); // Unsubscribe after the first state change
-                        resolve();
-                    });
-                });
-                console.log("Firebase Initialized and Authenticated.");
-            } catch (error) {
-                console.error("Error initializing Firebase:", error);
-                showModal("فشل في تهيئة Firebase. يرجى المحاولة مرة أخرى.");
-            } finally {
-                hideLoading();
-            }
-        }
-
-        // Initial load logic
-        window.onload = async function() {
-            await initializeFirebase(); // Ensure Firebase is initialized before proceeding
-
+        // التحقق من نوع الصفحة عند التحميل
+        window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
             const quizId = urlParams.get('quiz');
             const results = urlParams.get('results');
             
             if (results && quizId) {
-                window.showResults(quizId); // Call global function
+                showResults(quizId);
             } else if (quizId) {
-                window.loadQuizForStudent(quizId); // Call global function
+                loadQuizForStudent(quizId);
             } else {
-                window.showTeacherPage(); // Call global function
-            }
-
-            // تحميل اسم الطالب من sessionStorage إذا كان موجوداً
-            const storedStudentName = sessionStorage.getItem('studentName');
-            if (storedStudentName) {
-                document.getElementById('studentName').value = storedStudentName;
-                // إذا كان الكويز سيتم تحميله مباشرة للطالب، لا نظهر شاشة الاسم
-                if (quizId && !results) {
-                    studentAnswers.studentName = storedStudentName;
-                    document.getElementById('studentInfoForm').classList.add('hidden');
-                    document.getElementById('quizContent').classList.remove('hidden');
-                }
+                showTeacherPage();
             }
         };
 
-        // Make functions globally accessible for onclick attributes
-        window.showTeacherPage = function() {
+        function showTeacherPage() {
             document.getElementById('teacherPage').classList.remove('hidden');
             document.getElementById('studentPage').classList.add('hidden');
             document.getElementById('resultsPage').classList.add('hidden');
-            window.loadSavedQuizzes(); // Call global function
-        };
+            loadSavedQuizzes();
+        }
 
-        window.showStudentPage = function() {
+        function showStudentPage() {
             document.getElementById('teacherPage').classList.add('hidden');
             document.getElementById('studentPage').classList.remove('hidden');
             document.getElementById('resultsPage').classList.add('hidden');
-        };
+        }
 
-        window.showResultsPage = function() {
+        function showResultsPage() {
             document.getElementById('teacherPage').classList.add('hidden');
             document.getElementById('studentPage').classList.add('hidden');
             document.getElementById('resultsPage').classList.remove('hidden');
-        };
+        }
 
-        window.addQuestion = function(type, questionData = {}) {
-            const questionId = questionData.id || Date.now().toString(); // Ensure ID is string for Firestore
+        function addQuestion(type, questionData = {}) {
+            const questionId = questionData.id || Date.now();
             const questionDiv = document.createElement('div');
             questionDiv.className = 'question-card bg-gray-50 p-4 rounded-lg border border-gray-200 mb-4';
             questionDiv.id = `question-${questionId}`;
@@ -431,37 +273,34 @@
                     questions[existingIndex] = { id: questionId, type: type };
                 }
             }
-        };
+        }
 
-        window.removeQuestion = function(questionId) {
+        function removeQuestion(questionId) {
             document.getElementById(`question-${questionId}`).remove();
             questions = questions.filter(q => q.id != questionId);
-        };
+        }
 
-        window.saveQuiz = async function() {
-            showLoading();
+        async function saveQuiz() {
             const title = document.getElementById('quizTitle').value;
             const description = document.getElementById('quizDescription').value;
             const editQuizId = document.getElementById('editQuizId').value;
 
             if (!title.trim()) {
-                hideLoading();
-                showModal('يرجى إدخال عنوان الكويز');
+                alert('يرجى إدخال عنوان الكويز');
                 return;
             }
 
             if (questions.length === 0) {
-                hideLoading();
-                showModal('يرجى إضافة سؤال واحد على الأقل');
+                alert('يرجى إضافة سؤال واحد على الأقل');
                 return;
             }
 
             const quiz = {
+                id: editQuizId || Date.now().toString(), // Use existing ID or generate new
                 title: title,
                 description: description,
                 questions: [],
-                createdAt: new Date().toLocaleString('ar-EG'),
-                teacherUserId: currentUserId // Link quiz to the creating teacher
+                createdAt: new Date().toLocaleString('ar-EG')
             };
 
             for (const q of questions) {
@@ -472,8 +311,7 @@
                 let imageUrl = '';
 
                 if (!questionText.trim()) {
-                    hideLoading();
-                    showModal('يرجى ملء جميع الأسئلة');
+                    alert('يرجى ملء جميع الأسئلة');
                     return;
                 }
 
@@ -500,8 +338,7 @@
                     const correctAnswer = questionDiv.querySelector('input[name="correct-' + q.id + '"]:checked');
                     
                     if (!correctAnswer) {
-                        hideLoading();
-                        showModal('يرجى اختيار الإجابة الصحيحة لجميع الأسئلة');
+                        alert('يرجى اختيار الإجابة الصحيحة لجميع الأسئلة');
                         return;
                     }
 
@@ -511,8 +348,7 @@
                     const correctAnswer = questionDiv.querySelector('input[name="correct-' + q.id + '"]:checked');
                     
                     if (!correctAnswer) {
-                        hideLoading();
-                        showModal('يرجى اختيار الإجابة الصحيحة لجميع الأسئلة');
+                        alert('يرجى اختيار الإجابة الصحيحة لجميع الأسئلة');
                         return;
                         }
 
@@ -521,8 +357,7 @@
                     const correctText = questionDiv.querySelector('.correct-text').value;
                     
                     if (!correctText.trim()) {
-                        hideLoading();
-                        showModal('يرجى إدخال الإجابة الصحيحة لجميع الأسئلة');
+                        alert('يرجى إدخال الإجابة الصحيحة لجميع الأسئلة');
                         return;
                     }
 
@@ -532,27 +367,25 @@
                 quiz.questions.push(questionData);
             }
 
-            try {
-                if (editQuizId) {
-                    // Update existing quiz
-                    await setDoc(doc(db, `artifacts/${appId}/public/data/quizzes`, editQuizId), quiz);
-                    showModal('تم تحديث الكويز بنجاح!');
-                } else {
-                    // Add new quiz
-                    const docRef = await addDoc(collection(db, `artifacts/${appId}/public/data/quizzes`), quiz);
-                    // Update the quiz object with the new ID for local tracking
-                    quiz.id = docRef.id;
-                    showModal('تم حفظ الكويز بنجاح!');
-                }
-            } catch (e) {
-                console.error("Error saving quiz: ", e);
-                showModal("فشل في حفظ الكويز. يرجى المحاولة مرة أخرى.");
-            } finally {
-                hideLoading();
-                window.clearQuizForm(); // Call global function
-                window.loadSavedQuizzes(); // Call global function
+            // حفظ الكويز في localStorage
+            let savedQuizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+
+            if (editQuizId) {
+                // Update existing quiz
+                savedQuizzes = savedQuizzes.map(q => q.id === editQuizId ? quiz : q);
+            } else {
+                // Add new quiz
+                savedQuizzes.push(quiz);
             }
-        };
+            
+            localStorage.setItem('quizzes', JSON.stringify(savedQuizzes));
+
+            alert('تم حفظ الكويز بنجاح!');
+            
+            // إعادة تعيين النموذج
+            clearQuizForm();
+            loadSavedQuizzes();
+        }
 
         function encodeImageFileAsURL(file) {
             return new Promise((resolve) => {
@@ -564,278 +397,199 @@
             });
         }
 
-        window.clearQuizForm = function() {
+        function clearQuizForm() {
             document.getElementById('quizTitle').value = '';
             document.getElementById('quizDescription').value = '';
             document.getElementById('questionsContainer').innerHTML = '<h3 class="text-lg font-semibold text-gray-700 mb-4">الأسئلة</h3>';
             document.getElementById('editQuizId').value = ''; // Clear edit ID
             questions = [];
-        };
+        }
 
-        window.loadSavedQuizzes = async function() {
-            showLoading();
+        function loadSavedQuizzes() {
+            const savedQuizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
             const container = document.getElementById('savedQuizzes');
-            container.innerHTML = ''; // Clear existing quizzes
 
-            try {
-                const q = query(collection(db, `artifacts/${appId}/public/data/quizzes`));
-                const querySnapshot = await getDocs(q);
-                const savedQuizzes = [];
-                querySnapshot.forEach((doc) => {
-                    savedQuizzes.push({ id: doc.id, ...doc.data() });
-                });
+            if (savedQuizzes.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center col-span-full">لا توجد كويزات محفوظة</p>';
+                return;
+            }
 
-                if (savedQuizzes.length === 0) {
-                    container.innerHTML = '<p class="text-gray-500 text-center col-span-full">لا توجد كويزات محفوظة</p>';
-                    return;
-                }
-
-                container.innerHTML = savedQuizzes.map(quiz => `
-                    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-200">
-                        <h3 class="font-bold text-lg text-gray-800 mb-2">${quiz.title}</h3>
-                        <p class="text-gray-600 mb-2">${quiz.description}</p>
-                        <p class="text-sm text-gray-500 mb-3">
-                            <i class="fas fa-calendar ml-1"></i>${quiz.createdAt} | 
-                            <i class="fas fa-question-circle ml-1"></i>${quiz.questions.length} سؤال
-                        </p>
-                        <div class="flex gap-2 flex-wrap">
-                            <button onclick="copyQuizLink('${quiz.id}')" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm transition">
-                                <i class="fas fa-link ml-1"></i>نسخ الرابط
-                            </button>
-                            <button onclick="viewQuizResults('${quiz.id}')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition">
-                                <i class="fas fa-chart-bar ml-1"></i>النتائج
-                            </button>
-                            <button onclick="editQuiz('${quiz.id}')" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm transition">
-                                <i class="fas fa-edit ml-1"></i>تعديل
-                            </button>
-                            <button onclick="deleteQuiz('${quiz.id}')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition">
-                                <i class="fas fa-trash ml-1"></i>حذف
-                            </button>
-                        </div>
+            container.innerHTML = savedQuizzes.map(quiz => `
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-200">
+                    <h3 class="font-bold text-lg text-gray-800 mb-2">${quiz.title}</h3>
+                    <p class="text-gray-600 mb-2">${quiz.description}</p>
+                    <p class="text-sm text-gray-500 mb-3">
+                        <i class="fas fa-calendar ml-1"></i>${quiz.createdAt} | 
+                        <i class="fas fa-question-circle ml-1"></i>${quiz.questions.length} سؤال
+                    </p>
+                    <div class="flex gap-2 flex-wrap">
+                        <button onclick="copyQuizLink('${quiz.id}')" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm transition">
+                            <i class="fas fa-link ml-1"></i>نسخ الرابط
+                        </button>
+                        <button onclick="viewQuizResults('${quiz.id}')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition">
+                            <i class="fas fa-chart-bar ml-1"></i>النتائج
+                        </button>
+                        <button onclick="editQuiz('${quiz.id}')" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm transition">
+                            <i class="fas fa-edit ml-1"></i>تعديل
+                        </button>
+                        <button onclick="deleteQuiz('${quiz.id}')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition">
+                            <i class="fas fa-trash ml-1"></i>حذف
+                        </button>
                     </div>
-                `).join('');
-            } catch (e) {
-                console.error("Error loading quizzes: ", e);
-                showModal("فشل في تحميل الكويزات. يرجى المحاولة مرة أخرى.");
-            } finally {
-                hideLoading();
+                </div>
+            `).join('');
+        }
+
+        function editQuiz(quizId) {
+            const savedQuizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+            const quizToEdit = savedQuizzes.find(q => q.id === quizId);
+
+            if (!quizToEdit) {
+                alert('الكويز المراد تعديله غير موجود.');
+                return;
             }
-        };
 
-        window.editQuiz = async function(quizId) {
-            showLoading();
-            try {
-                const docRef = doc(db, `artifacts/${appId}/public/data/quizzes`, quizId);
-                const docSnap = await getDoc(docRef);
+            document.getElementById('quizTitle').value = quizToEdit.title;
+            document.getElementById('quizDescription').value = quizToEdit.description;
+            document.getElementById('editQuizId').value = quizToEdit.id; // Set ID for editing
 
-                if (docSnap.exists()) {
-                    const quizToEdit = docSnap.data();
-                    document.getElementById('quizTitle').value = quizToEdit.title;
-                    document.getElementById('quizDescription').value = quizToEdit.description;
-                    document.getElementById('editQuizId').value = quizId; // Set ID for editing
+            // Clear current questions and load questions from the quiz to edit
+            document.getElementById('questionsContainer').innerHTML = '<h3 class="text-lg font-semibold text-gray-700 mb-4">الأسئلة</h3>';
+            questions = []; // Reset questions array
 
-                    // Clear current questions and load questions from the quiz to edit
-                    document.getElementById('questionsContainer').innerHTML = '<h3 class="text-lg font-semibold text-gray-700 mb-4">الأسئلة</h3>';
-                    questions = []; // Reset questions array
+            quizToEdit.questions.forEach(q => {
+                addQuestion(q.type, q); // Pass existing question data
+            });
 
-                    quizToEdit.questions.forEach(q => {
-                        window.addQuestion(q.type, q); // Call global function
-                    });
+            // Scroll to the top of the form
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
 
-                    // Scroll to the top of the form
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                } else {
-                    showModal('الكويز المراد تعديله غير موجود.');
-                }
-            } catch (e) {
-                console.error("Error fetching quiz for edit: ", e);
-                showModal("فشل في تحميل الكويز للتعديل. يرجى المحاولة مرة أخرى.");
-            } finally {
-                hideLoading();
-            }
-        };
 
-        window.copyQuizLink = function(quizId) {
+        function copyQuizLink(quizId) {
             const link = window.location.origin + window.location.pathname + '?quiz=' + quizId;
-            // Using navigator.clipboard.writeText for modern and reliable copying
             navigator.clipboard.writeText(link).then(() => {
-                showModal('تم نسخ الرابط! يمكنك مشاركته مع الطلاب');
-            }).catch(err => {
-                console.error('Failed to copy text: ', err);
-                showModal('فشل في نسخ الرابط. يرجى المحاولة يدوياً بالنسخ من شريط العنوان.');
+                alert('تم نسخ الرابط! يمكنك مشاركته مع الطلاب');
             });
-        };
+        }
 
-        window.deleteQuiz = function(quizId) {
-            showModal('هل أنت متأكد من حذف هذا الكويز؟ سيتم حذف جميع النتائج المرتبطة به أيضاً.', 'confirm', async (confirmed) => {
-                if (confirmed) {
-                    showLoading();
-                    try {
-                        // Delete quiz document
-                        await deleteDoc(doc(db, `artifacts/${appId}/public/data/quizzes`, quizId));
-                        
-                        // Delete associated results
-                        const resultsQuery = query(collection(db, `artifacts/${appId}/public/data/quizResults`), where("quizId", "==", quizId));
-                        const resultsSnapshot = await getDocs(resultsQuery);
-                        const deletePromises = [];
-                        resultsSnapshot.forEach((resultDoc) => {
-                            deletePromises.push(deleteDoc(doc(db, `artifacts/${appId}/public/data/quizResults`, resultDoc.id)));
-                        });
-                        await Promise.all(deletePromises);
+        function deleteQuiz(quizId) {
+            if (confirm('هل أنت متأكد من حذف هذا الكويز؟')) {
+                let savedQuizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+                savedQuizzes = savedQuizzes.filter(quiz => quiz.id !== quizId);
+                localStorage.setItem('quizzes', JSON.stringify(savedQuizzes));
+                
+                // حذف نتائج الكويز أيضاً
+                localStorage.removeItem('quiz_results_' + quizId);
+                
+                loadSavedQuizzes();
+                alert('تم حذف الكويز بنجاح');
+            }
+        }
 
-                        showModal('تم حذف الكويز ونتائجه بنجاح');
-                        window.loadSavedQuizzes(); // Call global function
-                    } catch (e) {
-                        console.error("Error deleting quiz and results: ", e);
-                        showModal("فشل في حذف الكويز ونتائجه. يرجى المحاولة مرة أخرى.");
-                    } finally {
-                        hideLoading();
-                    }
-                }
-            });
-        };
+        function loadQuizForStudent(quizId) {
+            const savedQuizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+            const quiz = savedQuizzes.find(q => q.id === quizId);
 
-        window.loadQuizForStudent = async function(quizId) {
-            showLoading();
-            try {
-                const docRef = doc(db, `artifacts/${appId}/public/data/quizzes`, quizId);
-                const docSnap = await getDoc(docRef);
-
-                if (!docSnap.exists()) {
-                    document.getElementById('quizContent').innerHTML = `
-                        <div class="text-center py-8">
-                            <i class="fas fa-exclamation-triangle text-yellow-500 text-6xl mb-4"></i>
-                            <h2 class="text-2xl font-bold text-gray-800 mb-2">الكويز غير موجود</h2>
-                            <p class="text-gray-600">الرابط الذي تحاول الوصول إليه غير صحيح أو تم حذف الكويز</p>
-                        </div>
-                    `;
-                    window.showStudentPage(); // Call global function
-                    hideLoading();
-                    return;
-                }
-
-                currentQuiz = { id: docSnap.id, ...docSnap.data() };
-                studentAnswers = {}; // يتم إعادة تعيين الإجابات عند تحميل كويز جديد
-
-                // إذا كان اسم الطالب موجوداً بالفعل في sessionStorage، استخدمه
-                const storedStudentName = sessionStorage.getItem('studentName');
-                if (storedStudentName) {
-                    studentAnswers.studentName = storedStudentName;
-                    document.getElementById('studentName').value = storedStudentName; // Set the input field value
-                    document.getElementById('studentInfoForm').classList.add('hidden');
-                    document.getElementById('quizContent').classList.remove('hidden');
-                } else {
-                    // إذا لم يكن الاسم موجوداً، أظهر شاشة إدخال الاسم
-                    document.getElementById('studentInfoForm').classList.remove('hidden');
-                    document.getElementById('quizContent').classList.add('hidden');
-                }
-
-                const quizHTML = `
-                    <div class="text-center mb-6">
-                        <h1 class="text-3xl font-bold text-gray-800 mb-2">${currentQuiz.title}</h1>
-                        <p class="text-gray-600 text-lg">${currentQuiz.description}</p>
-                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-4">
-                            <i class="fas fa-info-circle text-blue-500 ml-2"></i>
-                            عدد الأسئلة: ${currentQuiz.questions.length}
-                        </div>
+            if (!quiz) {
+                document.getElementById('quizContent').innerHTML = `
+                    <div class="text-center py-8">
+                        <i class="fas fa-exclamation-triangle text-yellow-500 text-6xl mb-4"></i>
+                        <h2 class="text-2xl font-bold text-gray-800 mb-2">الكويز غير موجود</h2>
+                        <p class="text-gray-600">الرابط الذي تحاول الوصول إليه غير صحيح أو تم حذف الكويز</p>
                     </div>
-
-                    <form id="studentQuizForm">
-                        ${currentQuiz.questions.map((question, index) => {
-                            let questionHTML = `
-                                <div class="bg-gray-50 p-6 rounded-lg border border-gray-200 mb-6">
-                                    <h3 class="text-xl font-semibold text-gray-800 mb-4">
-                                        <span class="bg-blue-500 text-white rounded-full w-8 h-8 inline-flex items-center justify-center ml-2 text-sm">
-                                            ${index + 1}
-                                        </span>
-                                        ${question.text}
-                                    </h3>
-                                    ${question.imageUrl ? `<img src="${question.imageUrl}" class="mt-2 mb-4 rounded-lg max-w-full h-auto" alt="صورة السؤال">` : ''}
-                            `;
-
-                            if (question.type === 'multiple') {
-                                questionHTML += `
-                                    <div class="space-y-3">
-                                        ${question.options.map((option, optionIndex) => `
-                                            <label class="flex items-center p-3 bg-white rounded-lg border border-gray-200 hover:bg-blue-50 cursor-pointer transition">
-                                                <input type="radio" name="question_${question.id}" value="${optionIndex}" class="ml-3 text-blue-500 focus:ring-blue-500">
-                                                <span class="flex-1">${option}</span>
-                                            </label>
-                                        `).join('')}
-                                    </div>
-                                `;
-                            } else if (question.type === 'boolean') {
-                                questionHTML += `
-                                    <div class="space-y-3">
-                                        <label class="flex items-center p-3 bg-white rounded-lg border border-gray-200 hover:bg-blue-50 cursor-pointer transition">
-                                            <input type="radio" name="question_${question.id}" value="true" class="ml-3 text-blue-500 focus:ring-blue-500">
-                                            <span class="flex-1">صحيح</span>
-                                        </label>
-                                        <label class="flex items-center p-3 bg-white rounded-lg border border-gray-200 hover:bg-blue-50 cursor-pointer transition">
-                                            <input type="radio" name="question_${question.id}" value="false" class="ml-3 text-blue-500 focus:ring-blue-500">
-                                            <span class="flex-1">خطأ</span>
-                                        </label>
-                                    </div>
-                                `;
-                            } else if (question.type === 'text') {
-                                questionHTML += `
-                                    <input type="text" name="question_${question.id}" 
-                                        class="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-lg"
-                                        placeholder="اكتب إجابتك هنا...">
-                                `;
-                            }
-
-                            questionHTML += '</div>';
-                            return questionHTML;
-                        }).join('')}
-
-                        <div class="text-center mt-8">
-                            <button type="button" onclick="submitStudentQuiz()" 
-                                    class="btn-primary text-white px-8 py-4 rounded-lg font-semibold text-lg transition hover:shadow-lg">
-                                <i class="fas fa-paper-plane ml-2"></i>
-                                إرسال الإجابات
-                            </button>
-                        </div>
-                    </form>
                 `;
-
-                document.getElementById('quizContent').innerHTML = quizHTML;
-                window.showStudentPage(); // Call global function
-            } catch (e) {
-                console.error("Error loading quiz for student: ", e);
-                showModal("فشل في تحميل الكويز. يرجى التأكد من الرابط والمحاولة مرة أخرى.");
-            } finally {
-                hideLoading();
-            }
-        };
-
-        window.startQuiz = function() {
-            const studentName = document.getElementById('studentName').value;
-            if (!studentName.trim()) {
-                showModal('يرجى إدخال اسم الطالب');
-                return;
-            }
-            
-            // حفظ اسم الطالب في sessionStorage
-            sessionStorage.setItem('studentName', studentName);
-            
-            studentAnswers.studentName = studentName;
-            document.getElementById('studentInfoForm').classList.add('hidden');
-            document.getElementById('quizContent').classList.remove('hidden');
-        };
-
-        window.submitStudentQuiz = async function() {
-            showLoading();
-            const studentName = studentAnswers.studentName;
-            if (!studentName) {
-                hideLoading();
-                showModal('حدث خطأ في بيانات الطالب، يرجى إعادة تحميل الصفحة');
+                showStudentPage();
                 return;
             }
 
-            const form = document.getElementById('studentQuizForm');
-            const formData = new FormData(form);
-                    
+            currentQuiz = quiz;
+            studentAnswers = {};
+
+            const quizHTML = `
+                <div class="text-center mb-6">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-2">${quiz.title}</h1>
+                    <p class="text-gray-600 text-lg">${quiz.description}</p>
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-4">
+                        <i class="fas fa-info-circle text-blue-500 ml-2"></i>
+                        عدد الأسئلة: ${quiz.questions.length}
+                    </div>
+                </div>
+
+                <form id="studentQuizForm">
+                    ${quiz.questions.map((question, index) => {
+                        let questionHTML = `
+                            <div class="bg-gray-50 p-6 rounded-lg border border-gray-200 mb-6">
+                                <h3 class="text-xl font-semibold text-gray-800 mb-4">
+                                    <span class="bg-blue-500 text-white rounded-full w-8 h-8 inline-flex items-center justify-center ml-2 text-sm">
+                                        ${index + 1}
+                                    </span>
+                                    ${question.text}
+                                </h3>
+                                ${question.imageUrl ? `<img src="${question.imageUrl}" class="mt-2 mb-4 rounded-lg max-w-full h-auto" alt="صورة السؤال">` : ''}
+                        `;
+
+                        if (question.type === 'multiple') {
+                            questionHTML += `
+                                <div class="space-y-3">
+                                    ${question.options.map((option, optionIndex) => `
+                                        <label class="flex items-center p-3 bg-white rounded-lg border border-gray-200 hover:bg-blue-50 cursor-pointer transition">
+                                            <input type="radio" name="question_${question.id}" value="${optionIndex}" class="ml-3 text-blue-500 focus:ring-blue-500">
+                                            <span class="flex-1">${option}</span>
+                                        </label>
+                                    `).join('')}
+                                </div>
+                            `;
+                        } else if (question.type === 'boolean') {
+                            questionHTML += `
+                                <div class="space-y-3">
+                                    <label class="flex items-center p-3 bg-white rounded-lg border border-gray-200 hover:bg-blue-50 cursor-pointer transition">
+                                        <input type="radio" name="question_${question.id}" value="true" class="ml-3 text-blue-500 focus:ring-blue-500">
+                                        <span class="flex-1">صحيح</span>
+                                    </label>
+                                    <label class="flex items-center p-3 bg-white rounded-lg border border-gray-200 hover:bg-blue-50 cursor-pointer transition">
+                                        <input type="radio" name="question_${question.id}" value="false" class="ml-3 text-blue-500 focus:ring-blue-500">
+                                        <span class="flex-1">خطأ</span>
+                                    </label>
+                                </div>
+                            `;
+                        } else if (question.type === 'text') {
+                            questionHTML += `
+                                <input type="text" name="question_${question.id}" 
+                                       class="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-lg"
+                                       placeholder="اكتب إجابتك هنا...">
+                            `;
+                        }
+
+                        questionHTML += '</div>';
+                        return questionHTML;
+                    }).join('')}
+
+                    <div class="text-center mt-8">
+                        <button type="button" onclick="submitStudentQuiz()" 
+                                class="btn-primary text-white px-8 py-4 rounded-lg font-semibold text-lg transition hover:shadow-lg">
+                            <i class="fas fa-paper-plane ml-2"></i>
+                            إرسال الإجابات
+                        </button>
+                    </div>
+                </form>
+            `;
+
+            document.getElementById('quizContent').innerHTML = quizHTML;
+            showStudentPage();
+        }
+
+            
+    function submitStudentQuiz() {
+    const studentName = studentAnswers.studentName;
+    if (!studentName) {
+        alert('حدث خطأ في بيانات الطالب، يرجى إعادة تحميل الصفحة');
+        return;
+    }
+
+    const form = document.getElementById('studentQuizForm');
+    const formData = new FormData(form);
+            
             // التحقق من أن جميع الأسئلة تم الإجابة عليها
             let allAnswered = true;
             currentQuiz.questions.forEach(question => {
@@ -847,23 +601,21 @@
             });
 
             if (!allAnswered) {
-                hideLoading();
-                showModal('يرجى الإجابة على جميع الأسئلة قبل الإرسال');
+                alert('يرجى الإجابة على جميع الأسئلة قبل الإرسال');
                 return;
             }
 
             // حساب النتيجة
             let correctAnswers = 0;
            
-            const results = {
-                quizId: currentQuiz.id,
-                quizTitle: currentQuiz.title,
-                studentName: studentName,
-                studentUserId: currentUserId, // Associate result with the student's anonymous ID
-                totalQuestions: currentQuiz.questions.length,
-                answers: [],
-                submittedAt: new Date().toLocaleString('ar-EG')
-            };
+    const results = {
+        quizId: currentQuiz.id,
+        quizTitle: currentQuiz.title,
+        studentName: studentName, // إضافة اسم الطالب هنا
+        totalQuestions: currentQuiz.questions.length,
+        answers: [],
+        submittedAt: new Date().toLocaleString('ar-EG')
+        };
 
             currentQuiz.questions.forEach(question => {
                 const studentAnswer = studentAnswers[question.id];
@@ -894,330 +646,225 @@
             results.correctAnswers = correctAnswers;
             results.score = Math.round((correctAnswers / currentQuiz.questions.length) * 100);
 
-            try {
-                // حفظ النتيجة في Firestore
-                await addDoc(collection(db, `artifacts/${appId}/public/data/quizResults`), results);
-                // توجيه إلى صفحة النتائج
-                window.location.href = window.location.pathname + '?quiz=' + currentQuiz.id + '&results=true';
-            } catch (e) {
-                console.error("Error submitting quiz results: ", e);
-                showModal("فشل في إرسال الإجابات. يرجى المحاولة مرة أخرى.");
-            } finally {
-                hideLoading();
-            }
-        };
+            // حفظ النتيجة
+            const existingResults = JSON.parse(localStorage.getItem('quiz_results_' + currentQuiz.id) || '[]');
+            existingResults.push(results);
+            localStorage.setItem('quiz_results_' + currentQuiz.id, JSON.stringify(existingResults));
 
-        window.showResults = async function(quizId) {
-            showLoading();
-            try {
-                const quizDocRef = doc(db, `artifacts/${appId}/public/data/quizzes`, quizId);
-                const quizDocSnap = await getDoc(quizDocRef);
+            // توجيه إلى صفحة النتائج
+            window.location.href = window.location.pathname + '?quiz=' + currentQuiz.id + '&results=true';
+        }
 
-                if (!quizDocSnap.exists()) {
-                     document.getElementById('resultsContent').innerHTML = `
-                        <div class="text-center py-8">
-                            <i class="fas fa-chart-bar text-gray-400 text-6xl mb-4"></i>
-                            <h2 class="text-2xl font-bold text-gray-800 mb-2">الكويز غير موجود</h2>
-                            <p class="text-gray-600">الكويز المراد عرض نتائجه غير موجود.</p>
-                        </div>
-                    `;
-                    window.showResultsPage(); // Call global function
-                    hideLoading();
-                    return;
-                }
-                const quiz = { id: quizDocSnap.id, ...quizDocSnap.data() };
-
-                // Fetch results for the current student and quiz
-                const q = query(collection(db, `artifacts/${appId}/public/data/quizResults`), 
-                                where("quizId", "==", quizId),
-                                where("studentUserId", "==", currentUserId));
-                const querySnapshot = await getDocs(q);
-                const allResults = [];
-                querySnapshot.forEach((doc) => {
-                    allResults.push(doc.data());
-                });
+        function showResults(quizId) {
+            const savedQuizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+            const quiz = savedQuizzes.find(q => q.id === quizId);
+            const allResults = JSON.parse(localStorage.getItem('quiz_results_' + quizId) || '[]');
             
-                if (allResults.length === 0) {
-                    document.getElementById('resultsContent').innerHTML = `
-                        <div class="text-center py-8">
-                            <i class="fas fa-chart-bar text-gray-400 text-6xl mb-4"></i>
-                            <h2 class="text-2xl font-bold text-gray-800 mb-2">لا توجد نتائج</h2>
-                            <p class="text-gray-600">لم يتم العثور على نتائج لك لهذا الكويز</p>
-                        </div>
-                    `;
-                    window.showResultsPage(); // Call global function
-                    hideLoading();
-                    return;
-                }
-
-                // أحدث نتيجة للطالب
-                const latestResult = allResults[allResults.length - 1];
-
-                let resultsHTML = `
-                    <div class="text-center mb-8">
-                        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full ${latestResult.score >= 60 ? 'bg-green-100' : 'bg-red-100'} mb-4">
-                            <i class="fas fa-${latestResult.score >= 60 ? 'check' : 'times'} text-3xl ${latestResult.score >= 60 ? 'text-green-500' : 'text-red-500'}"></i>
-                        </div>
-                        <h1 class="text-3xl font-bold text-gray-800 mb-2">نتيجة الكويز</h1>
-                        <h2 class="text-xl text-gray-600 mb-4">${latestResult.quizTitle}</h2>
-                        <div class="bg-gray-100 p-3 rounded-lg inline-block mb-4">
-                            <i class="fas fa-user ml-2"></i>
-                            اسم الطالب: ${latestResult.studentName}
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                                <div class="text-2xl font-bold text-blue-600">${latestResult.score}%</div>
-                                <div class="text-sm text-gray-600">النسبة المئوية</div>
-                            </div>
-                            <div class="bg-green-50 border border-green-200 rounded-lg p-4">
-                                <div class="text-2xl font-bold text-green-600">${latestResult.correctAnswers}</div>
-                                <div class="text-sm text-gray-600">إجابات صحيحة</div>
-                            </div>
-                            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                                <div class="text-2xl font-bold text-gray-600">${latestResult.totalQuestions}</div>
-                                <div class="text-sm text-gray-600">إجمالي الأسئلة</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mb-6">
-                        <h3 class="text-2xl font-bold text-gray-800 mb-4">تفاصيل الإجابات</h3>
-                        ${latestResult.answers.map((answer, index) => {
-                            const question = quiz.questions.find(q => q.id == answer.questionId);
-                            
-                            let correctAnswerText = '';
-                            if (question.type === 'multiple') {
-                                correctAnswerText = question.options[answer.correctAnswer];
-                            } else if (question.type === 'boolean') {
-                                correctAnswerText = answer.correctAnswer ? 'صحيح' : 'خطأ';
-                            } else {
-                                correctAnswerText = answer.correctAnswer;
-                            }
-
-                            let studentAnswerText = '';
-                            if (question.type === 'multiple') {
-                                studentAnswerText = question.options[parseInt(answer.studentAnswer)] || 'لم يتم الإجابة';
-                            } else if (question.type === 'boolean') {
-                                studentAnswerText = answer.studentAnswer === 'true' ? 'صحيح' : 'خطأ';
-                            } else {
-                                studentAnswerText = answer.studentAnswer || 'لم يتم الإجابة';
-                            }
-
-                            // بناء عرض السؤال الكامل
-                            let questionDetails = `
-                                <div class="bg-gray-50 p-6 rounded-lg border-r-4 ${answer.isCorrect ? 'border-green-500' : 'border-red-500'} mb-6">
-                                    <div class="flex items-start justify-between mb-4">
-                                        <h4 class="text-xl font-bold text-gray-800">
-                                            <span class="bg-gray-500 text-white rounded-full w-8 h-8 inline-flex items-center justify-center ml-2 text-sm">
-                                                ${index + 1}
-                                            </span>
-                                            ${question.text}
-                                        </h4>
-                                        <span class="text-2xl ${answer.isCorrect ? 'text-green-500' : 'text-red-500'}">
-                                            <i class="fas fa-${answer.isCorrect ? 'check-circle' : 'times-circle'}"></i>
-                                        </span>
-                                    </div>
-                                    ${question.imageUrl ? `<img src="${question.imageUrl}" class="mt-2 mb-4 rounded-lg max-w-full h-auto" alt="صورة السؤال">` : ''}
-                                    <div class="mb-4">
-                                        <h5 class="text-lg font-semibold text-gray-700 mb-2">السؤال:</h5>
-                                        <div class="bg-white p-4 rounded-lg border border-gray-200">
-                            `;
-
-                            // عرض السؤال حسب نوعه
-                            if (question.type === 'multiple') {
-                                questionDetails += `
-                                    <div class="space-y-2">
-                                        ${question.options.map((option, optIndex) => `
-                                            <div class="flex items-center p-2 rounded ${optIndex === answer.correctAnswer ? 'bg-green-50 border border-green-200' : ''}">
-                                                <span class="w-6 h-6 flex items-center justify-center rounded-full ${optIndex === answer.correctAnswer ? 'bg-green-500 text-white' : 'bg-gray-200'} mr-2">
-                                                    ${String.fromCharCode(1632 + optIndex + 1)}
-                                                </span>
-                                                <span class="${parseInt(answer.studentAnswer) === optIndex ? (answer.isCorrect ? 'text-green-700 font-bold' : 'text-red-700 font-bold') : ''}">
-                                                    ${option}
-                                                </span>
-                                                ${optIndex === answer.correctAnswer ? '<span class="text-green-500 text-sm mr-2"><i class="fas fa-check ml-1"></i> الإجابة الصحيحة</span>' : ''}
-                                                ${parseInt(answer.studentAnswer) === optIndex && !answer.isCorrect ? '<span class="text-red-500 text-sm mr-2"><i class="fas fa-times ml-1"></i> إجابتك</span>' : ''}
-                                            </div>
-                                        `).join('')}
-                                    </div>
-                                `;
-                            } else if (question.type === 'boolean') {
-                                questionDetails += `
-                                    <div class="flex gap-4">
-                                        <div class="flex-1 p-3 rounded-lg border ${answer.correctAnswer ? 'border-green-200 bg-green-50' : 'border-gray-200'}">
-                                            <div class="flex items-center justify-between">
-                                                <span>صحيح</span>
-                                                ${answer.correctAnswer ? '<span class="text-green-500"><i class="fas fa-check"></i></span>' : ''}
-                                            </div>
-                                        </div>
-                                        <div class="flex-1 p-3 rounded-lg border ${!answer.correctAnswer ? 'border-green-200 bg-green-50' : 'border-gray-200'}">
-                                            <div class="flex items-center justify-between">
-                                                <span>خطأ</span>
-                                                ${!answer.correctAnswer ? '<span class="text-green-500"><i class="fas fa-check"></i></span>' : ''}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="mt-3 text-sm text-gray-600">
-                                        إجابتك كانت: <span class="${answer.isCorrect ? 'text-green-600 font-bold' : 'text-red-600 font-bold'}">${studentAnswerText}</span>
-                                    </div>
-                                `;
-                            } else if (question.type === 'text') {
-                                questionDetails += `
-                                    <div class="space-y-3">
-                                        <div class="bg-white p-3 rounded border border-gray-200">
-                                            <div class="text-sm font-medium text-gray-600 mb-1">إجابتك:</div>
-                                            <div class="text-lg ${answer.isCorrect ? 'text-green-700' : 'text-red-700'}">${studentAnswerText}</div>
-                                        </div>
-                                        <div class="bg-white p-3 rounded border border-gray-200">
-                                            <div class="text-sm font-medium text-gray-600 mb-1">الإجابة الصحيحة:</div>
-                                            <div class="text-lg text-green-700">${correctAnswerText}</div>
-                                        </div>
-                                    </div>
-                                `;
-                            }
-
-                            questionDetails += `
-                                        </div>
-                                    </div>
-                                    ${answer.explanation ? `
-                                        <div class="bg-blue-50 border border-blue-200 p-3 rounded-lg mt-4">
-                                            <div class="text-sm font-medium text-blue-700 mb-1">هامش توضيحي:</div>
-                                            <p class="text-blue-800">${answer.explanation}</p>
-                                        </div>
-                                    ` : ''}
-                                    <div class="bg-${answer.isCorrect ? 'green' : 'red'}-50 p-3 rounded-lg border border-${answer.isCorrect ? 'green' : 'red'}-200 mt-4">
-                                        <div class="flex items-center">
-                                            <i class="fas fa-${answer.isCorrect ? 'check-circle text-green-500' : 'times-circle text-red-500'} ml-2"></i>
-                                            <span class="text-${answer.isCorrect ? 'green' : 'red'}-700">
-                                                ${answer.isCorrect ? 'إجابة صحيحة' : 'إجابة خاطئة'}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            `;
-
-                            return questionDetails;
-                        }).join('')}
-                    </div>
-
-                    <div class="text-center">
-                        <button onclick="window.close()" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold transition">
-                            <i class="fas fa-times ml-2"></i>إغلاق النافذة
-                        </button>
+            if (!quiz || allResults.length === 0) {
+                document.getElementById('resultsContent').innerHTML = `
+                    <div class="text-center py-8">
+                        <i class="fas fa-chart-bar text-gray-400 text-6xl mb-4"></i>
+                        <h2 class="text-2xl font-bold text-gray-800 mb-2">لا توجد نتائج</h2>
+                        <p class="text-gray-600">لم يتم العثور على نتائج لهذا الكويز</p>
                     </div>
                 `;
-
-                document.getElementById('resultsContent').innerHTML = resultsHTML;
-                window.showResultsPage(); // Call global function
-            } catch (e) {
-                console.error("Error showing results: ", e);
-                showModal("فشل في عرض النتائج. يرجى المحاولة مرة أخرى.");
-            } finally {
-                hideLoading();
+                showResultsPage();
+                return;
             }
-        };
 
-        window.viewQuizResults = async function(quizId) {
-            showLoading();
-            try {
-                const quizDocRef = doc(db, `artifacts/${appId}/public/data/quizzes`, quizId);
-                const quizDocSnap = await getDoc(quizDocRef);
+            // أحدث نتيجة للطالب
+            const latestResult = allResults[allResults.length - 1];
 
-                if (!quizDocSnap.exists()) {
-                    showModal('الكويز المراد عرض نتائجه غير موجود.');
-                    hideLoading();
-                    return;
-                }
-                const quiz = { id: quizDocSnap.id, ...quizDocSnap.data() };
-
-                const q = query(collection(db, `artifacts/${appId}/public/data/quizResults`), where("quizId", "==", quizId));
-                const querySnapshot = await getDocs(q);
-                const allResults = [];
-                querySnapshot.forEach((doc) => {
-                    allResults.push(doc.data());
-                });
-
-                if (allResults.length === 0) {
-                    showModal('لا توجد نتائج لهذا الكويز بعد');
-                    hideLoading();
-                    return;
-                }
-
-                // إحصائيات عامة
-                const totalAttempts = allResults.length;
-                const avgScore = Math.round(allResults.reduce((sum, result) => sum + result.score, 0) / totalAttempts);
-                const passCount = allResults.filter(result => result.score >= 60).length;
-
-                const statsHTML = `
-                    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onclick="closeStatsModal(event)">
-                        <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto m-4" onclick="event.stopPropagation()">
-                            <div class="p-6 border-b border-gray-200">
-                                <div class="flex justify-between items-center">
-                                    <h2 class="text-2xl font-bold text-gray-800">
-                                        <i class="fas fa-chart-line text-blue-500 ml-2"></i>
-                                        إحصائيات الكويز: ${quiz.title}
-                                    </h2>
-                                    <button onclick="closeStatsModal()" class="text-gray-500 hover:text-gray-700">
-                                        <i class="fas fa-times text-2xl"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <div class="p-6">
-                                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
-                                        <div class="text-2xl font-bold text-blue-600">${totalAttempts}</div>
-                                        <div class="text-sm text-gray-600">محاولات إجمالية</div>
-                                    </div>
-                                    <div class="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
-                                        <div class="text-2xl font-bold text-green-600">${avgScore}%</div>
-                                        <div class="text-sm text-gray-600">متوسط الدرجات</div>
-                                    </div>
-                                    <div class="bg-purple-50 border border-purple-200 rounded-lg p-4 text-center">
-                                        <div class="text-2xl font-bold text-purple-600">${passCount}</div>
-                                        <div class="text-sm text-gray-600">نجحوا (60%+)</div>
-                                    </div>
-                                    <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 text-center">
-                                        <div class="text-2xl font-bold text-orange-600">${totalAttempts - passCount}</div>
-                                        <div class="text-sm text-gray-600">لم ينجحوا</div>
-                                    </div>
-                                </div>
-
-                            <h3 class="text-xl font-bold text-gray-800 mb-4">جميع المحاولات</h3>
-            <div class="space-y-3 max-h-96 overflow-y-auto">
-                ${allResults.map((result, index) => `
-                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <div class="font-semibold text-gray-800">${result.studentName || 'طالب'}</div>
-                                <div class="text-sm text-gray-600">محاولة #${index + 1} - ${result.submittedAt}</div>
-                            </div>
-                            <div class="text-left">
-                                <div class="text-2xl font-bold ${result.score >= 60 ? 'text-green-600' : 'text-red-600'}">${result.score}%</div>
-                                <div class="text-sm text-gray-600">${result.correctAnswers}/${result.totalQuestions}</div>
-                            </div>
-                        </div>
-                    </div>
-                `).join('')}
+          let resultsHTML = `
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full ${latestResult.score >= 60 ? 'bg-green-100' : 'bg-red-100'} mb-4">
+                <i class="fas fa-${latestResult.score >= 60 ? 'check' : 'times'} text-3xl ${latestResult.score >= 60 ? 'text-green-500' : 'text-red-500'}"></i>
             </div>
-                            </div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">نتيجة الكويز</h1>
+            <h2 class="text-xl text-gray-600 mb-4">${latestResult.quizTitle}</h2>
+            <div class="bg-gray-100 p-3 rounded-lg inline-block mb-4">
+                <i class="fas fa-user ml-2"></i>
+                اسم الطالب: ${latestResult.studentName}
+            </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <div class="text-2xl font-bold text-blue-600">${latestResult.score}%</div>
+                            <div class="text-sm text-gray-600">النسبة المئوية</div>
+                        </div>
+                        <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                            <div class="text-2xl font-bold text-green-600">${latestResult.correctAnswers}</div>
+                            <div class="text-sm text-gray-600">إجابات صحيحة</div>
+                        </div>
+                        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                            <div class="text-2xl font-bold text-gray-600">${latestResult.totalQuestions}</div>
+                            <div class="text-sm text-gray-600">إجمالي الأسئلة</div>
                         </div>
                     </div>
-                `;
+                </div>
 
-                document.body.insertAdjacentHTML('beforeend', statsHTML);
-            } catch (e) {
-                console.error("Error viewing quiz results: ", e);
-                showModal("فشل في عرض الإحصائيات. يرجى المحاولة مرة أخرى.");
-            } finally {
-                hideLoading();
+                <div class="mb-6">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">مراجعة الإجابات</h3>
+                    ${latestResult.answers.map((answer, index) => {
+                        let correctAnswerText = '';
+                        const question = quiz.questions.find(q => q.id == answer.questionId);
+
+                        if (answer.questionType === 'multiple') {
+                            correctAnswerText = quiz.questions.find(q => q.id == answer.questionId).options[answer.correctAnswer];
+                        } else if (answer.questionType === 'boolean') {
+                            correctAnswerText = answer.correctAnswer ? 'صحيح' : 'خطأ';
+                        } else {
+                            correctAnswerText = answer.correctAnswer;
+                        }
+
+                        let studentAnswerText = '';
+                        if (answer.questionType === 'multiple') {
+                            studentAnswerText = quiz.questions.find(q => q.id == answer.questionId).options[parseInt(answer.studentAnswer)];
+                        } else if (answer.questionType === 'boolean') {
+                            studentAnswerText = answer.studentAnswer === 'true' ? 'صحيح' : 'خطأ';
+                        } else {
+                            studentAnswerText = answer.studentAnswer;
+                        }
+
+                        return `
+                            <div class="bg-gray-50 p-6 rounded-lg border-r-4 ${answer.isCorrect ? 'border-green-500' : 'border-red-500'} mb-4">
+                                <div class="flex items-start justify-between mb-3">
+                                    <h4 class="text-lg font-semibold text-gray-800">
+                                        <span class="bg-gray-500 text-white rounded-full w-8 h-8 inline-flex items-center justify-center ml-2 text-sm">
+                                            ${index + 1}
+                                        </span>
+                                        ${answer.questionText}
+                                    </h4>
+                                    <span class="text-2xl ${answer.isCorrect ? 'text-green-500' : 'text-red-500'}">
+                                        <i class="fas fa-${answer.isCorrect ? 'check-circle' : 'times-circle'}"></i>
+                                    </span>
+                                </div>
+                                ${question.imageUrl ? `<img src="${question.imageUrl}" class="mt-2 mb-4 rounded-lg max-w-full h-auto" alt="صورة السؤال">` : ''}
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="bg-white p-3 rounded border">
+                                        <div class="text-sm font-medium text-gray-600 mb-1">إجابتك:</div>
+                                        <div class="text-lg ${answer.isCorrect ? 'text-green-700' : 'text-red-700'}">${studentAnswerText}</div>
+                                    </div>
+                                    <div class="bg-white p-3 rounded border">
+                                        <div class="text-sm font-medium text-gray-600 mb-1">الإجابة الصحيحة:</div>
+                                        <div class="text-lg text-green-700">${correctAnswerText}</div>
+                                    </div>
+                                </div>
+                                ${answer.explanation ? `
+                                    <div class="bg-blue-50 border border-blue-200 p-3 rounded-lg mt-4">
+                                        <div class="text-sm font-medium text-blue-700 mb-1">هامش توضيحي:</div>
+                                        <p class="text-blue-800">${answer.explanation}</p>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+
+                <div class="text-center">
+                    <button onclick="window.close()" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold transition">
+                        <i class="fas fa-times ml-2"></i>إغلاق النافذة
+                    </button>
+                </div>
+            `;
+
+            document.getElementById('resultsContent').innerHTML = resultsHTML;
+            showResultsPage();
+        }
+
+        function viewQuizResults(quizId) {
+            const allResults = JSON.parse(localStorage.getItem('quiz_results_' + quizId) || '[]');
+            const savedQuizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+            const quiz = savedQuizzes.find(q => q.id === quizId);
+
+            if (allResults.length === 0) {
+                alert('لا توجد نتائج لهذا الكويز بعد');
+                return;
             }
-        };
 
-        window.closeStatsModal = function(event) {
+            // إحصائيات عامة
+            const totalAttempts = allResults.length;
+            const avgScore = Math.round(allResults.reduce((sum, result) => sum + result.score, 0) / totalAttempts);
+            const passCount = allResults.filter(result => result.score >= 60).length;
+
+            const statsHTML = `
+                <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onclick="closeStatsModal(event)">
+                    <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto m-4" onclick="event.stopPropagation()">
+                        <div class="p-6 border-b border-gray-200">
+                            <div class="flex justify-between items-center">
+                                <h2 class="text-2xl font-bold text-gray-800">
+                                    <i class="fas fa-chart-line text-blue-500 ml-2"></i>
+                                    إحصائيات الكويز: ${quiz.title}
+                                </h2>
+                                <button onclick="closeStatsModal()" class="text-gray-500 hover:text-gray-700">
+                                    <i class="fas fa-times text-2xl"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="p-6">
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
+                                    <div class="text-2xl font-bold text-blue-600">${totalAttempts}</div>
+                                    <div class="text-sm text-gray-600">محاولات إجمالية</div>
+                                </div>
+                                <div class="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
+                                    <div class="text-2xl font-bold text-green-600">${avgScore}%</div>
+                                    <div class="text-sm text-gray-600">متوسط الدرجات</div>
+                                </div>
+                                <div class="bg-purple-50 border border-purple-200 rounded-lg p-4 text-center">
+                                    <div class="text-2xl font-bold text-purple-600">${passCount}</div>
+                                    <div class="text-sm text-gray-600">نجحوا (60%+)</div>
+                                </div>
+                                <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 text-center">
+                                    <div class="text-2xl font-bold text-orange-600">${totalAttempts - passCount}</div>
+                                    <div class="text-sm text-gray-600">لم ينجحوا</div>
+                                </div>
+                            </div>
+
+                          <h3 class="text-xl font-bold text-gray-800 mb-4">جميع المحاولات</h3>
+        <div class="space-y-3 max-h-96 overflow-y-auto">
+            ${allResults.map((result, index) => `
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <div class="font-semibold text-gray-800">${result.studentName || 'طالب'}</div>
+                            <div class="text-sm text-gray-600">محاولة #${index + 1} - ${result.submittedAt}</div>
+                        </div>
+                        <div class="text-left">
+                            <div class="text-2xl font-bold ${result.score >= 60 ? 'text-green-600' : 'text-red-600'}">${result.score}%</div>
+                            <div class="text-sm text-gray-600">${result.correctAnswers}/${result.totalQuestions}</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.body.insertAdjacentHTML('beforeend', statsHTML);
+        }
+
+        function closeStatsModal(event) {
             if (event && event.target.closest('.bg-white')) return;
             document.querySelector('.fixed.inset-0').remove();
-        };
+        }
+
+        // منع الوصول للصفحة الرئيسية من صفحة الطالب
+        window.addEventListener('popstate', function(event) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const quizId = urlParams.get('quiz');
+            const results = urlParams.get('results');
+            
+            if (results && quizId) {
+                showResults(quizId);
+            } else if (quizId) {
+                loadQuizForStudent(quizId);
+            } else {
+                showTeacherPage();
+            }
+        });
 
         // منع الانتقال بالأزرار
         document.addEventListener('keydown', function(event) {
@@ -1230,5 +877,192 @@
             }
         });
     </script>
+    <script>
+    function showResults(quizId) {
+        const savedQuizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+        const quiz = savedQuizzes.find(q => q.id === quizId);
+        const allResults = JSON.parse(localStorage.getItem('quiz_results_' + quizId) || '[]');
+        
+        if (!quiz || allResults.length === 0) {
+            document.getElementById('resultsContent').innerHTML = `
+                <div class="text-center py-8">
+                    <i class="fas fa-chart-bar text-gray-400 text-6xl mb-4"></i>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">لا توجد نتائج</h2>
+                    <p class="text-gray-600">لم يتم العثور على نتائج لهذا الكويز</p>
+                </div>
+            `;
+            showResultsPage();
+            return;
+        }
+
+        // أحدث نتيجة للطالب
+        const latestResult = allResults[allResults.length - 1];
+
+        let resultsHTML = `
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-20 h-20 rounded-full ${latestResult.score >= 60 ? 'bg-green-100' : 'bg-red-100'} mb-4">
+                    <i class="fas fa-${latestResult.score >= 60 ? 'check' : 'times'} text-3xl ${latestResult.score >= 60 ? 'text-green-500' : 'text-red-500'}"></i>
+                </div>
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">نتيجة الكويز</h1>
+                <h2 class="text-xl text-gray-600 mb-4">${latestResult.quizTitle}</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div class="text-2xl font-bold text-blue-600">${latestResult.score}%</div>
+                        <div class="text-sm text-gray-600">النسبة المئوية</div>
+                    </div>
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <div class="text-2xl font-bold text-green-600">${latestResult.correctAnswers}</div>
+                        <div class="text-sm text-gray-600">إجابات صحيحة</div>
+                    </div>
+                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                        <div class="text-2xl font-bold text-gray-600">${latestResult.totalQuestions}</div>
+                        <div class="text-sm text-gray-600">إجمالي الأسئلة</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">تفاصيل الإجابات</h3>
+                ${latestResult.answers.map((answer, index) => {
+                    const question = quiz.questions.find(q => q.id == answer.questionId);
+                    
+                    let correctAnswerText = '';
+                    if (question.type === 'multiple') {
+                        correctAnswerText = question.options[answer.correctAnswer];
+                    } else if (question.type === 'boolean') {
+                        correctAnswerText = answer.correctAnswer ? 'صحيح' : 'خطأ';
+                    } else {
+                        correctAnswerText = answer.correctAnswer;
+                    }
+
+                    let studentAnswerText = '';
+                    if (question.type === 'multiple') {
+                        studentAnswerText = question.options[parseInt(answer.studentAnswer)] || 'لم يتم الإجابة';
+                    } else if (question.type === 'boolean') {
+                        studentAnswerText = answer.studentAnswer === 'true' ? 'صحيح' : 'خطأ';
+                    } else {
+                        studentAnswerText = answer.studentAnswer || 'لم يتم الإجابة';
+                    }
+
+                    // بناء عرض السؤال الكامل
+                    let questionDetails = `
+                        <div class="bg-gray-50 p-6 rounded-lg border-r-4 ${answer.isCorrect ? 'border-green-500' : 'border-red-500'} mb-6">
+                            <div class="flex items-start justify-between mb-4">
+                                <h4 class="text-xl font-bold text-gray-800">
+                                    <span class="bg-gray-500 text-white rounded-full w-8 h-8 inline-flex items-center justify-center ml-2 text-sm">
+                                        ${index + 1}
+                                    </span>
+                                    ${question.text}
+                                </h4>
+                                <span class="text-2xl ${answer.isCorrect ? 'text-green-500' : 'text-red-500'}">
+                                    <i class="fas fa-${answer.isCorrect ? 'check-circle' : 'times-circle'}"></i>
+                                </span>
+                            </div>
+                            ${question.imageUrl ? `<img src="${question.imageUrl}" class="mt-2 mb-4 rounded-lg max-w-full h-auto" alt="صورة السؤال">` : ''}
+                            <div class="mb-4">
+                                <h5 class="text-lg font-semibold text-gray-700 mb-2">السؤال:</h5>
+                                <div class="bg-white p-4 rounded-lg border border-gray-200">
+                    `;
+
+                    // عرض السؤال حسب نوعه
+                    if (question.type === 'multiple') {
+                        questionDetails += `
+                            <div class="space-y-2">
+                                ${question.options.map((option, optIndex) => `
+                                    <div class="flex items-center p-2 rounded ${optIndex === answer.correctAnswer ? 'bg-green-50 border border-green-200' : ''}">
+                                        <span class="w-6 h-6 flex items-center justify-center rounded-full ${optIndex === answer.correctAnswer ? 'bg-green-500 text-white' : 'bg-gray-200'} mr-2">
+                                            ${String.fromCharCode(1632 + optIndex + 1)}
+                                        </span>
+                                        <span class="${parseInt(answer.studentAnswer) === optIndex ? (answer.isCorrect ? 'text-green-700 font-bold' : 'text-red-700 font-bold') : ''}">
+                                            ${option}
+                                        </span>
+                                        ${optIndex === answer.correctAnswer ? '<span class="text-green-500 text-sm mr-2"><i class="fas fa-check ml-1"></i> الإجابة الصحيحة</span>' : ''}
+                                        ${parseInt(answer.studentAnswer) === optIndex && !answer.isCorrect ? '<span class="text-red-500 text-sm mr-2"><i class="fas fa-times ml-1"></i> إجابتك</span>' : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `;
+                    } else if (question.type === 'boolean') {
+                        questionDetails += `
+                            <div class="flex gap-4">
+                                <div class="flex-1 p-3 rounded-lg border ${answer.correctAnswer ? 'border-green-200 bg-green-50' : 'border-gray-200'}">
+                                    <div class="flex items-center justify-between">
+                                        <span>صحيح</span>
+                                        ${answer.correctAnswer ? '<span class="text-green-500"><i class="fas fa-check"></i></span>' : ''}
+                                    </div>
+                                </div>
+                                <div class="flex-1 p-3 rounded-lg border ${!answer.correctAnswer ? 'border-green-200 bg-green-50' : 'border-gray-200'}">
+                                    <div class="flex items-center justify-between">
+                                        <span>خطأ</span>
+                                        ${!answer.correctAnswer ? '<span class="text-green-500"><i class="fas fa-check"></i></span>' : ''}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-3 text-sm text-gray-600">
+                                إجابتك كانت: <span class="${answer.isCorrect ? 'text-green-600 font-bold' : 'text-red-600 font-bold'}">${studentAnswerText}</span>
+                            </div>
+                        `;
+                    } else if (question.type === 'text') {
+                        questionDetails += `
+                            <div class="space-y-3">
+                                <div class="bg-white p-3 rounded border border-gray-200">
+                                    <div class="text-sm font-medium text-gray-600 mb-1">إجابتك:</div>
+                                    <div class="text-lg ${answer.isCorrect ? 'text-green-700' : 'text-red-700'}">${studentAnswerText}</div>
+                                </div>
+                                <div class="bg-white p-3 rounded border border-gray-200">
+                                    <div class="text-sm font-medium text-gray-600 mb-1">الإجابة الصحيحة:</div>
+                                    <div class="text-lg text-green-700">${correctAnswerText}</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    questionDetails += `
+                                </div>
+                            </div>
+                            ${answer.explanation ? `
+                                <div class="bg-blue-50 border border-blue-200 p-3 rounded-lg mt-4">
+                                    <div class="text-sm font-medium text-blue-700 mb-1">هامش توضيحي:</div>
+                                    <p class="text-blue-800">${answer.explanation}</p>
+                                </div>
+                            ` : ''}
+                            <div class="bg-${answer.isCorrect ? 'green' : 'red'}-50 p-3 rounded-lg border border-${answer.isCorrect ? 'green' : 'red'}-200 mt-4">
+                                <div class="flex items-center">
+                                    <i class="fas fa-${answer.isCorrect ? 'check-circle text-green-500' : 'times-circle text-red-500'} ml-2"></i>
+                                    <span class="text-${answer.isCorrect ? 'green' : 'red'}-700">
+                                        ${answer.isCorrect ? 'إجابة صحيحة' : 'إجابة خاطئة'}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    return questionDetails;
+                }).join('')}
+            </div>
+
+            <div class="text-center">
+                <button onclick="window.close()" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold transition">
+                    <i class="fas fa-times ml-2"></i>إغلاق النافذة
+                </button>
+            </div>
+        `;
+
+        document.getElementById('resultsContent').innerHTML = resultsHTML;
+        showResultsPage();
+    }
+    function startQuiz() {
+    const studentName = document.getElementById('studentName').value;
+    if (!studentName.trim()) {
+        alert('يرجى إدخال اسم الطالب');
+        return;
+    }
+    
+    studentAnswers.studentName = studentName;
+    document.getElementById('studentInfoForm').classList.add('hidden');
+    document.getElementById('quizContent').classList.remove('hidden');
+}
+</script>
 </body>
 </html>
