@@ -286,12 +286,13 @@
             const editQuizId = document.getElementById('editQuizId').value;
 
             if (!title.trim()) {
-                alert('يرجى إدخال عنوان الكويز');
+                // استخدام مربع رسالة مخصص بدلاً من alert
+                showMessageBox('يرجى إدخال عنوان الكويز');
                 return;
             }
 
             if (questions.length === 0) {
-                alert('يرجى إضافة سؤال واحد على الأقل');
+                showMessageBox('يرجى إضافة سؤال واحد على الأقل');
                 return;
             }
 
@@ -311,7 +312,7 @@
                 let imageUrl = '';
 
                 if (!questionText.trim()) {
-                    alert('يرجى ملء جميع الأسئلة');
+                    showMessageBox('يرجى ملء جميع الأسئلة');
                     return;
                 }
 
@@ -338,7 +339,7 @@
                     const correctAnswer = questionDiv.querySelector('input[name="correct-' + q.id + '"]:checked');
                     
                     if (!correctAnswer) {
-                        alert('يرجى اختيار الإجابة الصحيحة لجميع الأسئلة');
+                        showMessageBox('يرجى اختيار الإجابة الصحيحة لجميع الأسئلة');
                         return;
                     }
 
@@ -348,7 +349,7 @@
                     const correctAnswer = questionDiv.querySelector('input[name="correct-' + q.id + '"]:checked');
                     
                     if (!correctAnswer) {
-                        alert('يرجى اختيار الإجابة الصحيحة لجميع الأسئلة');
+                        showMessageBox('يرجى اختيار الإجابة الصحيحة لجميع الأسئلة');
                         return;
                         }
 
@@ -357,7 +358,7 @@
                     const correctText = questionDiv.querySelector('.correct-text').value;
                     
                     if (!correctText.trim()) {
-                        alert('يرجى إدخال الإجابة الصحيحة لجميع الأسئلة');
+                        showMessageBox('يرجى إدخال الإجابة الصحيحة لجميع الأسئلة');
                         return;
                     }
 
@@ -367,7 +368,7 @@
                 quiz.questions.push(questionData);
             }
 
-            // حفظ الكويز في localStorage
+            // حفظ الكويز في localStorage (لصفحة المعلم)
             let savedQuizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
 
             if (editQuizId) {
@@ -380,7 +381,7 @@
             
             localStorage.setItem('quizzes', JSON.stringify(savedQuizzes));
 
-            alert('تم حفظ الكويز بنجاح!');
+            showMessageBox('تم حفظ الكويز بنجاح!');
             
             // إعادة تعيين النموذج
             clearQuizForm();
@@ -445,7 +446,7 @@
             const quizToEdit = savedQuizzes.find(q => q.id === quizId);
 
             if (!quizToEdit) {
-                alert('الكويز المراد تعديله غير موجود.');
+                showMessageBox('الكويز المراد تعديله غير موجود.');
                 return;
             }
 
@@ -467,14 +468,28 @@
 
 
         function copyQuizLink(quizId) {
+            // حفظ الكويز في sessionStorage عند مشاركة الرابط
+            const savedQuizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+            const quizToShare = savedQuizzes.find(q => q.id === quizId);
+            if (quizToShare) {
+                sessionStorage.setItem('sharedQuiz', JSON.stringify(quizToShare));
+            }
+
             const link = window.location.origin + window.location.pathname + '?quiz=' + quizId;
-            navigator.clipboard.writeText(link).then(() => {
-                alert('تم نسخ الرابط! يمكنك مشاركته مع الطلاب');
-            });
+            // استخدام execCommand('copy') بدلاً من navigator.clipboard.writeText لدعم أوسع في بيئات iframes
+            const tempInput = document.createElement('input');
+            tempInput.value = link;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            
+            showMessageBox('تم نسخ الرابط! يمكنك مشاركته مع الطلاب');
         }
 
         function deleteQuiz(quizId) {
-            if (confirm('هل أنت متأكد من حذف هذا الكويز؟')) {
+            // استخدام مربع رسالة مخصص بدلاً من confirm
+            showConfirmBox('هل أنت متأكد من حذف هذا الكويز؟', () => {
                 let savedQuizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
                 savedQuizzes = savedQuizzes.filter(quiz => quiz.id !== quizId);
                 localStorage.setItem('quizzes', JSON.stringify(savedQuizzes));
@@ -483,13 +498,21 @@
                 localStorage.removeItem('quiz_results_' + quizId);
                 
                 loadSavedQuizzes();
-                alert('تم حذف الكويز بنجاح');
-            }
+                showMessageBox('تم حذف الكويز بنجاح');
+            });
         }
 
         function loadQuizForStudent(quizId) {
-            const savedQuizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
-            const quiz = savedQuizzes.find(q => q.id === quizId);
+            // محاولة تحميل الكويز من sessionStorage أولاً
+            let quiz = null;
+            const sharedQuiz = JSON.parse(sessionStorage.getItem('sharedQuiz'));
+            if (sharedQuiz && sharedQuiz.id === quizId) {
+                quiz = sharedQuiz;
+            } else {
+                // إذا لم يتم العثور عليه في sessionStorage، ابحث في localStorage
+                const savedQuizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+                quiz = savedQuizzes.find(q => q.id === quizId);
+            }
 
             if (!quiz) {
                 document.getElementById('quizContent').innerHTML = `
@@ -583,7 +606,7 @@
     function submitStudentQuiz() {
     const studentName = studentAnswers.studentName;
     if (!studentName) {
-        alert('حدث خطأ في بيانات الطالب، يرجى إعادة تحميل الصفحة');
+        showMessageBox('حدث خطأ في بيانات الطالب، يرجى إعادة تحميل الصفحة');
         return;
     }
 
@@ -601,7 +624,7 @@
             });
 
             if (!allAnswered) {
-                alert('يرجى الإجابة على جميع الأسئلة قبل الإرسال');
+                showMessageBox('يرجى الإجابة على جميع الأسئلة قبل الإرسال');
                 return;
             }
 
@@ -646,7 +669,7 @@
             results.correctAnswers = correctAnswers;
             results.score = Math.round((correctAnswers / currentQuiz.questions.length) * 100);
 
-            // حفظ النتيجة
+            // حفظ النتيجة في localStorage
             const existingResults = JSON.parse(localStorage.getItem('quiz_results_' + currentQuiz.id) || '[]');
             existingResults.push(results);
             localStorage.setItem('quiz_results_' + currentQuiz.id, JSON.stringify(existingResults));
@@ -777,7 +800,7 @@
             const quiz = savedQuizzes.find(q => q.id === quizId);
 
             if (allResults.length === 0) {
-                alert('لا توجد نتائج لهذا الكويز بعد');
+                showMessageBox('لا توجد نتائج لهذا الكويز بعد');
                 return;
             }
 
@@ -876,6 +899,35 @@
                 location.reload();
             }
         });
+
+        // دالة لعرض مربع رسالة مخصص بدلاً من alert
+        function showMessageBox(message) {
+            const modalHTML = `
+                <div id="customAlertModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full text-center">
+                        <p class="text-gray-800 text-lg mb-4">${message}</p>
+                        <button onclick="document.getElementById('customAlertModal').remove()" class="btn-primary text-white px-6 py-2 rounded-lg font-semibold transition">حسناً</button>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+        }
+
+        // دالة لعرض مربع تأكيد مخصص بدلاً من confirm
+        function showConfirmBox(message, onConfirm) {
+            const modalHTML = `
+                <div id="customConfirmModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full text-center">
+                        <p class="text-gray-800 text-lg mb-4">${message}</p>
+                        <div class="flex justify-center gap-4">
+                            <button onclick="document.getElementById('customConfirmModal').remove(); ${onConfirm.name}();" class="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg font-semibold transition">نعم</button>
+                            <button onclick="document.getElementById('customConfirmModal').remove()" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-semibold transition">إلغاء</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+        }
     </script>
     <script>
     function showResults(quizId) {
@@ -1055,7 +1107,7 @@
     function startQuiz() {
     const studentName = document.getElementById('studentName').value;
     if (!studentName.trim()) {
-        alert('يرجى إدخال اسم الطالب');
+        showMessageBox('يرجى إدخال اسم الطالب');
         return;
     }
     
