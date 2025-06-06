@@ -10,23 +10,50 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     
     <style>
+        /* Base font for body, ensuring good readability */
         body {
             font-family: 'Tajawal', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+        /* Heading font for a more distinct look */
         h1, h2, h3, h4, h5, h6 {
             font-family: 'Amiri', serif;
         }
+        /* Form styling to center and limit width */
         #studentInfoForm {
             max-width: 600px;
             margin: 0 auto;
         }
-        .quiz-container { max-width: 800px; margin: 0 auto; }
-        .question-card { transition: all 0.3s ease; }
-        .question-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
-        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        .btn-primary:hover { background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%); }
-        .student-mode { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-        .teacher-mode { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        /* Quiz container styling for better readability */
+        .quiz-container { 
+            max-width: 800px; 
+            margin: 0 auto; 
+        }
+        /* Question card transition for smooth hover effects */
+        .question-card { 
+            transition: all 0.3s ease; 
+        }
+        /* Hover effect for question cards */
+        .question-card:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15); 
+        }
+        /* Primary button gradient style */
+        .btn-primary { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+        }
+        /* Primary button hover effect */
+        .btn-primary:hover { 
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%); 
+        }
+        /* Student mode background gradient */
+        .student-mode { 
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); 
+        }
+        /* Teacher mode background gradient */
+        .teacher-mode { 
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); 
+        }
+        /* Loader spinner animation */
         .loader {
             border: 5px solid #f3f3f3;
             border-top: 5px solid #3498db;
@@ -36,6 +63,7 @@
             animation: spin 1s linear infinite;
             margin: 20px auto;
         }
+        /* Keyframes for spinner animation */
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -43,14 +71,14 @@
     </style>
 </head>
 <body class="bg-gray-100">
-    <!-- صفحة المعلم -->
+    <!-- Teacher Page -->
     <div id="teacherPage" class="hidden">
         <div class="teacher-mode text-white py-8">
             <div class="container mx-auto px-4">
                 <h1 class="text-4xl font-bold text-center mb-2">
                     <i class="fas fa-graduation-cap mr-3"></i>منصة كويزات MET
                 </h1>
-                <p class="text-center text-lg opacity-90">UserID: <span id="userIdDisplay"></span></p>
+                <p class="text-center text-lg opacity-90">معرف المستخدم: <span id="userIdDisplay"></span></p>
             </div>
         </div>
 
@@ -101,13 +129,14 @@
                     <i class="fas fa-list text-green-500 mr-2"></i>الكويزات المحفوظة
                 </h2>
                 <div id="savedQuizzes" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                     <!-- Loader for saved quizzes -->
                      <div class="loader"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- صفحة الطالب -->
+    <!-- Student Page -->
     <div id="studentPage" class="hidden">
         <div class="student-mode text-white py-8">
             <div class="container mx-auto px-4">
@@ -129,12 +158,13 @@
                 </button>
             </div>
             <div id="quizContent" class="bg-white rounded-lg shadow-lg p-6 hidden">
+                 <!-- Loader for quiz content -->
                  <div class="loader"></div>
             </div>
         </div>
     </div>
     
-    <!-- صفحة النتائج -->
+    <!-- Results Page -->
     <div id="resultsPage" class="hidden">
         <div class="student-mode text-white py-8">
             <div class="container mx-auto px-4">
@@ -145,6 +175,7 @@
         </div>
         <div class="quiz-container px-4 py-8">
             <div id="resultsContent" class="bg-white rounded-lg shadow-lg p-6">
+                 <!-- Loader for results content -->
                  <div class="loader"></div>
             </div>
         </div>
@@ -158,42 +189,75 @@
         import { getFirestore, doc, getDoc, setDoc, addDoc, deleteDoc, onSnapshot, collection, query, serverTimestamp, getDocs, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
         // Your web app's Firebase configuration
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        // Ensure __firebase_config is properly parsed. If it's not defined, initialize as an empty object.
+        // Added fallback for firebaseConfig
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "YOUR_API_KEY", // Replace with your actual Firebase API Key if running locally
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Get the application ID, falling back to a default if not defined.
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-quiz-app';
 
         // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        let app;
+        let auth;
+        let db;
+        // Check if firebaseConfig has an apiKey, if not, skip Firebase initialization
+        if (firebaseConfig && firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_API_KEY") {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+        } else {
+            console.warn("Firebase configuration is missing or default. Firebase functions will not work. Please ensure you have a valid Firebase setup if you intend to use data persistence.");
+        }
 
-        let questions = [];
-        let currentQuiz = null;
-        let studentAnswers = {};
-        let userId = null;
-        
+
+        // Global variables to manage quiz state
+        let questions = []; // Stores questions for the currently edited quiz
+        let currentQuiz = null; // Stores the quiz data for the student currently taking it
+        let studentAnswers = {}; // Stores answers submitted by the student
+        let userId = null; // Stores the current user's ID
+
         // --- AUTHENTICATION ---
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                userId = user.uid;
-                console.log("User is signed in with UID:", userId);
-                document.getElementById('userIdDisplay').textContent = userId;
-                initializeAppLogic();
-            } else {
-                console.log("User is not signed in. Attempting to sign in.");
-                try {
-                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                        await signInWithCustomToken(auth, __initial_auth_token);
-                    } else {
-                        await signInAnonymously(auth);
+        // Listen for authentication state changes
+        if (auth) { // Only attempt to listen if auth is initialized
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    // User is signed in
+                    userId = user.uid;
+                    console.log("User is signed in with UID:", userId);
+                    document.getElementById('userIdDisplay').textContent = userId;
+                    // Initialize the application logic after successful authentication
+                    initializeAppLogic();
+                } else {
+                    // User is not signed in, attempt to sign in
+                    console.log("User is not signed in. Attempting to sign in.");
+                    try {
+                        // Use custom token if available, otherwise sign in anonymously
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                            await signInWithCustomToken(auth, __initial_auth_token);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    } catch (error) {
+                        console.error("Error signing in:", error);
+                        // Display a user-friendly error message if authentication fails
+                        document.body.innerHTML = "<h1>Error: Could not authenticate. Please refresh the page.</h1>";
                     }
-                } catch (error) {
-                    console.error("Error signing in:", error);
-                    document.body.innerHTML = "<h1>Error: Could not authenticate. Please refresh the page.</h1>";
                 }
-            }
-        });
+            });
+        } else {
+            // If Firebase is not initialized, proceed with app logic (without Firebase features)
+            initializeAppLogic();
+        }
 
         // --- INITIALIZATION ---
+        // Determines which page to show based on URL parameters
         function initializeAppLogic() {
             const urlParams = new URLSearchParams(window.location.search);
             const quizId = urlParams.get('quiz');
@@ -201,15 +265,18 @@
             const studentAttemptId = urlParams.get('attempt');
 
             if (resultsForStudent && quizId && studentAttemptId) {
+                // If results are requested for a specific student attempt
                 showResultsForStudent(quizId, studentAttemptId);
             } else if (quizId) {
+                // If a quiz ID is present, load the quiz for the student
                 loadQuizForStudent(quizId);
             } else {
+                // Otherwise, show the teacher page by default
                 showTeacherPage();
             }
         }
         
-        // Expose functions to global scope
+        // Expose functions to the global scope to be accessible from HTML
         window.addQuestion = addQuestion;
         window.removeQuestion = removeQuestion;
         window.saveQuiz = saveQuiz;
@@ -224,19 +291,23 @@
 
 
         // --- UI VISIBILITY ---
+        // Function to display the teacher page and hide others
         function showTeacherPage() {
             document.getElementById('teacherPage').classList.remove('hidden');
             document.getElementById('studentPage').classList.add('hidden');
             document.getElementById('resultsPage').classList.add('hidden');
+            // Load saved quizzes when the teacher page is shown
             loadSavedQuizzes();
         }
 
+        // Function to display the student page and hide others
         function showStudentPage() {
             document.getElementById('teacherPage').classList.add('hidden');
             document.getElementById('studentPage').classList.remove('hidden');
             document.getElementById('resultsPage').classList.add('hidden');
         }
 
+        // Function to display the results page and hide others
         function showResultsPage() {
             document.getElementById('teacherPage').classList.add('hidden');
             document.getElementById('studentPage').classList.add('hidden');
@@ -244,12 +315,15 @@
         }
 
         // --- TEACHER: QUIZ CREATION ---
+        // Adds a new question card to the form
         function addQuestion(type, questionData = {}) {
+            // Generate a unique ID for the question if not provided (for new questions)
             const questionId = questionData.id || Date.now();
             const questionDiv = document.createElement('div');
             questionDiv.className = 'question-card bg-gray-50 p-4 rounded-lg border border-gray-200 mb-4';
             questionDiv.id = `question-${questionId}`;
 
+            // Get the current index for display purposes
             const questionIndex = questions.length;
 
             let questionHTML = `
@@ -263,6 +337,7 @@
                 <!-- Image upload is disabled for this version to simplify backend integration -->
             `;
 
+            // Add specific inputs based on question type
             if (type === 'multiple') {
                 questionHTML += `
                     <div class="options-container">
@@ -297,22 +372,31 @@
             questionDiv.innerHTML = questionHTML;
             document.getElementById('questionsContainer').appendChild(questionDiv);
 
+            // Add question to the internal questions array if it's new
             if (!questions.find(q => q.id === questionId)) {
                 questions.push({ id: questionId, type: type });
             }
         }
         
+        // Removes a question card from the form
         function removeQuestion(questionId) {
             document.getElementById(`question-${questionId}`).remove();
+            // Filter out the removed question from the internal array
             questions = questions.filter(q => q.id != questionId);
         }
 
+        // Saves or updates a quiz in Firestore
         async function saveQuiz() {
-            document.getElementById('saveQuizBtn').disabled = true;
+            if (!db) {
+                showMessageBox('وظائف حفظ الكويز غير متاحة. يرجى التأكد من تهيئة Firebase بشكل صحيح.');
+                return;
+            }
+            document.getElementById('saveQuizBtn').disabled = true; // Disable button to prevent multiple clicks
             const title = document.getElementById('quizTitle').value;
             const description = document.getElementById('quizDescription').value;
             const editQuizId = document.getElementById('editQuizId').value;
 
+            // Input validation
             if (!title.trim()) {
                 showMessageBox('يرجى إدخال عنوان الكويز');
                 document.getElementById('saveQuizBtn').disabled = false;
@@ -328,10 +412,11 @@
                 title: title,
                 description: description,
                 creatorId: userId,
-                createdAt: serverTimestamp(),
+                createdAt: serverTimestamp(), // Use server timestamp for consistent creation time
                 questions: [],
             };
 
+            // Iterate through questions to gather their data
             for (const q of questions) {
                 const questionDiv = document.getElementById(`question-${q.id}`);
                 const questionText = questionDiv.querySelector('.question-text').value;
@@ -340,6 +425,7 @@
                     document.getElementById('saveQuizBtn').disabled = false;
                     return;
                 }
+                // Get explanation text if available
                 const explanationText = questionDiv.querySelector('.explanation-text') ? questionDiv.querySelector('.explanation-text').value : '';
 
                 const questionData = {
@@ -349,6 +435,7 @@
                     explanation: explanationText
                 };
 
+                // Handle specific logic for different question types
                 if (q.type === 'multiple') {
                     const options = Array.from(questionDiv.querySelectorAll('.option-text')).map(input => input.value);
                     const correctAnswer = questionDiv.querySelector('input[name="correct-' + q.id + '"]:checked');
@@ -380,33 +467,46 @@
             }
 
             try {
+                // Determine if it's a new quiz or an update
                 const quizId = editQuizId || doc(collection(db, `artifacts/${appId}/public/data/quizzes`)).id;
                 const quizRef = doc(db, `artifacts/${appId}/public/data/quizzes`, quizId);
-                await setDoc(quizRef, quizData, { merge: true }); // Use setDoc with merge for both create and update
+                // Use setDoc with merge: true for both create and update operations
+                await setDoc(quizRef, quizData, { merge: true }); 
                 
                 showMessageBox('تم حفظ الكويز بنجاح!');
-                clearQuizForm();
+                clearQuizForm(); // Clear the form after saving
             } catch (error) {
                 console.error("Error saving quiz: ", error);
                 showMessageBox('حدث خطأ أثناء حفظ الكويز. يرجى المحاولة مرة أخرى.');
             } finally {
-                document.getElementById('saveQuizBtn').disabled = false;
+                document.getElementById('saveQuizBtn').disabled = false; // Re-enable the button
             }
         }
         
+        // Clears the quiz creation form
         function clearQuizForm() {
             document.getElementById('quizTitle').value = '';
             document.getElementById('quizDescription').value = '';
+            // Reset the questions container
             document.getElementById('questionsContainer').innerHTML = '<h3 class="text-lg font-semibold text-gray-700 mb-4">الأسئلة</h3>';
             document.getElementById('editQuizId').value = '';
-            questions = [];
+            questions = []; // Clear the internal questions array
         }
 
+        // Loads and displays saved quizzes for the teacher
         function loadSavedQuizzes() {
-            if (!userId) return;
+            if (!userId || !db) {
+                // If userId or db is not available yet, wait for authentication or Firebase initialization
+                console.log("UserID or Firebase not available, skipping loadSavedQuizzes.");
+                document.getElementById('savedQuizzes').innerHTML = '<p class="text-gray-500 text-center col-span-full">وظائف الكويزات المحفوظة غير متاحة بدون تهيئة Firebase.</p>';
+                return; 
+            }
             const quizzesRef = collection(db, `artifacts/${appId}/public/data/quizzes`);
-            const q = query(quizzesRef); // In a real app with many users, you'd add: where("creatorId", "==", userId)
+            // For a real app with many users, you'd filter by creatorId:
+            // const q = query(quizzesRef, where("creatorId", "==", userId));
+            const q = query(quizzesRef);
             
+            // Listen for real-time updates to the quizzes collection
             onSnapshot(q, (snapshot) => {
                 const container = document.getElementById('savedQuizzes');
                 if (snapshot.empty) {
@@ -414,9 +514,11 @@
                     return;
                 }
 
+                // Map through each quiz document and create HTML for display
                 container.innerHTML = snapshot.docs.map(doc => {
                     const quiz = doc.data();
                     const quizId = doc.id;
+                    // Format creation date for display
                     const readableDate = quiz.createdAt ? new Date(quiz.createdAt.seconds * 1000).toLocaleString('ar-EG') : 'غير محدد';
                     return `
                         <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-200">
@@ -441,7 +543,12 @@
             });
         }
         
+        // Edits an existing quiz by loading its data into the form
         async function editQuiz(quizId) {
+            if (!db) {
+                showMessageBox('وظائف التعديل غير متاحة. يرجى التأكد من تهيئة Firebase بشكل صحيح.');
+                return;
+            }
             try {
                 const quizRef = doc(db, `artifacts/${appId}/public/data/quizzes`, quizId);
                 const docSnap = await getDoc(quizRef);
@@ -451,41 +558,50 @@
                 }
                 const quizToEdit = docSnap.data();
                 
+                // Populate form fields with quiz data
                 document.getElementById('quizTitle').value = quizToEdit.title;
                 document.getElementById('quizDescription').value = quizToEdit.description;
-                document.getElementById('editQuizId').value = quizId;
-                
+                document.getElementById('editQuizId').value = quizId; // Store the ID for updating
+
+                // Clear existing questions and repopulate them
                 document.getElementById('questionsContainer').innerHTML = '<h3 class="text-lg font-semibold text-gray-700 mb-4">الأسئلة</h3>';
-                questions = [];
+                questions = []; // Clear the internal array
                 
-                quizToEdit.questions.forEach(q => addQuestion(q.type, q));
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                quizToEdit.questions.forEach(q => addQuestion(q.type, q)); // Add each question
+                window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to top for better UX
             } catch (error) {
                 console.error("Error fetching quiz for edit:", error);
                 showMessageBox('فشل في تحميل الكويز للتعديل.');
             }
         }
         
+        // Copies the quiz link to the clipboard for sharing
         function copyQuizLink(quizId) {
             const link = `${window.location.origin}${window.location.pathname}?quiz=${quizId}`;
             const tempInput = document.createElement('input');
             tempInput.value = link;
             document.body.appendChild(tempInput);
             tempInput.select();
-            document.execCommand('copy');
+            // Use execCommand for copying as navigator.clipboard.writeText might be restricted in iframes
+            document.execCommand('copy'); 
             document.body.removeChild(tempInput);
             showMessageBox('تم نسخ الرابط! يمكنك مشاركته مع الطلاب');
         }
 
+        // Deletes a quiz from Firestore
         function deleteQuiz(quizId) {
+            if (!db) {
+                showMessageBox('وظائف الحذف غير متاحة. يرجى التأكد من تهيئة Firebase بشكل صحيح.');
+                return;
+            }
             showConfirmBox('هل أنت متأكد من حذف هذا الكويز؟ سيتم حذف جميع نتائجه أيضاً.', async () => {
                 try {
                     const quizRef = doc(db, `artifacts/${appId}/public/data/quizzes`, quizId);
                     await deleteDoc(quizRef);
-                    // Note: Deleting subcollections like results needs more complex logic (e.g., a cloud function)
+                    // Note: Deleting subcollections like results needs more complex logic (e.g., a cloud function).
                     // For this app, we'll just delete the quiz document.
                     showMessageBox('تم حذف الكويز بنجاح');
-                    loadSavedQuizzes(); // Refresh list
+                    loadSavedQuizzes(); // Refresh list after deletion
                 } catch(error) {
                     console.error("Error deleting quiz:", error);
                     showMessageBox("فشل حذف الكويز.");
@@ -494,26 +610,38 @@
         }
 
         // --- STUDENT: TAKING QUIZ ---
+        // Loads a quiz for a student based on quizId from URL
         async function loadQuizForStudent(quizId) {
             showStudentPage();
+            if (!db) {
+                document.getElementById('quizContent').innerHTML = `
+                        <div class="text-center py-8">
+                            <i class="fas fa-exclamation-triangle text-yellow-500 text-6xl mb-4"></i>
+                            <h2 class="text-2xl font-bold text-gray-800 mb-2">وظائف الكويزات غير متاحة</h2>
+                            <p class="text-gray-600">يرجى التأكد من تهيئة Firebase بشكل صحيح لاستخدام هذه الوظيفة.</p>
+                        </div>`;
+                document.getElementById('studentInfoForm').classList.add('hidden');
+                return;
+            }
             try {
                 const quizRef = doc(db, `artifacts/${appId}/public/data/quizzes`, quizId);
                 const docSnap = await getDoc(quizRef);
 
                 if (!docSnap.exists()) {
+                    // Display error if quiz not found
                     document.getElementById('quizContent').innerHTML = `
                         <div class="text-center py-8">
                             <i class="fas fa-exclamation-triangle text-yellow-500 text-6xl mb-4"></i>
                             <h2 class="text-2xl font-bold text-gray-800 mb-2">الكويز غير موجود</h2>
                             <p class="text-gray-600">الرابط الذي تحاول الوصول إليه غير صحيح أو تم حذف الكويز</p>
                         </div>`;
-                    document.getElementById('studentInfoForm').classList.add('hidden');
+                    document.getElementById('studentInfoForm').classList.add('hidden'); // Hide student info form
                     return;
                 }
                 
-                currentQuiz = { id: docSnap.id, ...docSnap.data() };
-                document.getElementById('studentInfoForm').classList.remove('hidden');
-                document.getElementById('quizContent').classList.add('hidden');
+                currentQuiz = { id: docSnap.id, ...docSnap.data() }; // Store current quiz data
+                document.getElementById('studentInfoForm').classList.remove('hidden'); // Show student info form
+                document.getElementById('quizContent').classList.add('hidden'); // Hide quiz content initially
                 document.getElementById('quizContent').innerHTML = ''; // Clear loader
             } catch(error) {
                 console.error("Error loading quiz for student: ", error);
@@ -521,17 +649,23 @@
             }
         }
 
+        // Starts the quiz after student name is entered
         function startQuiz() {
             const studentName = document.getElementById('studentName').value;
             if (!studentName.trim()) {
                 showMessageBox('يرجى إدخال اسم الطالب');
                 return;
             }
-            studentAnswers.studentName = studentName;
-            document.getElementById('studentInfoForm').classList.add('hidden');
-            document.getElementById('quizContent').classList.remove('hidden');
+            if (!currentQuiz) {
+                 showMessageBox('لا يوجد كويز متاح للبدء.');
+                 return;
+            }
+            studentAnswers.studentName = studentName; // Store student name
+            document.getElementById('studentInfoForm').classList.add('hidden'); // Hide student info form
+            document.getElementById('quizContent').classList.remove('hidden'); // Show quiz content
             
             const quiz = currentQuiz;
+            // Generate HTML for the quiz questions
             const quizHTML = `
                 <div class="text-center mb-6">
                     <h1 class="text-3xl font-bold text-gray-800 mb-2">${quiz.title}</h1>
@@ -548,6 +682,7 @@
                                     <span class="bg-blue-500 text-white rounded-full w-8 h-8 inline-flex items-center justify-center ml-2 text-sm">${index + 1}</span>
                                     ${question.text}
                                 </h3>`;
+                        // Render options based on question type
                         if (question.type === 'multiple') {
                             questionHTML += `<div class="space-y-3">${question.options.map((option, optionIndex) => `
                                 <label class="flex items-center p-3 bg-white rounded-lg border border-gray-200 hover:bg-blue-50 cursor-pointer transition">
@@ -578,14 +713,20 @@
             document.getElementById('quizContent').innerHTML = quizHTML;
         }
 
+        // Submits the student's quiz answers and calculates score
         async function submitStudentQuiz() {
+            if (!db) {
+                showMessageBox('وظائف إرسال الإجابات غير متاحة. يرجى التأكد من تهيئة Firebase بشكل صحيح.');
+                return;
+            }
             const form = document.getElementById('studentQuizForm');
             const formData = new FormData(form);
             let allAnswered = true;
             currentQuiz.questions.forEach(question => {
                 const answer = formData.get(`question_${question.id}`);
+                // Check if any question is unanswered
                 if (!answer || answer.trim() === '') allAnswered = false;
-                studentAnswers[question.id] = answer;
+                studentAnswers[question.id] = answer; // Store student's answer
             });
             if (!allAnswered) {
                 showMessageBox('يرجى الإجابة على جميع الأسئلة قبل الإرسال');
@@ -598,16 +739,21 @@
                 quizTitle: currentQuiz.title,
                 studentName: studentAnswers.studentName,
                 totalQuestions: currentQuiz.questions.length,
-                submittedAt: serverTimestamp(),
+                submittedAt: serverTimestamp(), // Record submission time
                 answers: [],
             };
             
+            // Compare student answers with correct answers
             currentQuiz.questions.forEach(question => {
                 const studentAnswer = studentAnswers[question.id];
                 let isCorrect = false;
-                if (question.type === 'multiple') isCorrect = parseInt(studentAnswer) === question.correctAnswer;
-                else if (question.type === 'boolean') isCorrect = (studentAnswer === 'true') === question.correctAnswer;
-                else if (question.type === 'text') isCorrect = studentAnswer.trim().toLowerCase() === question.correctAnswer.toLowerCase();
+                if (question.type === 'multiple') {
+                    isCorrect = parseInt(studentAnswer) === question.correctAnswer;
+                } else if (question.type === 'boolean') {
+                    isCorrect = (studentAnswer === 'true') === question.correctAnswer;
+                } else if (question.type === 'text') {
+                    isCorrect = studentAnswer.trim().toLowerCase() === question.correctAnswer.toLowerCase();
+                }
                 if (isCorrect) correctAnswersCount++;
                 resultDetails.answers.push({
                     questionId: question.id,
@@ -621,7 +767,8 @@
 
             try {
                 const resultsCollectionRef = collection(db, `artifacts/${appId}/public/data/quiz_results`);
-                const resultDocRef = await addDoc(resultsCollectionRef, resultDetails);
+                const resultDocRef = await addDoc(resultsCollectionRef, resultDetails); // Add results to Firestore
+                // Redirect to results page after submission
                 window.location.href = `${window.location.pathname}?quiz=${currentQuiz.id}&results=true&attempt=${resultDocRef.id}`;
             } catch (error) {
                 console.error("Error submitting results:", error);
@@ -630,8 +777,13 @@
         }
         
         // --- RESULTS VIEW ---
+        // Displays the results for a specific student attempt
         async function showResultsForStudent(quizId, attemptId) {
             showResultsPage();
+             if (!db) {
+                document.getElementById('resultsContent').innerHTML = `<h2 class="text-center text-red-500">وظائف عرض النتائج غير متاحة. يرجى التأكد من تهيئة Firebase بشكل صحيح.</h2>`;
+                return;
+            }
             try {
                 const resultRef = doc(db, `artifacts/${appId}/public/data/quiz_results`, attemptId);
                 const resultSnap = await getDoc(resultRef);
@@ -659,12 +811,16 @@
                     <div class="mb-6"><h3 class="text-2xl font-bold text-gray-800 mb-4">مراجعة الإجابات</h3>
                     ${resultData.answers.map((answer, index) => {
                         const question = quizData.questions.find(q => q.id == answer.questionId);
-                        if (!question) return '';
+                        if (!question) return ''; // Skip if question not found
+
                         let correctAnswerText = '';
+                        // Determine correct answer text based on question type
                         if (question.type === 'multiple') correctAnswerText = question.options[question.correctAnswer];
                         else if (question.type === 'boolean') correctAnswerText = question.correctAnswer ? 'صحيح' : 'خطأ';
                         else correctAnswerText = question.correctAnswer;
+
                         let studentAnswerText = answer.studentAnswer;
+                        // Format student answer text based on question type
                         if (question.type === 'multiple') studentAnswerText = question.options[parseInt(answer.studentAnswer)];
                         else if (question.type === 'boolean') studentAnswerText = answer.studentAnswer === 'true' ? 'صحيح' : 'خطأ';
                         
@@ -687,7 +843,12 @@
             }
         }
         
+        // Displays statistics for a quiz (total attempts, average score)
         async function viewQuizResults(quizId) {
+             if (!db) {
+                showMessageBox('وظائف إحصائيات الكويز غير متاحة. يرجى التأكد من تهيئة Firebase بشكل صحيح.');
+                return;
+            }
             const resultsRef = collection(db, `artifacts/${appId}/public/data/quiz_results`);
             const q = query(resultsRef, where("quizId", "==", quizId));
             const querySnapshot = await getDocs(q);
@@ -701,8 +862,10 @@
             }
 
             const totalAttempts = allResults.length;
+            // Calculate average score
             const avgScore = Math.round(allResults.reduce((sum, result) => sum + result.score, 0) / totalAttempts);
             
+            // Generate HTML for the statistics modal
             const statsHTML = `
                 <div id="statsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onclick="closeStatsModal(event)">
                     <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
@@ -736,6 +899,7 @@
             document.body.insertAdjacentHTML('beforeend', statsHTML);
         }
 
+        // Closes the statistics modal if clicked outside its content
         function closeStatsModal(event) {
             if (event.target.id === "statsModal") {
                 document.getElementById('statsModal').remove();
@@ -743,8 +907,10 @@
         }
 
         // --- UTILITIES: MODALS ---
+        // Custom message box (replaces alert())
         function showMessageBox(message) {
             const modalId = 'customAlertModal';
+            // Remove existing modal if any
             if(document.getElementById(modalId)) document.getElementById(modalId).remove();
             const modalHTML = `<div id="${modalId}" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                     <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full text-center">
@@ -753,8 +919,11 @@
                     </div></div>`;
             document.body.insertAdjacentHTML('beforeend', modalHTML);
         }
+
+        // Custom confirmation box (replaces confirm())
         function showConfirmBox(message, onConfirmCallback) {
              const modalId = 'customConfirmModal';
+            // Remove existing modal if any
             if(document.getElementById(modalId)) document.getElementById(modalId).remove();
             const modalHTML = `<div id="${modalId}" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                     <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full text-center">
@@ -766,10 +935,10 @@
             document.body.insertAdjacentHTML('beforeend', modalHTML);
             document.getElementById('confirmYesBtn').onclick = () => {
                 document.getElementById(modalId).remove();
-                if (onConfirmCallback) onConfirmCallback();
+                if (onConfirmCallback) onConfirmCallback(); // Execute callback if confirmed
             };
             document.getElementById('confirmNoBtn').onclick = () => {
-                document.getElementById(modalId).remove();
+                document.getElementById(modalId).remove(); // Just close if cancelled
             };
         }
     </script>
