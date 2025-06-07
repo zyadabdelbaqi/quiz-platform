@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة الكويزات التعليمية</title>
+    <title>كويزات MET</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
@@ -18,31 +18,52 @@
         h1, h2, h3, h4, h5, h6 {
             font-family: 'Amiri', serif;
         }
-        .quiz-container { max-width: 800px; margin: 0 auto; padding: 1rem; } /* Added padding for smaller screens */
+        .quiz-container { max-width: 800px; margin: 0 auto; }
         .question-card { transition: all 0.3s ease; }
         .question-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
         .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         .btn-primary:hover { background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%); }
         .student-mode { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
         .teacher-mode { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-        #studentInfoForm { max-width: 600px; margin: 0 auto; padding: 1.5rem; } /* Added padding */
+        #studentInfoForm { max-width: 600px; margin: 0 auto; }
     </style>
 </head>
 <body class="bg-gray-100">
+    <!-- صفحة تسجيل الدخول (جديدة) -->
+    <div id="loginPage" class="flex items-center justify-center min-h-screen bg-gradient-to-r from-purple-400 via-pink-500 to-red-500">
+        <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full text-center transform hover:scale-105 transition duration-300">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">
+                <i class="fas fa-lock text-purple-600 mr-2"></i>
+                تسجيل الدخول
+            </h1>
+            <p class="text-gray-600 mb-6">يرجى إدخال كلمة المرور</p>
+            <input type="password" id="teacherPassword" 
+                   class="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 mb-6 text-center text-lg" 
+                   placeholder="كلمة المرور" 
+                   onkeypress="if(event.keyCode == 13) checkTeacherPassword()">
+            <button onclick="checkTeacherPassword()" 
+                    class="btn-primary text-white px-8 py-4 rounded-lg font-semibold text-lg transition hover:shadow-xl hover:translate-y-1">
+                <i class="fas fa-sign-in-alt mr-2"></i>
+                دخول
+            </button>
+        </div>
+    </div>
+
+    <!-- صفحة المعلم -->
     <div id="teacherPage" class="hidden">
-        <div class="teacher-mode text-white py-6 md:py-8"> <!-- Adjusted padding for mobile -->
+        <div class="teacher-mode text-white py-8">
             <div class="container mx-auto px-4">
-                <h1 class="text-3xl md:text-4xl font-bold text-center mb-2"> <!-- Responsive font size -->
-                    <i class="fas fa-graduation-cap mr-2 md:mr-3"></i>
+                <h1 class="text-4xl font-bold text-center mb-2">
+                    <i class="fas fa-graduation-cap mr-3"></i>
                     منصة كويزات MET
                 </h1>
-                <p class="text-sm md:text-lg text-center opacity-90"></p> <!-- Responsive font size -->
+                <p class="text-center text-lg opacity-90"></p>
             </div>
         </div>
 
-        <div class="container mx-auto px-4 py-6 md:py-8"> <!-- Adjusted padding for mobile -->
-            <div class="bg-white rounded-lg shadow-lg p-4 md:p-6 mb-6 md:mb-8"> <!-- Adjusted padding -->
-                <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-4 md:mb-6"> <!-- Responsive font size -->
+        <div class="container mx-auto px-4 py-8">
+            <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">
                     <i class="fas fa-plus-circle text-blue-500 mr-2"></i>
                     إنشاء / تعديل كويز
                 </h2>
@@ -50,43 +71,41 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
                         <label class="block text-gray-700 font-semibold mb-2">عنوان الكويز</label>
-                        <input type="text" id="quizTitle" class="w-full p-2 md:p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" placeholder="أدخل عنوان الكويز">
+                        <input type="text" id="quizTitle" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" placeholder="أدخل عنوان الكويز">
                     </div>
                     <div>
                         <label class="block text-gray-700 font-semibold mb-2">وصف الكويز</label>
-                        <input type="text" id="quizDescription" class="w-full p-2 md:p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" placeholder="وصف مختصر للكويز">
+                        <input type="text" id="quizDescription" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" placeholder="وصف مختصر للكويز">
                     </div>
                 </div>
 
                 <div id="questionsContainer" class="mb-6">
-                    <h3 class="text-base md:text-lg font-semibold text-gray-700 mb-4">الأسئلة</h3> <!-- Responsive font size -->
+                    <h3 class="text-lg font-semibold text-gray-700 mb-4">الأسئلة</h3>
                 </div>
 
-                <div class="flex flex-col sm:flex-row gap-3 md:gap-4 mb-6 flex-wrap"> <!-- Responsive button layout -->
-                    <button onclick="addQuestion('multiple')" class="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg transition text-sm sm:text-base">
+                <div class="flex gap-4 mb-6 flex-wrap">
+                    <button onclick="addQuestion('multiple')" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition">
                         <i class="fas fa-list mr-2"></i>إضافة سؤال اختيار متعدد
                     </button>
-                    <button onclick="addQuestion('boolean')" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 rounded-lg transition text-sm sm:text-base">
+                    <button onclick="addQuestion('boolean')" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg transition">
                         <i class="fas fa-check-circle mr-2"></i>إضافة سؤال صح/خطأ
                     </button>
-                    <button onclick="addQuestion('text')" class="bg-purple-500 hover:bg-purple-600 text-white px-3 py-2 rounded-lg transition text-sm sm:text-base">
+                    <button onclick="addQuestion('text')" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg transition">
                         <i class="fas fa-edit mr-2"></i>إضافة سؤال نصي
                     </button>
                 </div>
 
-                <div class="flex flex-col sm:flex-row gap-3 md:gap-4"> <!-- Responsive button layout -->
-                    <button onclick="saveQuiz()" class="btn-primary text-white px-6 py-3 rounded-lg font-semibold transition hover:shadow-lg text-base sm:text-lg flex-1 justify-center">
-                        <i class="fas fa-save mr-2"></i>حفظ الكويز
-                    </button>
-                    <button onclick="clearQuizForm()" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold transition hover:shadow-lg text-base sm:text-lg flex-1 justify-center">
-                        <i class="fas fa-eraser mr-2"></i>مسح النموذج
-                    </button>
-                </div>
+                <button onclick="saveQuiz()" class="btn-primary text-white px-8 py-3 rounded-lg font-semibold transition hover:shadow-lg">
+                    <i class="fas fa-save mr-2"></i>حفظ الكويز
+                </button>
+                <button onclick="clearQuizForm()" class="bg-gray-500 hover:bg-gray-600 text-white px-8 py-3 rounded-lg font-semibold transition hover:shadow-lg ml-2">
+                    <i class="fas fa-eraser mr-2"></i>مسح النموذج
+                </button>
                  <input type="hidden" id="editQuizId">
             </div>
 
-            <div class="bg-white rounded-lg shadow-lg p-4 md:p-6"> <!-- Adjusted padding -->
-                <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-4 md:mb-6"> <!-- Responsive font size -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">
                     <i class="fas fa-list text-green-500 mr-2"></i>
                     الكويزات المحفوظة
                 </h2>
@@ -97,49 +116,51 @@
         </div>
     </div>
 
+    <!-- صفحة الطالب -->
     <div id="studentPage" class="hidden">
-        <div class="student-mode text-white py-6 md:py-8"> <!-- Adjusted padding -->
+        <div class="student-mode text-white py-8">
             <div class="container mx-auto px-4">
-                <h1 class="text-3xl md:text-4xl font-bold text-center mb-2"> <!-- Responsive font size -->
-                    <i class="fas fa-user-graduate mr-2 md:mr-3"></i>
+                <h1 class="text-4xl font-bold text-center mb-2">
+                    <i class="fas fa-user-graduate mr-3"></i>
                     صفحة الطالب
                 </h1>
-                <p class="text-sm md:text-lg text-center opacity-90">أجب على الأسئلة بعناية</p>
-                <p class="text-xs md:text-sm mt-2 text-center"> <!-- Responsive font size -->
+                <p class="text-center text-lg opacity-90">أجب على الأسئلة بعناية</p>
+                <p class="text-center text-sm mt-2">
                      <i class="fas fa-id-badge ml-1"></i> معرف المستخدم: <span id="studentUserId"></span>
                 </p>
             </div>
         </div>
 
-        <div class="quiz-container px-4 py-6 md:py-8"> <!-- Adjusted padding -->
-            <div id="studentInfoForm" class="bg-white rounded-lg shadow-lg p-4 md:p-6 mb-6"> <!-- Adjusted padding -->
-                <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-4">بيانات الطالب</h2> <!-- Responsive font size -->
+        <div class="quiz-container px-4 py-8">
+            <div id="studentInfoForm" class="bg-white rounded-lg shadow-lg p-6 mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">بيانات الطالب</h2>
                 <div class="mb-4">
                     <label class="block text-gray-700 font-semibold mb-2">اسم الطالب</label>
-                    <input type="text" id="studentName" class="w-full p-2 md:p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" placeholder="أدخل اسمك الكامل">
+                    <input type="text" id="studentName" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" placeholder="أدخل اسمك الكامل">
                 </div>
-                <button onclick="startQuiz()" class="btn-primary text-white px-6 py-3 rounded-lg font-semibold transition hover:shadow-lg text-base md:text-lg w-full">
+                <button onclick="startQuiz()" class="btn-primary text-white px-8 py-3 rounded-lg font-semibold transition hover:shadow-lg">
                     <i class="fas fa-play mr-2"></i>بدء الاختبار
                 </button>
             </div>
-            <div id="quizContent" class="bg-white rounded-lg shadow-lg p-4 md:p-6 hidden"> <!-- Adjusted padding -->
+            <div id="quizContent" class="bg-white rounded-lg shadow-lg p-6 hidden">
                 <!-- سيتم تحميل محتوى الكويز هنا -->
             </div>
         </div>
     </div>
 
+    <!-- صفحة النتائج -->
     <div id="resultsPage" class="hidden">
-        <div class="student-mode text-white py-6 md:py-8"> <!-- Adjusted padding -->
+        <div class="student-mode text-white py-8">
             <div class="container mx-auto px-4">
-                <h1 class="text-3xl md:text-4xl font-bold text-center mb-2"> <!-- Responsive font size -->
-                    <i class="fas fa-chart-bar mr-2 md:mr-3"></i>
+                <h1 class="text-4xl font-bold text-center mb-2">
+                    <i class="fas fa-chart-bar mr-3"></i>
                     نتائج الكويز
                 </h1>
             </div>
         </div>
 
-        <div class="quiz-container px-4 py-6 md:py-8"> <!-- Adjusted padding -->
-            <div id="resultsContent" class="bg-white rounded-lg shadow-lg p-4 md:p-6"> <!-- Adjusted padding -->
+        <div class="quiz-container px-4 py-8">
+            <div id="resultsContent" class="bg-white rounded-lg shadow-lg p-6">
                 <!-- سيتم تحميل النتائج هنا -->
             </div>
         </div>
@@ -178,6 +199,9 @@
         // localStorage key for saving partial quiz progress
         const QUIZ_PROGRESS_STORAGE_KEY = 'quiz_student_progress';
 
+        // Teacher password (hardcoded for simplicity, should be managed more securely)
+        const TEACHER_PASSWORD = '223244'; // Example password
+
         // Firebase Authentication Listener
         onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -193,7 +217,7 @@
                     }
                     currentUserId = auth.currentUser?.uid || crypto.randomUUID(); // Fallback for anonymous
                 } catch (error) {
-                    console.error("Error signing in anonymously:", error);
+                    console.error("خطأ في تسجيل الدخول كزائر:", error);
                     showMessageBox("حدث خطأ في المصادقة: " + error.message + ". يرجى المحاولة مرة أخرى.");
                 }
             }
@@ -222,16 +246,37 @@
                 // If direct link to quiz (student mode), load quiz for student
                 window.loadQuizForStudent(quizId, teacherIdParam); // Pass teacherId to load quiz
             } else {
-                // Default to teacher page if no specific quiz is requested
+                // Default to login page if no specific quiz is requested
+                window.showLoginPage();
+            }
+        }
+
+        // --- New Login Page Functions ---
+        window.showLoginPage = function() { // Made global
+            document.getElementById('loginPage').classList.remove('hidden');
+            document.getElementById('teacherPage').classList.add('hidden');
+            document.getElementById('studentPage').classList.add('hidden');
+            document.getElementById('resultsPage').classList.add('hidden');
+        }
+
+        window.checkTeacherPassword = function() { // Made global
+            const enteredPassword = document.getElementById('teacherPassword').value;
+            if (enteredPassword === TEACHER_PASSWORD) {
+                document.getElementById('loginPage').classList.add('hidden');
                 window.showTeacherPage();
+            } else {
+                window.showMessageBox('كلمة المرور غير صحيحة. يرجى المحاولة مرة أخرى.');
+                document.getElementById('teacherPassword').value = ''; // Clear password field
             }
         }
 
         // --- Teacher Functions ---
         window.showTeacherPage = function() { // Made global
+            // This function is now called AFTER successful password check
             document.getElementById('teacherPage').classList.remove('hidden');
             document.getElementById('studentPage').classList.add('hidden');
             document.getElementById('resultsPage').classList.add('hidden');
+            document.getElementById('loginPage').classList.add('hidden'); // Hide login page
             if (isAuthReady) {
                 window.loadSavedQuizzes();
             } else {
@@ -283,7 +328,7 @@
                     <div class="flex gap-4">
                         <label class="flex items-center">
                             <input type="radio" name="correct-${questionId}" value="true" class="correct-answer ml-2" ${questionData.correctAnswer === true ? 'checked' : ''}>
-                            صحيح
+                            صح
                         </label>
                         <label class="flex items-center">
                             <input type="radio" name="correct-${questionId}" value="false" class="correct-answer ml-2" ${questionData.correctAnswer === false ? 'checked' : ''}>
@@ -433,7 +478,7 @@
                     window.showMessageBox('تم حفظ الكويز بنجاح!');
                 }
             } catch (e) {
-                console.error("Error saving quiz: ", e);
+                console.error("خطأ في حفظ الكويز: ", e);
                 window.showMessageBox("حدث خطأ أثناء حفظ الكويز. يرجى المحاولة مرة أخرى.");
             }
             
@@ -461,7 +506,7 @@
 
         window.loadSavedQuizzes = async function() { // Made global
             if (!isAuthReady || !currentUserId) {
-                console.log("Waiting for authentication to load quizzes...");
+                console.log("جارٍ انتظار المصادقة لتحميل الكويزات...");
                 return;
             }
 
@@ -506,7 +551,7 @@
                     </div>
                 `).join('');
             } catch (e) {
-                console.error("Error loading quizzes: ", e);
+                console.error("خطأ في تحميل الكويزات: ", e);
                 container.innerHTML = '<p class="text-red-500 text-center col-span-full">حدث خطأ أثناء تحميل الكويزات.</p>';
             }
         }
@@ -542,7 +587,7 @@
                 // Scroll to the top of the form
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             } catch (e) {
-                console.error("Error editing quiz:", e);
+                console.error("خطأ في تعديل الكويز:", e);
                 window.showMessageBox("حدث خطأ أثناء تحميل الكويز للتعديل.");
             }
         }
@@ -583,7 +628,7 @@
                     window.loadSavedQuizzes();
                     window.showMessageBox('تم حذف الكويز ونتائجه بنجاح');
                 } catch (e) {
-                    console.error("Error deleting quiz:", e);
+                    console.error("خطأ في حذف الكويز:", e);
                     window.showMessageBox("حدث خطأ أثناء حذف الكويز.");
                 }
             });
@@ -592,7 +637,7 @@
         // --- Student Functions ---
         window.loadQuizForStudent = async function(quizId, teacherIdFromUrl) { // Made global
             if (!isAuthReady) {
-                console.log("Waiting for authentication to load student quiz...");
+                console.log("جارٍ انتظار المصادقة لتحميل كويز الطالب...");
                 const unsubscribe = onAuthStateChanged(auth, (user) => {
                     if (user) {
                         window.loadQuizForStudent(quizId, teacherIdFromUrl);
@@ -629,7 +674,7 @@
                     }
                 }
             } catch (e) {
-                console.error("Error loading quiz for student:", e);
+                console.error("خطأ في تحميل الكويز للطالب:", e);
             }
 
             if (!quiz) {
@@ -670,7 +715,7 @@
                     }
                 }
             } catch (e) {
-                console.error("Error loading quiz progress from localStorage:", e);
+                console.error("خطأ في تحميل تقدم الكويز من التخزين المحلي:", e);
                 localStorage.removeItem(QUIZ_PROGRESS_STORAGE_KEY); // Clear corrupted data
             }
 
@@ -695,7 +740,7 @@
                     return; // Stop here, show results instead of quiz
                 }
             } catch (e) {
-                console.error("Error checking for previous quiz results:", e);
+                console.error("خطأ في التحقق من نتائج الكويز السابقة:", e);
                 // Continue to show quiz if check fails
             }
 
@@ -712,8 +757,8 @@
 
             const quizHTML = `
                 <div class="text-center mb-6">
-                    <h1 class="text-xl md:text-3xl font-bold text-gray-800 mb-2">${quiz.title}</h1> <!-- Responsive font size -->
-                    <p class="text-sm md:text-lg text-gray-600 text-lg">${quiz.description}</p> <!-- Responsive font size -->
+                    <h1 class="text-3xl font-bold text-gray-800 mb-2">${quiz.title}</h1>
+                    <p class="text-gray-600 text-lg">${quiz.description}</p>
                     <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-4">
                         <i class="fas fa-info-circle text-blue-500 ml-2"></i>
                         عدد الأسئلة: ${quiz.questions.length}
@@ -723,9 +768,9 @@
                 <form id="studentQuizForm">
                     ${quiz.questions.map((question, index) => {
                         let questionHTML = `
-                            <div class="bg-gray-50 p-4 md:p-6 rounded-lg border border-gray-200 mb-6"> <!-- Adjusted padding -->
-                                <h3 class="text-lg md:text-xl font-semibold text-gray-800 mb-4"> <!-- Responsive font size -->
-                                    <span class="bg-blue-500 text-white rounded-full w-7 h-7 md:w-8 md:h-8 inline-flex items-center justify-center ml-2 text-sm md:text-base"> <!-- Responsive size -->
+                            <div class="bg-gray-50 p-6 rounded-lg border border-gray-200 mb-6">
+                                <h3 class="text-xl font-semibold text-gray-800 mb-4">
+                                    <span class="bg-blue-500 text-white rounded-full w-8 h-8 inline-flex items-center justify-center ml-2 text-sm">
                                         ${index + 1}
                                     </span>
                                     ${question.text}
@@ -742,7 +787,7 @@
                                     ${question.options.map((option, optionIndex) => `
                                         <label class="flex items-center p-3 bg-white rounded-lg border border-gray-200 hover:bg-blue-50 cursor-pointer transition">
                                             <input type="radio" name="question_${question.id}" value="${optionIndex}" class="ml-3 text-blue-500 focus:ring-blue-500" ${savedAnswer !== undefined && savedAnswer !== null && parseInt(savedAnswer) === optionIndex ? 'checked' : ''} onchange="saveQuizProgress()">
-                                            <span class="flex-1 text-sm md:text-base">${option}</span> <!-- Responsive font size -->
+                                            <span class="flex-1">${option}</span>
                                         </label>
                                     `).join('')}
                                 </div>
@@ -752,18 +797,18 @@
                                 <div class="space-y-3">
                                     <label class="flex items-center p-3 bg-white rounded-lg border border-gray-200 hover:bg-blue-50 cursor-pointer transition">
                                         <input type="radio" name="question_${question.id}" value="true" class="ml-3 text-blue-500 focus:ring-blue-500" ${savedAnswer === 'true' ? 'checked' : ''} onchange="saveQuizProgress()">
-                                        <span class="flex-1 text-sm md:text-base">صحيح</span> <!-- Responsive font size -->
+                                        <span class="flex-1">صح</span>
                                     </label>
                                     <label class="flex items-center p-3 bg-white rounded-lg border border-gray-200 hover:bg-blue-50 cursor-pointer transition">
                                         <input type="radio" name="question_${question.id}" value="false" class="ml-3 text-blue-500 focus:ring-blue-500" ${savedAnswer === 'false' ? 'checked' : ''} onchange="saveQuizProgress()">
-                                        <span class="flex-1 text-sm md:text-base">خطأ</span> <!-- Responsive font size -->
+                                        <span class="flex-1">خطأ</span>
                                     </label>
                                 </div>
                             `;
                         } else if (question.type === 'text') {
                             questionHTML += `
                                 <input type="text" name="question_${question.id}" 
-                                       class="w-full p-3 md:p-4 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-base md:text-lg" <!-- Responsive padding and font size -->
+                                       class="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-lg"
                                        placeholder="اكتب إجابتك هنا..." value="${savedAnswer || ''}" oninput="saveQuizProgress()">
                             `;
                         }
@@ -774,7 +819,7 @@
 
                     <div class="text-center mt-8">
                         <button type="button" onclick="submitStudentQuiz()" 
-                                class="btn-primary text-white px-6 py-3 md:px-8 md:py-4 rounded-lg font-semibold text-base md:text-lg transition hover:shadow-lg w-full"> <!-- Responsive padding and font size -->
+                                class="btn-primary text-white px-8 py-4 rounded-lg font-semibold text-lg transition hover:shadow-lg">
                             <i class="fas fa-paper-plane ml-2"></i>
                             إرسال الإجابات
                         </button>
@@ -925,7 +970,7 @@
                 window.displayInlineResults(results, currentQuiz);
 
             } catch (e) {
-                console.error("Error submitting quiz results: ", e);
+                console.error("خطأ في إرسال نتائج الكويز: ", e);
                 window.showMessageBox("حدث خطأ أثناء إرسال النتائج. يرجى المحاولة مرة أخرى.");
             }
         }
@@ -940,33 +985,33 @@
 
             let resultsHTML = `
                 <div class="text-center mb-8">
-                    <div class="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 rounded-full ${results.score >= 60 ? 'bg-green-100' : 'bg-red-100'} mb-4"> <!-- Responsive size -->
-                        <i class="fas fa-${results.score >= 60 ? 'check' : 'times'} text-2xl md:text-3xl ${results.score >= 60 ? 'text-green-500' : 'text-red-500'}"></i> <!-- Responsive icon size -->
+                    <div class="inline-flex items-center justify-center w-20 h-20 rounded-full ${results.score >= 60 ? 'bg-green-100' : 'bg-red-100'} mb-4">
+                        <i class="fas fa-${results.score >= 60 ? 'check' : 'times'} text-3xl ${results.score >= 60 ? 'text-green-500' : 'text-red-500'}"></i>
                     </div>
-                    <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-2">نتيجة الكويز</h1> <!-- Responsive font size -->
-                    <h2 class="text-lg md:text-xl text-gray-600 mb-4">${results.quizTitle}</h2> <!-- Responsive font size -->
-                    <div class="bg-gray-100 p-3 rounded-lg inline-block mb-4 text-sm md:text-base"> <!-- Responsive font size -->
+                    <h1 class="text-3xl font-bold text-gray-800 mb-2">نتيجة الكويز</h1>
+                    <h2 class="text-xl text-gray-600 mb-4">${results.quizTitle}</h2>
+                    <div class="bg-gray-100 p-3 rounded-lg inline-block mb-4">
                         <i class="fas fa-user ml-2"></i>
                         اسم الطالب: ${results.studentName}
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 md:p-4"> <!-- Adjusted padding -->
-                            <div class="text-xl md:text-2xl font-bold text-blue-600">${results.score}%</div> <!-- Responsive font size -->
-                            <div class="text-xs md:text-sm text-gray-600">النسبة المئوية</div> <!-- Responsive font size -->
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <div class="text-2xl font-bold text-blue-600">${results.score}%</div>
+                            <div class="text-sm text-gray-600">النسبة المئوية</div>
                         </div>
-                        <div class="bg-green-50 border border-green-200 rounded-lg p-3 md:p-4"> <!-- Adjusted padding -->
-                            <div class="text-xl md:text-2xl font-bold text-green-600">${results.correctAnswers}</div> <!-- Responsive font size -->
-                            <div class="text-xs md:text-sm text-gray-600">إجابات صحيحة</div> <!-- Responsive font size -->
+                        <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                            <div class="text-2xl font-bold text-green-600">${results.correctAnswers}</div>
+                            <div class="text-sm text-gray-600">إجابات صحيحة</div>
                         </div>
-                        <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 md:p-4"> <!-- Adjusted padding -->
-                            <div class="text-xl md:text-2xl font-bold text-gray-600">${results.totalQuestions}</div> <!-- Responsive font size -->
-                            <div class="text-xs md:text-sm text-gray-600">إجمالي الأسئلة</div> <!-- Responsive font size -->
+                        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                            <div class="text-2xl font-bold text-gray-600">${results.totalQuestions}</div>
+                            <div class="text-sm text-gray-600">إجمالي الأسئلة</div>
                         </div>
                     </div>
                 </div>
 
                 <div class="mb-6">
-                    <h3 class="text-xl md:text-2xl font-bold text-gray-800 mb-4">مراجعة الإجابات</h3> <!-- Responsive font size -->
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">مراجعة الإجابات</h3>
                     ${results.answers.map((answer, index) => {
                         // Find the original question from the quiz to get options/details
                         const originalQuestion = quiz.questions.find(q => q.id == answer.questionId);
@@ -983,18 +1028,18 @@
                             studentAnswerDisplay = originalQuestion.options[parseInt(answer.studentAnswer)];
                             correctAnswerDisplay = originalQuestion.options[originalQuestion.correctAnswer];
                         } else if (answer.questionType === 'boolean') {
-                            studentAnswerDisplay = answer.studentAnswer === 'true' ? 'صحيح' : 'خطأ';
-                            correctAnswerDisplay = originalQuestion.correctAnswer ? 'صحيح' : 'خطأ';
+                            studentAnswerDisplay = answer.studentAnswer === 'true' ? 'صح' : 'خطأ';
+                            correctAnswerDisplay = originalQuestion.correctAnswer ? 'صح' : 'خطأ';
                         } else if (answer.questionType === 'text') {
                             studentAnswerDisplay = answer.studentAnswer;
                             correctAnswerDisplay = originalQuestion.correctAnswer;
                         }
 
                         return `
-                            <div class="bg-gray-50 p-4 md:p-6 rounded-lg border-r-4 ${answer.isCorrect ? 'border-green-500' : 'border-red-500'} mb-4"> <!-- Adjusted padding -->
+                            <div class="bg-gray-50 p-6 rounded-lg border-r-4 ${answer.isCorrect ? 'border-green-500' : 'border-red-500'} mb-4">
                                 <div class="flex items-start justify-between mb-3">
-                                    <h4 class="text-lg md:text-xl font-semibold text-gray-800"> <!-- Responsive font size -->
-                                        <span class="bg-gray-500 text-white rounded-full w-7 h-7 md:w-8 md:h-8 inline-flex items-center justify-center ml-2 text-sm md:text-base"> <!-- Responsive size -->
+                                    <h4 class="text-lg font-semibold text-gray-800">
+                                        <span class="bg-gray-500 text-white rounded-full w-8 h-8 inline-flex items-center justify-center ml-2 text-sm">
                                             ${index + 1}
                                         </span>
                                         ${answer.questionText}
@@ -1029,7 +1074,7 @@
                                                 optionClass = 'bg-white border-gray-200 text-gray-700';
                                             }
                                             return `
-                                                <div class="${optionClass} flex items-center text-sm md:text-base"> <!-- Responsive font size -->
+                                                <div class="${optionClass} flex items-center">
                                                     ${iconHtml}
                                                     <span class="flex-1">${option}</span>
                                                 </div>
@@ -1039,7 +1084,7 @@
                                 ` : answer.questionType === 'boolean' ? `
                                     <div class="space-y-2 mt-4">
                                         ${[true, false].map(boolValue => {
-                                            const optionText = boolValue ? 'صحيح' : 'خطأ';
+                                            const optionText = boolValue ? 'صح' : 'خطأ';
                                             let optionClass = 'p-3 rounded-lg border text-gray-800 flex items-center';
                                             let iconHtml = '';
                                             const isStudentChoice = (answer.studentAnswer === String(boolValue));
@@ -1060,7 +1105,7 @@
                                                 optionClass = 'bg-white border-gray-200 text-gray-700';
                                             }
                                             return `
-                                                <div class="${optionClass} flex items-center text-sm md:text-base"> <!-- Responsive font size -->
+                                                <div class="${optionClass} flex items-center">
                                                     ${iconHtml}
                                                     <span class="flex-1">${optionText}</span>
                                                 </div>
@@ -1070,20 +1115,20 @@
                                 ` : `
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div class="bg-white p-3 rounded border">
-                                            <div class="text-xs md:text-sm font-medium text-gray-600 mb-1">إجابتك:</div> <!-- Responsive font size -->
-                                            <div class="text-sm md:text-lg ${answer.isCorrect ? 'text-green-700' : 'text-red-700'}">${studentAnswerDisplay}</div> <!-- Responsive font size -->
+                                            <div class="text-sm font-medium text-gray-600 mb-1">إجابتك:</div>
+                                            <div class="text-lg ${answer.isCorrect ? 'text-green-700' : 'text-red-700'}">${studentAnswerDisplay}</div>
                                         </div>
                                         <div class="bg-white p-3 rounded border">
-                                            <div class="text-xs md:text-sm font-medium text-gray-600 mb-1">الإجابة الصحيحة:</div> <!-- Responsive font size -->
-                                            <div class="text-sm md:text-lg text-green-700">${correctAnswerDisplay}</div> <!-- Responsive font size -->
+                                            <div class="text-sm font-medium text-gray-600 mb-1">الإجابة الصحيحة:</div>
+                                            <div class="text-lg text-green-700">${correctAnswerDisplay}</div>
                                         </div>
                                     </div>
                                 `}
 
                                 ${originalQuestion.explanation ? `
                                     <div class="bg-blue-50 border border-blue-200 p-3 rounded-lg mt-4">
-                                        <div class="text-xs md:text-sm font-medium text-blue-700 mb-1">هامش توضيحي:</div> <!-- Responsive font size -->
-                                        <p class="text-sm md:text-base text-blue-800">${originalQuestion.explanation}</p> <!-- Responsive font size -->
+                                        <div class="text-sm font-medium text-blue-700 mb-1">هامش توضيحي:</div>
+                                        <p class="text-blue-800">${originalQuestion.explanation}</p>
                                     </div>
                                 ` : ''}
                             </div>
@@ -1092,7 +1137,7 @@
                 </div>
 
                 <div class="text-center">
-                    <button onclick="window.close()" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold transition text-base md:text-lg"> <!-- Responsive font size -->
+                    <button onclick="window.close()" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold transition">
                         <i class="fas fa-times ml-2"></i>إغلاق النافذة
                     </button>
                     <!-- يمكنك إضافة زر للعودة إلى صفحة الطالب أو الصفحة الرئيسية هنا -->
@@ -1105,7 +1150,7 @@
 
         window.showResults = async function(quizId, studentIdParam, teacherIdParam) { // Made global
             if (!isAuthReady || !currentUserId) {
-                console.log("Waiting for authentication to show results...");
+                console.log("جارٍ انتظار المصادقة لعرض النتائج...");
                 const unsubscribe = onAuthStateChanged(auth, (user) => {
                     if (user) {
                         window.showResults(quizId, studentIdParam, teacherIdParam);
@@ -1188,7 +1233,7 @@
                 window.displayInlineResults(latestResult, quiz);
 
             } catch (e) {
-                console.error("Error showing results:", e);
+                console.error("خطأ في عرض النتائج:", e);
                 document.getElementById('resultsContent').innerHTML = `
                     <div class="text-center py-8">
                         <i class="fas fa-exclamation-triangle text-red-500 text-6xl mb-4"></i>
@@ -1215,7 +1260,7 @@
                     quizTitle = quizDocSnap.data().title;
                 }
             } catch (e) {
-                console.error("Error fetching quiz title for results:", e);
+                console.error("خطأ في جلب عنوان الكويز للنتائج:", e);
             }
 
             const allResults = [];
@@ -1230,7 +1275,7 @@
                     allResults.push({ id: doc.id, ...doc.data() });
                 });
             } catch (e) {
-                console.error("Error loading all quiz results for teacher:", e);
+                console.error("خطأ في تحميل جميع نتائج الكويز للمعلم:", e);
                 window.showMessageBox("حدث خطأ أثناء تحميل نتائج الطلاب.");
                 return;
             }
@@ -1250,7 +1295,7 @@
                     <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto m-4" onclick="event.stopPropagation()">
                         <div class="p-6 border-b border-200">
                             <div class="flex justify-between items-center">
-                                <h2 class="text-xl md:text-2xl font-bold text-gray-800"> <!-- Responsive font size -->
+                                <h2 class="text-2xl font-bold text-gray-800">
                                     <i class="fas fa-chart-line text-blue-500 ml-2"></i>
                                     إحصائيات الكويز: ${quizTitle}
                                 </h2>
@@ -1260,39 +1305,39 @@
                             </div>
                         </div>
                         
-                        <div class="p-4 md:p-6"> <!-- Adjusted padding -->
-                            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6"> <!-- Responsive grid -->
-                                <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 md:p-4 text-center"> <!-- Adjusted padding -->
-                                    <div class="text-xl md:text-2xl font-bold text-blue-600">${totalAttempts}</div> <!-- Responsive font size -->
-                                    <div class="text-xs md:text-sm text-gray-600">محاولات إجمالية</div> <!-- Responsive font size -->
+                        <div class="p-6">
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
+                                    <div class="text-2xl font-bold text-blue-600">${totalAttempts}</div>
+                                    <div class="text-sm text-gray-600">محاولات إجمالية</div>
                                 </div>
-                                <div class="bg-green-50 border border-green-200 rounded-lg p-3 md:p-4 text-center"> <!-- Adjusted padding -->
-                                    <div class="text-xl md:text-2xl font-bold text-green-600">${avgScore}%</div> <!-- Responsive font size -->
-                                    <div class="text-xs md:text-sm text-gray-600">متوسط الدرجات</div> <!-- Responsive font size -->
+                                <div class="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
+                                    <div class="text-2xl font-bold text-green-600">${avgScore}%</div>
+                                    <div class="text-sm text-gray-600">متوسط الدرجات</div>
                                 </div>
-                                <div class="bg-purple-50 border border-purple-200 rounded-lg p-3 md:p-4 text-center"> <!-- Adjusted padding -->
-                                    <div class="text-xl md:text-2xl font-bold text-purple-600">${passCount}</div> <!-- Responsive font size -->
-                                    <div class="text-xs md:text-sm text-gray-600">نجحوا (60%+)</div> <!-- Responsive font size -->
+                                <div class="bg-purple-50 border border-purple-200 rounded-lg p-4 text-center">
+                                    <div class="text-2xl font-bold text-purple-600">${passCount}</div>
+                                    <div class="text-sm text-gray-600">نجحوا (60%+)</div>
                                 </div>
-                                <div class="bg-orange-50 border border-orange-200 rounded-lg p-3 md:p-4 text-center"> <!-- Adjusted padding -->
-                                    <div class="text-xl md:text-2xl font-bold text-orange-600">${totalAttempts - passCount}</div> <!-- Responsive font size -->
-                                    <div class="text-xs md:text-sm text-gray-600">لم ينجحوا</div> <!-- Responsive font size -->
+                                <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 text-center">
+                                    <div class="text-2xl font-bold text-orange-600">${totalAttempts - passCount}</div>
+                                    <div class="text-sm text-gray-600">لم ينجحوا</div>
                                 </div>
                             </div>
 
-                            <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-4">جميع المحاولات</h3> <!-- Responsive font size -->
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">جميع المحاولات</h3>
                             <div class="space-y-3 max-h-96 overflow-y-auto">
                                 ${allResults.map((result, index) => `
-                                    <div class="bg-gray-50 p-3 md:p-4 rounded-lg border border-gray-200"> <!-- Adjusted padding -->
-                                        <div class="flex flex-col sm:flex-row justify-between items-center sm:items-start"> <!-- Responsive layout for list items -->
-                                            <div class="text-center sm:text-right mb-2 sm:mb-0">
-                                                <div class="font-semibold text-gray-800 text-base md:text-lg">${result.studentName || 'طالب'}</div> <!-- Responsive font size -->
-                                                <div class="text-xs md:text-sm text-gray-600">معرف الطالب: ${result.studentId || 'غير متوفر'}</div> <!-- Responsive font size -->
-                                                <div class="text-xs md:text-sm text-gray-600">محاولة #${index + 1} - ${result.submittedAt}</div> <!-- Responsive font size -->
+                                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                        <div class="flex justify-between items-center">
+                                            <div>
+                                                <div class="font-semibold text-gray-800">${result.studentName || 'طالب'}</div>
+                                                <div class="text-sm text-gray-600">معرف الطالب: ${result.studentId || 'غير متوفر'}</div>
+                                                <div class="text-sm text-gray-600">محاولة #${index + 1} - ${result.submittedAt}</div>
                                             </div>
-                                            <div class="text-center sm:text-left">
-                                                <div class="text-xl md:text-2xl font-bold ${result.score >= 60 ? 'text-green-600' : 'text-red-600'}">${result.score}%</div> <!-- Responsive font size -->
-                                                <div class="text-xs md:text-sm text-gray-600">${result.correctAnswers}/${result.totalQuestions}</div> <!-- Responsive font size -->
+                                            <div class="text-left">
+                                                <div class="text-2xl font-bold ${result.score >= 60 ? 'text-green-600' : 'text-red-600'}">${result.score}%</div>
+                                                <div class="text-sm text-gray-600">${result.correctAnswers}/${result.totalQuestions}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -1314,12 +1359,14 @@
 
         // --- Utility/UI Functions ---
         window.showStudentPage = function() { // Made global
+            document.getElementById('loginPage').classList.add('hidden'); // Hide login page
             document.getElementById('teacherPage').classList.add('hidden');
             document.getElementById('studentPage').classList.remove('hidden');
             document.getElementById('resultsPage').classList.add('hidden');
         }
 
         window.showResultsPage = function() { // Made global
+            document.getElementById('loginPage').classList.add('hidden'); // Hide login page
             document.getElementById('teacherPage').classList.add('hidden');
             document.getElementById('studentPage').classList.add('hidden');
             document.getElementById('resultsPage').classList.remove('hidden');
@@ -1329,9 +1376,9 @@
         window.showMessageBox = function(message) { // Made global
             const modalHTML = `
                 <div id="customAlertModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div class="bg-white rounded-lg shadow-xl p-4 md:p-6 max-w-sm w-full text-center"> <!-- Adjusted padding -->
-                        <p class="text-base md:text-lg mb-4">${message}</p> <!-- Responsive font size -->
-                        <button onclick="document.getElementById('customAlertModal').remove()" class="btn-primary text-white px-5 py-2 rounded-lg font-semibold transition text-sm md:text-base">حسناً</button> <!-- Responsive font size -->
+                    <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full text-center">
+                        <p class="text-gray-800 text-lg mb-4">${message}</p>
+                        <button onclick="document.getElementById('customAlertModal').remove()" class="btn-primary text-white px-6 py-2 rounded-lg font-semibold transition">حسناً</button>
                     </div>
                 </div>
             `;
@@ -1342,11 +1389,11 @@
         window.showConfirmBox = function(message, onConfirmCallback) { // Made global
             const modalHTML = `
                 <div id="customConfirmModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div class="bg-white rounded-lg shadow-xl p-4 md:p-6 max-w-sm w-full text-center"> <!-- Adjusted padding -->
-                        <p class="text-base md:text-lg mb-4">${message}</p> <!-- Responsive font size -->
-                        <div class="flex justify-center gap-3 md:gap-4 flex-wrap"> <!-- Responsive button layout -->
-                            <button id="confirmYesBtn" class="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg font-semibold transition text-sm md:text-base">نعم</button> <!-- Responsive font size -->
-                            <button id="confirmNoBtn" class="bg-gray-500 hover:bg-gray-600 text-white px-5 py-2 rounded-lg font-semibold transition text-sm md:text-base">إلغاء</button> <!-- Responsive font size -->
+                    <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full text-center">
+                        <p class="text-gray-800 text-lg mb-4">${message}</p>
+                        <div class="flex justify-center gap-4">
+                            <button id="confirmYesBtn" class="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg font-semibold transition">نعم</button>
+                            <button id="confirmNoBtn" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-semibold transition">إلغاء</button>
                         </div>
                     </div>
                 </div>
