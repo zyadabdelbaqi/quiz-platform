@@ -149,15 +149,12 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, addDoc, collection, query, where, getDocs, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase configuration - Using the provided configuration OR Canvas global if available
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : `{
-            "apiKey": "AIzaSyCTyHb79TSlbjwuebsb_Pd8VoqvWHEh-RI",
-            "authDomain": "my-quiz-app-77c96.firebaseapp.com",
-            "projectId": "my-quiz-app-77c96",
-            "storageBucket": "my-quiz-app-77c96.firebasestorage.app",
-            "messagingSenderId": "692482795107",
-            "appId": "1:692482795107:web:10ad0a80e523dfdaaa3a56"
-        }`);
+        // Firebase configuration - Use __firebase_config if provided, else use the user's explicit config
+        const firebaseConfig = JSON.parse(
+            typeof __firebase_config !== 'undefined' && __firebase_config.length > 2 // Check if it's actually populated
+                ? __firebase_config
+                : '{"apiKey":"AIzaSyCTyHb79TSlbjwuebsb_Pd8VoqvWHEh-RI","authDomain":"my-quiz-app-77c96.firebaseapp.com","projectId":"my-quiz-app-77c96","storageBucket":"my-quiz-app-77c96.firebasestorage.app","messagingSenderId":"692482795107","appId":"1:692482795107:web:10ad0a80e523dfdaaa3a56"}'
+        );
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
@@ -809,13 +806,121 @@
                 // Save results to a public collection accessible by the teacher (via teacherId)
                 await addDoc(collection(db, `artifacts/${appId}/public/data/quiz_results`), results);
                 window.showMessageBox('تم إرسال إجاباتك بنجاح!');
-                // توجيه إلى صفحة النتائج
-                window.location.href = `${window.location.pathname}?quiz=${currentQuiz.id}&results=true&studentId=${currentUserId}`;
+                
+                // **** التغيير هنا: عرض النتائج مباشرة بدلاً من إعادة التوجيه ****
+                window.displayInlineResults(results, currentQuiz);
+
             } catch (e) {
                 console.error("Error submitting quiz results: ", e);
                 window.showMessageBox("حدث خطأ أثناء إرسال النتائج. يرجى المحاولة مرة أخرى.");
             }
         }
+
+        // **** دالة جديدة لعرض النتائج مباشرة في الصفحة ****
+        window.displayInlineResults = function(results, quiz) {
+            let resultsHTML = `
+                <div class="text-center mb-8">
+                    <div class="inline-flex items-center justify-center w-20 h-20 rounded-full ${results.score >= 60 ? 'bg-green-100' : 'bg-red-100'} mb-4">
+                        <i class="fas fa-${results.score >= 60 ? 'check' : 'times'} text-3xl ${results.score >= 60 ? 'text-green-500' : 'text-red-500'}"></i>
+                    </div>
+                    <h1 class="text-3xl font-bold text-gray-800 mb-2">نتيجة الكويز</h1>
+                    <h2 class="text-xl text-gray-600 mb-4">${results.quizTitle}</h2>
+                    <div class="bg-gray-100 p-3 rounded-lg inline-block mb-4">
+                        <i class="fas fa-user ml-2"></i>
+                        اسم الطالب: ${results.studentName}
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <div class="text-2xl font-bold text-blue-600">${results.score}%</div>
+                            <div class="text-sm text-gray-600">النسبة المئوية</div>
+                        </div>
+                        <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                            <div class="text-2xl font-bold text-green-600">${results.correctAnswers}</div>
+                            <div class="text-sm text-gray-600">إجابات صحيحة</div>
+                        </div>
+                        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                            <div class="text-2xl font-bold text-gray-600">${results.totalQuestions}</div>
+                            <div class="text-sm text-gray-600">إجمالي الأسئلة</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">مراجعة الإجابات</h3>
+                    ${results.answers.map((answer, index) => {
+                        let correctAnswerText = '';
+                        // Find the original question from the quiz to get options/details
+                        const originalQuestion = quiz.questions.find(q => q.id == answer.questionId);
+
+                        if (!originalQuestion) {
+                            return `<div class="text-red-500">خطأ: لم يتم العثور على السؤال #${answer.questionId} في الكويز الأصلي.</div>`;
+                        }
+
+                        if (answer.questionType === 'multiple') {
+                            correctAnswerText = originalQuestion.options[answer.correctAnswer];
+                        } else if (answer.questionType === 'boolean') {
+                            correctAnswerText = answer.correctAnswer ? 'صحيح' : 'خطأ';
+                        } else {
+                            correctAnswerText = answer.correctAnswer;
+                        }
+
+                        let studentAnswerText = '';
+                        if (answer.questionType === 'multiple') {
+                            // Ensure studentAnswer is parsed as integer for array access
+                            studentAnswerText = originalQuestion.options[parseInt(answer.studentAnswer)];
+                        } else if (answer.questionType === 'boolean') {
+                            studentAnswerText = answer.studentAnswer === 'true' ? 'صحيح' : 'خطأ';
+                        } else {
+                            studentAnswerText = answer.studentAnswer;
+                        }
+
+                        return `
+                            <div class="bg-gray-50 p-6 rounded-lg border-r-4 ${answer.isCorrect ? 'border-green-500' : 'border-red-500'} mb-4">
+                                <div class="flex items-start justify-between mb-3">
+                                    <h4 class="text-lg font-semibold text-gray-800">
+                                        <span class="bg-gray-500 text-white rounded-full w-8 h-8 inline-flex items-center justify-center ml-2 text-sm">
+                                            ${index + 1}
+                                        </span>
+                                        ${answer.questionText}
+                                    </h4>
+                                    <span class="text-2xl ${answer.isCorrect ? 'text-green-500' : 'text-red-500'}">
+                                        <i class="fas fa-${answer.isCorrect ? 'check-circle' : 'times-circle'}"></i>
+                                    </span>
+                                </div>
+                                ${originalQuestion.imageUrl ? `<img src="${originalQuestion.imageUrl}" class="mt-2 mb-4 rounded-lg max-w-full h-auto" alt="صورة السؤال">` : ''}
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="bg-white p-3 rounded border">
+                                        <div class="text-sm font-medium text-gray-600 mb-1">إجابتك:</div>
+                                        <div class="text-lg ${answer.isCorrect ? 'text-green-700' : 'text-red-700'}">${studentAnswerText}</div>
+                                    </div>
+                                    <div class="bg-white p-3 rounded border">
+                                        <div class="text-sm font-medium text-gray-600 mb-1">الإجابة الصحيحة:</div>
+                                        <div class="text-lg text-green-700">${correctAnswerText}</div>
+                                    </div>
+                                </div>
+                                ${answer.explanation ? `
+                                    <div class="bg-blue-50 border border-blue-200 p-3 rounded-lg mt-4">
+                                        <div class="text-sm font-medium text-blue-700 mb-1">هامش توضيحي:</div>
+                                        <p class="text-blue-800">${answer.explanation}</p>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+
+                <div class="text-center">
+                    <button onclick="window.close()" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold transition">
+                        <i class="fas fa-times ml-2"></i>إغلاق النافذة
+                    </button>
+                    <!-- يمكنك إضافة زر للعودة إلى صفحة الطالب أو الصفحة الرئيسية هنا -->
+                </div>
+            `;
+
+            document.getElementById('resultsContent').innerHTML = resultsHTML;
+            window.showResultsPage(); // عرض قسم النتائج
+        };
+
 
         window.showResults = async function(quizId) { // Made global
             if (!isAuthReady || !currentUserId) {
@@ -905,104 +1010,8 @@
 
                 latestResult = allResultsForStudent[allResultsForStudent.length - 1]; // Get the latest attempt
 
-                let resultsHTML = `
-                    <div class="text-center mb-8">
-                        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full ${latestResult.score >= 60 ? 'bg-green-100' : 'bg-red-100'} mb-4">
-                            <i class="fas fa-${latestResult.score >= 60 ? 'check' : 'times'} text-3xl ${latestResult.score >= 60 ? 'text-green-500' : 'text-red-500'}"></i>
-                        </div>
-                        <h1 class="text-3xl font-bold text-gray-800 mb-2">نتيجة الكويز</h1>
-                        <h2 class="text-xl text-gray-600 mb-4">${latestResult.quizTitle}</h2>
-                        <div class="bg-gray-100 p-3 rounded-lg inline-block mb-4">
-                            <i class="fas fa-user ml-2"></i>
-                            اسم الطالب: ${latestResult.studentName}
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                                <div class="text-2xl font-bold text-blue-600">${latestResult.score}%</div>
-                                <div class="text-sm text-gray-600">النسبة المئوية</div>
-                            </div>
-                            <div class="bg-green-50 border border-green-200 rounded-lg p-4">
-                                <div class="text-2xl font-bold text-green-600">${latestResult.correctAnswers}</div>
-                                <div class="text-sm text-gray-600">إجابات صحيحة</div>
-                            </div>
-                            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                                <div class="text-2xl font-bold text-gray-600">${latestResult.totalQuestions}</div>
-                                <div class="text-sm text-gray-600">إجمالي الأسئلة</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mb-6">
-                        <h3 class="text-2xl font-bold text-gray-800 mb-4">مراجعة الإجابات</h3>
-                        ${latestResult.answers.map((answer, index) => {
-                            let correctAnswerText = '';
-                            const question = quiz.questions.find(q => q.id == answer.questionId);
-
-                            if (!question) { // Handle case where question might be missing (shouldn't happen with correct data)
-                                return `<div class="text-red-500">خطأ: لم يتم العثور على السؤال #${answer.questionId}</div>`;
-                            }
-
-                            if (answer.questionType === 'multiple') {
-                                correctAnswerText = question.options[answer.correctAnswer];
-                            } else if (answer.questionType === 'boolean') {
-                                correctAnswerText = answer.correctAnswer ? 'صحيح' : 'خطأ';
-                            } else {
-                                correctAnswerText = answer.correctAnswer;
-                            }
-
-                            let studentAnswerText = '';
-                            if (answer.questionType === 'multiple') {
-                                studentAnswerText = question.options[parseInt(answer.studentAnswer)];
-                            } else if (answer.questionType === 'boolean') {
-                                studentAnswerText = answer.studentAnswer === 'true' ? 'صحيح' : 'خطأ';
-                            } else {
-                                studentAnswerText = answer.studentAnswer;
-                            }
-
-                            return `
-                                <div class="bg-gray-50 p-6 rounded-lg border-r-4 ${answer.isCorrect ? 'border-green-500' : 'border-red-500'} mb-4">
-                                    <div class="flex items-start justify-between mb-3">
-                                        <h4 class="text-lg font-semibold text-gray-800">
-                                            <span class="bg-gray-500 text-white rounded-full w-8 h-8 inline-flex items-center justify-center ml-2 text-sm">
-                                                ${index + 1}
-                                            </span>
-                                            ${answer.questionText}
-                                        </h4>
-                                        <span class="text-2xl ${answer.isCorrect ? 'text-green-500' : 'text-red-500'}">
-                                            <i class="fas fa-${answer.isCorrect ? 'check-circle' : 'times-circle'}"></i>
-                                        </span>
-                                    </div>
-                                    ${question.imageUrl ? `<img src="${question.imageUrl}" class="mt-2 mb-4 rounded-lg max-w-full h-auto" alt="صورة السؤال">` : ''}
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div class="bg-white p-3 rounded border">
-                                            <div class="text-sm font-medium text-gray-600 mb-1">إجابتك:</div>
-                                            <div class="text-lg ${answer.isCorrect ? 'text-green-700' : 'text-red-700'}">${studentAnswerText}</div>
-                                        </div>
-                                        <div class="bg-white p-3 rounded border">
-                                            <div class="text-sm font-medium text-gray-600 mb-1">الإجابة الصحيحة:</div>
-                                            <div class="text-lg text-green-700">${correctAnswerText}</div>
-                                        </div>
-                                    </div>
-                                    ${answer.explanation ? `
-                                        <div class="bg-blue-50 border border-blue-200 p-3 rounded-lg mt-4">
-                                            <div class="text-sm font-medium text-blue-700 mb-1">هامش توضيحي:</div>
-                                            <p class="text-blue-800">${answer.explanation}</p>
-                                        </div>
-                                    ` : ''}
-                                </div>
-                            `;
-                        }).join('')}
-                    </div>
-
-                    <div class="text-center">
-                        <button onclick="window.close()" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold transition">
-                            <i class="fas fa-times ml-2"></i>إغلاق النافذة
-                        </button>
-                    </div>
-                `;
-
-                document.getElementById('resultsContent').innerHTML = resultsHTML;
-                window.showResultsPage();
+                // Call the new displayInlineResults function to render the results
+                window.displayInlineResults(latestResult, quiz);
 
             } catch (e) {
                 console.error("Error showing results:", e);
