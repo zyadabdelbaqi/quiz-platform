@@ -64,17 +64,56 @@
         #loginPage input {
             text-align: center;
         }
+
+        /* Language selector positioning for mobile to prevent overlap */
+        /* Adjusted positioning to top-4 right-4 for Arabic (RTL) and top-4 left-4 for English (LTR) */
+        /* Increased z-index and added responsive padding to main content */
+        .language-selector {
+            position: absolute;
+            top: 1rem; /* 16px */
+            padding: 0.5rem; /* 8px */
+            background-color: #e5e7eb; /* gray-200 */
+            border-radius: 0.5rem; /* rounded-lg */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* shadow-md */
+            display: flex;
+            gap: 0.5rem; /* gap-2 */
+            z-index: 50; /* Ensure it's on top */
+        }
+
+        html[lang="ar"] .language-selector {
+            right: 1rem;
+            left: auto;
+        }
+
+        html[lang="en"] .language-selector {
+            left: 1rem;
+            right: auto;
+        }
+
+        /* Add top padding to main content areas to prevent overlap with the language selector */
+        /* This applies to all main content areas that might be under the selector */
+        .main-content-area {
+            padding-top: 4rem; /* Adjust as needed, considering selector height + some margin */
+            /* Default horizontal padding remains px-4 or similar */
+        }
+
+        /* Specific adjustments for smaller screens if needed */
+        @media (max-width: 640px) { /* Tailwind's sm breakpoint */
+            .main-content-area {
+                padding-top: 5rem; /* More padding for smaller screens if selector is larger or content is higher */
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-100">
     <!-- Language Selector -->
-    <div class="absolute top-4 left-4 p-2 bg-gray-200 rounded-lg shadow-md flex gap-2 z-50">
+    <div class="language-selector">
         <button onclick="setLanguage('ar')" class="px-3 py-1 rounded-md text-sm font-semibold hover:bg-gray-300 transition" data-lang-btn="ar">العربية</button>
         <button onclick="setLanguage('en')" class="px-3 py-1 rounded-md text-sm font-semibold hover:bg-gray-300 transition" data-lang-btn="en">English</button>
     </div>
 
     <!-- صفحة تسجيل الدخول (جديدة) -->
-    <div id="loginPage" class="flex items-center justify-center min-h-screen bg-gradient-to-r from-purple-400 via-pink-500 to-red-500">
+    <div id="loginPage" class="flex items-center justify-center min-h-screen bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 main-content-area">
         <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full text-center transform hover:scale-105 transition duration-300">
             <h1 class="text-3xl font-bold text-gray-800 mb-6">
                 <i class="fas fa-lock text-purple-600 mr-2" data-translate-key="login_icon"></i>
@@ -106,7 +145,7 @@
 
     <!-- صفحة المعلم -->
     <div id="teacherPage" class="hidden">
-        <div class="teacher-mode text-white py-8">
+        <div class="teacher-mode text-white py-8 main-content-area">
             <div class="container mx-auto px-4">
                 <h1 class="text-4xl font-bold text-center mb-2">
                     <i class="fas fa-graduation-cap mr-3" data-translate-key="platform_icon"></i>
@@ -181,7 +220,7 @@
 
     <!-- صفحة الطالب -->
     <div id="studentPage" class="hidden">
-        <div class="student-mode text-white py-8">
+        <div class="student-mode text-white py-8 main-content-area">
             <div class="container mx-auto px-4">
                 <h1 class="text-4xl font-bold text-center mb-2">
                     <i class="fas fa-user-graduate mr-3" data-translate-key="student_page_icon"></i>
@@ -213,7 +252,7 @@
 
     <!-- صفحة النتائج -->
     <div id="resultsPage" class="hidden">
-        <div class="student-mode text-white py-8">
+        <div class="student-mode text-white py-8 main-content-area">
             <div class="container mx-auto px-4">
                 <h1 class="text-4xl font-bold text-center mb-2">
                     <i class="fas fa-chart-bar mr-3" data-translate-key="quiz_results_icon"></i>
@@ -344,7 +383,7 @@
                 'submit_answers_button': 'إرسال الإجابات',
                 'submit_answers_icon': '', // Handled by font-awesome class
                 'answers_submitted_success': 'تم إرسال إجاباتك بنجاح!',
-                'results_not_shown_message': 'تم إرسال إجاباتك بنجاح. سيتم عرض النتائج لاحقًا بواسطة المعلم.', // New translation
+                'results_not_shown_message': '', // New translation
                 'error_submitting_answers': 'حدث خطأ أثناء إرسال النتائج. يرجى المحاولة مرة أخرى.',
                 'quiz_results_title': 'نتائج الكويز',
                 'quiz_results_icon': '', // Handled by font-awesome class
@@ -1230,7 +1269,7 @@
                 document.getElementById('quizContent').innerHTML = `
                     <div class="text-center py-8">
                         <i class="fas fa-exclamation-triangle text-yellow-500 text-6xl mb-4"></i>
-                        <h2 class="2xl font-bold text-gray-800 mb-2">${translations[currentLang].quiz_not_found}</h2>
+                        <h2 class="text-2xl font-bold text-gray-800 mb-2">${translations[currentLang].quiz_not_found}</h2>
                         <p class="text-gray-600">${translations[currentLang].quiz_not_found_desc}</p>
                     </div>
                 `;
@@ -1581,7 +1620,7 @@
                 </div>
 
                 <div class="mb-6">
-                    <h3 class="2xl font-bold text-gray-800 mb-4">${translations[currentLang].review_answers_title}</h3>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">${translations[currentLang].review_answers_title}</h3>
                     ${results.answers.map((answer, index) => {
                         // Find the original question from the quiz to get options/details
                         const originalQuestion = quiz.questions.find(q => q.id == answer.questionId);
@@ -1614,7 +1653,7 @@
                                         </span>
                                         ${answer.questionText}
                                     </h4>
-                                    <span class="2xl ${answer.isCorrect ? 'text-green-500' : 'text-red-500'}">
+                                    <span class="text-2xl ${answer.isCorrect ? 'text-green-500' : 'text-red-500'}">
                                         <i class="fas fa-${answer.isCorrect ? 'check-circle' : 'times-circle'}"></i>
                                     </span>
                                 </div>
@@ -1867,7 +1906,7 @@
                     <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto m-4" onclick="event.stopPropagation()">
                         <div class="p-6 border-b border-200">
                             <div class="flex justify-between items-center">
-                                <h2 class="2xl font-bold text-gray-800">
+                                <h2 class="text-2xl font-bold text-gray-800">
                                     <i class="fas fa-chart-line text-blue-500 ml-2"></i>
                                     ${translations[currentLang].quiz_stats_title} ${quizTitle}
                                 </h2>
@@ -1892,12 +1931,12 @@
                                     <div class="text-sm text-gray-600">${translations[currentLang].passed_students}</div>
                                 </div>
                                 <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 text-center">
-                                    <div class="2xl font-bold text-orange-600">${totalAttempts - passCount}</div>
+                                    <div class="text-2xl font-bold text-orange-600">${totalAttempts - passCount}</div>
                                     <div class="text-sm text-gray-600">${translations[currentLang].failed_students}</div>
                                 </div>
                             </div>
 
-                            <h3 class="xl font-bold text-gray-800 mb-4">${translations[currentLang].all_attempts}</h3>
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">${translations[currentLang].all_attempts}</h3>
                             <div class="space-y-3 max-h-96 overflow-y-auto">
                                 ${allResults.map((result, index) => `
                                     <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
