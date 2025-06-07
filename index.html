@@ -5,40 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>كويزات MET</title>
     <!-- Improved Arabic and English Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&family=Amiri:wght@400;700&family=Noto+Sans+Arabic:wght@400;500;700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&family=Amiri:wght@400;500;700&family=Noto+Sans+Arabic:wght@440;500;700&family=Inter:wght@400;500;700&family=Cairo:wght@400;700&family=Changa:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@400;700&family=Lateef&family=Reem+Kufi:wght@400;700&family=El+Messiri:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     
     <style>
         /* الأنماط العامة */
         body {
-            /* Default font for Arabic, will be overridden by JS based on language */
-            font-family: 'Tajawal', 'Noto Sans Arabic', sans-serif;
+            /* Default font for general content, will be overridden by html[lang] */
+            font-family: 'Inter', sans-serif; /* Neutral default */
             background-color: #f3f4f6; /* لون خلفية افتراضي */
             line-height: 1.6; /* تحسين تباعد الأسطر */
-            text-align: right; /* محاذاة النص لليمين افتراضياً للعربية */
+            text-align: left; /* محاذاة النص لليسار افتراضياً (لالإنجليزية) */
         }
-        /* Apply Amiri for headings in Arabic by default */
-        html[lang="ar"] h1 {
-            font-family: 'Amiri', 'Noto Sans Arabic', serif;
-            /* Removed text-align: right; to allow Tailwind's text-center on h1 */
+
+        /* تعيين الخط الأساسي للمحتوى العربي ليكون Amiri */
+        html[lang="ar"] body {
+            font-family: 'Amiri', 'Noto Sans Arabic', 'Tajawal', 'Cairo', 'Changa', 'IBM Plex Sans Arabic', 'Lateef', 'Reem Kufi', 'El Messiri', serif;
+            text-align: right;
         }
-        html[lang="ar"] h2, html[lang="ar"] h3, html[lang="ar"] h4, html[lang="ar"] h5, html[lang="ar"] h6 {
-            font-family: 'Amiri', 'Noto Sans Arabic', serif;
-            text-align: right; /* محاذاة العناوين لليمين في العربية */
-        }
-        /* Apply Inter for headings and body text in English */
+        /* تعيين الخط الأساسي للمحتوى الإنجليزي ليكون Inter */
         html[lang="en"] body {
             font-family: 'Inter', sans-serif;
-            text-align: left; /* محاذاة النص لليسار في الإنجليزية */
-        }
-        html[lang="en"] h1 {
-            font-family: 'Inter', sans-serif;
-            /* Removed text-align: left; to allow Tailwind's text-center on h1 */
-        }
-        html[lang="en"] h2, html[lang="en"] h3, html[lang="en"] h4, html[lang="en"] h5, html[lang="en"] h6 {
-            font-family: 'Inter', sans-serif;
-            text-align: left; /* محاذاة العناوين لليسار في الإنجليزية */
+            text-align: left;
         }
 
         /* Override specific Tailwind defaults for RTL if needed, or ensure proper usage */
@@ -102,6 +91,44 @@
             .main-content-area {
                 padding-top: 5rem; /* More padding for smaller screens if selector is larger or content is higher */
             }
+        }
+
+        /* New styles for theme options - custom select */
+        .custom-select-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .custom-select {
+            display: block;
+            width: 100%;
+            padding: 0.75rem; /* p-3 */
+            border: 1px solid #d1d5db; /* border-gray-300 */
+            border-radius: 0.5rem; /* rounded-lg */
+            background-color: white;
+            appearance: none; /* Remove default browser styling */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            cursor: pointer;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #1f2937; /* text-gray-900 */
+            background-image: url('data:image/svg+xml;utf8,<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>');
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1.5em;
+        }
+
+        .custom-select:focus {
+            outline: none;
+            border-color: #3b82f6; /* focus:border-blue-500 */
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5); /* focus:ring-2 focus:ring-blue-500 */
+        }
+
+        /* Specific styles for quiz content based on theme */
+        .quiz-content-themed {
+            transition: all 0.3s ease-in-out;
         }
     </style>
 </head>
@@ -181,6 +208,42 @@
                     </label>
                 </div>
 
+                <!-- Theme Options Section -->
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-4" data-translate-key="theme_options_title">خيارات المظهر (للطلاب)</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2" data-translate-key="background_color_label">لون الخلفية</label>
+                            <input type="color" id="themeBackgroundColor" class="w-full h-10 border border-gray-300 rounded-lg" value="#f3f4f6">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2" data-translate-key="text_color_label">لون النص</label>
+                            <input type="color" id="themeTextColor" class="w-full h-10 border border-gray-300 rounded-lg" value="#1f2937">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2" data-translate-key="font_family_label">نوع الخط</label>
+                            <div class="custom-select-wrapper">
+                                <select id="themeFontFamily" class="custom-select">
+                                    <option value="Tajawal, Noto Sans Arabic, sans-serif" data-translate-key="font_tajawal">Tajawal (عربي)</option>
+                                    <option value="Amiri, Noto Sans Arabic, serif" data-translate-key="font_amiri">Amiri (عربي)</option>
+                                    <option value="Cairo, sans-serif" data-translate-key="font_cairo">Cairo (عربي)</option>
+                                    <option value="Changa, sans-serif" data-translate-key="font_changa">Changa (عربي)</option>
+                                    <option value="IBM Plex Sans Arabic, sans-serif" data-translate-key="font_ibm_plex_sans_arabic">IBM Plex Sans Arabic (عربي)</option>
+                                    <option value="Lateef, serif" data-translate-key="font_lateef">Lateef (عربي)</option>
+                                    <option value="Reem Kufi, sans-serif" data-translate-key="font_reem_kufi">Reem Kufi (عربي)</option>
+                                    <option value="El Messiri, sans-serif" data-translate-key="font_el_messiri">El Messiri (عربي)</option>
+                                    <option value="Inter, sans-serif" data-translate-key="font_inter">Inter (إنجليزي)</option>
+                                    <option value="system-ui, sans-serif" data-translate-key="font_system_ui">System UI</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2" data-translate-key="font_size_label">حجم الخط</label>
+                            <input type="number" id="themeFontSize" class="w-full p-3 border border-gray-300 rounded-lg" value="16" min="12" max="24">
+                        </div>
+                    </div>
+                </div>
+
                 <div id="questionsContainer" class="mb-6">
                     <h3 class="text-lg font-semibold text-gray-700 mb-4" data-translate-key="questions_section_title">الأسئلة</h3>
                 </div>
@@ -244,7 +307,7 @@
                     <i class="fas fa-play mr-2" data-translate-key="start_quiz_icon"></i><span data-translate-key="start_quiz_button">بدء الاختبار</span>
                 </button>
             </div>
-            <div id="quizContent" class="bg-white rounded-lg shadow-lg p-6 hidden">
+            <div id="quizContent" class="bg-white rounded-lg shadow-lg p-6 hidden quiz-content-themed">
                 <!-- سيتم تحميل محتوى الكويز هنا -->
             </div>
         </div>
@@ -262,7 +325,7 @@
         </div>
 
         <div class="quiz-container px-4 py-8">
-            <div id="resultsContent" class="bg-white rounded-lg shadow-lg p-6">
+            <div id="resultsContent" class="bg-white rounded-lg shadow-lg p-6 quiz-content-themed">
                 <!-- سيتم تحميل النتائج هنا -->
             </div>
         </div>
@@ -330,6 +393,21 @@
                 'quiz_description_label': 'وصف الكويز',
                 'quiz_description_placeholder': 'وصف مختصر للكويز',
                 'show_results_option': 'السماح للطلاب بمشاهدة النتائج فوراً', // New translation
+                'theme_options_title': 'خيارات المظهر (للطلاب)', // New translation
+                'background_color_label': 'لون الخلفية', // New translation
+                'text_color_label': 'لون النص', // New translation
+                'font_family_label': 'نوع الخط', // New translation
+                'font_size_label': 'حجم الخط', // New translation
+                'font_tajawal': 'Tajawal (عربي)', // New translation
+                'font_amiri': 'Amiri (عربي)', // New translation
+                'font_cairo': 'Cairo (عربي)', // New translation
+                'font_changa': 'Changa (عربي)', // New translation
+                'font_ibm_plex_sans_arabic': 'IBM Plex Sans Arabic (عربي)', // New translation
+                'font_lateef': 'Lateef (عربي)', // New translation
+                'font_reem_kufi': 'Reem Kufi (عربي)', // New translation
+                'font_el_messiri': 'El Messiri (عربي)', // New translation
+                'font_inter': 'Inter (إنجليزي)', // New translation
+                'font_system_ui': 'System UI', // New translation
                 'questions_section_title': 'الأسئلة',
                 'add_multiple_choice': 'إضافة سؤال اختيار متعدد',
                 'add_multiple_choice_icon': '', // Handled by font-awesome class
@@ -446,6 +524,21 @@
                 'quiz_description_label': 'Quiz Description',
                 'quiz_description_placeholder': 'Brief description of the quiz',
                 'show_results_option': 'Allow students to see results immediately', // New translation
+                'theme_options_title': 'Theme Options (for Students)', // New translation
+                'background_color_label': 'Background Color', // New translation
+                'text_color_label': 'Text Color', // New translation
+                'font_family_label': 'Font Family', // New translation
+                'font_size_label': 'Font Size', // New translation
+                'font_tajawal': 'Tajawal (Arabic)', // New translation
+                'font_amiri': 'Amiri (Arabic)', // New translation
+                'font_cairo': 'Cairo (Arabic)', // New translation
+                'font_changa': 'Changa (Arabic)', // New translation
+                'font_ibm_plex_sans_arabic': 'IBM Plex Sans Arabic (Arabic)', // New translation
+                'font_lateef': 'Lateef (Arabic)', // New translation
+                'font_reem_kufi': 'Reem Kufi (Arabic)', // New translation
+                'font_el_messiri': 'El Messiri (Arabic)', // New translation
+                'font_inter': 'Inter (English)', // New translation
+                'font_system_ui': 'System UI', // New translation
                 'questions_section_title': 'Questions',
                 'add_multiple_choice': 'Add Multiple Choice Question',
                 'add_multiple_choice_icon': '', // Handled by font-awesome class
@@ -550,50 +643,8 @@
             localStorage.setItem('quizAppLang', lang);
             document.documentElement.lang = lang;
             document.documentElement.dir = (lang === 'ar' ? 'rtl' : 'ltr');
-            // Update font-family for body and headings based on language
-            if (lang === 'ar') {
-                document.body.style.fontFamily = "'Tajawal', 'Noto Sans Arabic', sans-serif";
-                document.body.style.textAlign = 'right';
-                // For headings, set specific Arabic fonts
-                document.querySelectorAll('h1').forEach(el => {
-                    el.style.fontFamily = "'Amiri', 'Noto Sans Arabic', serif";
-                    el.style.textAlign = 'center'; /* Center align h1 for Arabic */
-                });
-                document.querySelectorAll('h2, h3, h4, h5, h6').forEach(el => {
-                    el.style.fontFamily = "'Amiri', 'Noto Sans Arabic', serif";
-                    el.style.textAlign = 'right';
-                });
-                // Ensure inputs align right
-                document.querySelectorAll('input[type="text"], input[type="email"], input[type="password"], textarea').forEach(el => {
-                    el.style.direction = 'rtl';
-                    el.style.textAlign = 'right';
-                });
-                // Special case for login inputs
-                document.querySelectorAll('#loginPage input').forEach(el => {
-                    el.style.textAlign = 'center';
-                });
-
-            } else { // English
-                document.body.style.fontFamily = "'Inter', sans-serif";
-                document.body.style.textAlign = 'left';
-                document.querySelectorAll('h1').forEach(el => {
-                    el.style.fontFamily = "'Inter', sans-serif";
-                    el.style.textAlign = 'center'; /* Center align h1 for English */
-                });
-                document.querySelectorAll('h2, h3, h4, h5, h6').forEach(el => {
-                    el.style.fontFamily = "'Inter', sans-serif";
-                    el.style.textAlign = 'left';
-                });
-                // Ensure inputs align left
-                document.querySelectorAll('input[type="text"], input[type="email"], input[type="password"], textarea').forEach(el => {
-                    el.style.direction = 'ltr';
-                    el.style.textAlign = 'left';
-                });
-                // Special case for login inputs
-                document.querySelectorAll('#loginPage input').forEach(el => {
-                    el.style.textAlign = 'center';
-                });
-            }
+            // Font application is now handled by CSS rules based on html[lang]
+            // and by theme settings for quiz content.
             renderContent();
         };
 
@@ -605,7 +656,10 @@
                 if (translations[currentLang] && translations[currentLang][key]) {
                     if (element.tagName === 'INPUT' && element.hasAttribute('placeholder')) {
                         element.setAttribute('placeholder', translations[currentLang][key]);
-                    } else {
+                    } else if (element.tagName === 'OPTION' && element.hasAttribute('data-translate-key')) {
+                        element.textContent = translations[currentLang][key]; // For option elements
+                    }
+                     else {
                         element.textContent = translations[currentLang][key];
                     }
                 }
@@ -935,6 +989,13 @@
             const title = document.getElementById('quizTitle').value;
             const description = document.getElementById('quizDescription').value;
             const showResultsToStudents = document.getElementById('showResultsToStudents').checked; // Get the checkbox value
+            
+            // Get theme options
+            const themeBackgroundColor = document.getElementById('themeBackgroundColor').value;
+            const themeTextColor = document.getElementById('themeTextColor').value;
+            const themeFontFamily = document.getElementById('themeFontFamily').value;
+            const themeFontSize = document.getElementById('themeFontSize').value;
+
             const editQuizId = document.getElementById('editQuizId').value;
 
             if (!title.trim()) {
@@ -953,7 +1014,13 @@
                 questions: [],
                 createdAt: new Date().toLocaleString(currentLang === 'ar' ? 'ar-EG' : 'en-US'), // Localized date
                 teacherId: currentUserId, // Link quiz to the teacher
-                showResultsToStudents: showResultsToStudents // Save the new setting
+                showResultsToStudents: showResultsToStudents, // Save the new setting
+                theme: { // Save theme options
+                    backgroundColor: themeBackgroundColor,
+                    textColor: themeTextColor,
+                    fontFamily: themeFontFamily,
+                    fontSize: themeFontSize
+                }
             };
 
             for (const q of questions) {
@@ -997,7 +1064,7 @@
                         window.showMessageBox(translations[currentLang].choose_correct_answer);
                         return;
                     }
-                    if (options.some(option => option.trim() === '')) {
+                    if (options.some(option => option.trim() === '') && options.length > 0) { // Check for empty options only if options exist
                          window.showMessageBox('الرجاء ملء جميع حقول الخيارات في أسئلة الاختيار من متعدد.'); // New validation message
                          return;
                     }
@@ -1062,6 +1129,12 @@
             document.getElementById('quizTitle').value = '';
             document.getElementById('quizDescription').value = '';
             document.getElementById('showResultsToStudents').checked = true; // Reset checkbox to default true
+            // Reset theme options to defaults
+            document.getElementById('themeBackgroundColor').value = '#f3f4f6';
+            document.getElementById('themeTextColor').value = '#1f2937';
+            document.getElementById('themeFontFamily').value = 'Tajawal, Noto Sans Arabic, sans-serif';
+            document.getElementById('themeFontSize').value = '16';
+
             document.getElementById('questionsContainer').innerHTML = `<h3 class="text-lg font-semibold text-gray-700 mb-4">${translations[currentLang].questions_section_title}</h3>`;
             document.getElementById('editQuizId').value = ''; // Clear edit ID
             questions = [];
@@ -1162,6 +1235,13 @@
                 document.getElementById('quizDescription').value = quizToEdit.description;
                 // Set the checkbox state based on the saved quiz data, default to true if not found
                 document.getElementById('showResultsToStudents').checked = quizToEdit.showResultsToStudents !== undefined ? quizToEdit.showResultsToStudents : true;
+                
+                // Set theme options from quiz data, or use defaults if not present
+                document.getElementById('themeBackgroundColor').value = quizToEdit.theme?.backgroundColor || '#f3f4f6';
+                document.getElementById('themeTextColor').value = quizToEdit.theme?.textColor || '#1f2937';
+                document.getElementById('themeFontFamily').value = quizToEdit.theme?.fontFamily || 'Tajawal, Noto Sans Arabic, sans-serif';
+                document.getElementById('themeFontSize').value = quizToEdit.theme?.fontSize || '16';
+
                 document.getElementById('editQuizId').value = quizToEdit.id; // Set ID for editing
 
                 // Clear current questions and load questions from the quiz to edit
@@ -1280,6 +1360,52 @@
 
             currentQuiz = quiz;
             studentAnswers = {}; // Reset student answers for a new attempt or session
+
+            // Apply theme settings to the quiz content and results page
+            const quizContentElement = document.getElementById('quizContent');
+            const resultsContentElement = document.getElementById('resultsContent');
+
+            if (currentQuiz.theme) {
+                quizContentElement.style.backgroundColor = currentQuiz.theme.backgroundColor;
+                quizContentElement.style.color = currentQuiz.theme.textColor;
+                quizContentElement.style.fontFamily = currentQuiz.theme.fontFamily;
+                quizContentElement.style.fontSize = `${currentQuiz.theme.fontSize}px`;
+
+                resultsContentElement.style.backgroundColor = currentQuiz.theme.backgroundColor;
+                resultsContentElement.style.color = currentQuiz.theme.textColor;
+                resultsContentElement.style.fontFamily = currentQuiz.theme.fontFamily;
+                resultsContentElement.style.fontSize = `${currentQuiz.theme.fontSize}px`;
+
+                // Also apply to headings within these containers
+                // Apply to h1 (quiz title), h3 (question titles), and h4 (question numbers in teacher view)
+                quizContentElement.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(h => {
+                    h.style.color = currentQuiz.theme.textColor;
+                    h.style.fontFamily = currentQuiz.theme.fontFamily;
+                });
+                resultsContentElement.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(h => {
+                    h.style.color = currentQuiz.theme.textColor;
+                    h.style.fontFamily = currentQuiz.theme.fontFamily;
+                });
+            } else {
+                // Reset to default if no theme is defined (for older quizzes)
+                quizContentElement.style.backgroundColor = '';
+                quizContentElement.style.color = '';
+                quizContentElement.style.fontFamily = '';
+                quizContentElement.style.fontSize = '';
+                resultsContentElement.style.backgroundColor = '';
+                resultsContentElement.style.color = '';
+                resultsContentElement.style.fontFamily = '';
+                resultsContentElement.style.fontSize = '';
+                quizContentElement.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(h => {
+                    h.style.color = '';
+                    h.style.fontFamily = '';
+                });
+                resultsContentElement.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(h => {
+                    h.style.color = '';
+                    h.style.fontFamily = '';
+                });
+            }
+
 
             // Show student user ID
             const studentUserIdElement = document.getElementById('studentUserId');
@@ -1434,6 +1560,24 @@
             if (savedProgress) {
                 studentAnswers = { ...studentAnswers, ...savedProgress.answers };
             }
+
+            // Apply theme font and size to question titles (h3) and options (span within labels)
+            if (currentQuiz.theme) {
+                quizContentElement.querySelectorAll('h3').forEach(h3 => {
+                    h3.style.fontFamily = currentQuiz.theme.fontFamily;
+                    h3.style.fontSize = `${currentQuiz.theme.fontSize}px`;
+                });
+                // Target all text elements that are direct children of label within .space-y-3
+                quizContentElement.querySelectorAll('.space-y-3 label span').forEach(span => {
+                    span.style.fontFamily = currentQuiz.theme.fontFamily;
+                    span.style.fontSize = `${currentQuiz.theme.fontSize}px`;
+                });
+                // Also apply to text input for text questions
+                quizContentElement.querySelectorAll('input[type="text"][name^="question_"]').forEach(input => {
+                    input.style.fontFamily = currentQuiz.theme.fontFamily;
+                    input.style.fontSize = `${currentQuiz.theme.fontSize}px`;
+                });
+            }
         }
 
         window.saveQuizProgress = function() {
@@ -1538,7 +1682,6 @@
                 results.answers.push({
                     questionId: question.id,
                     questionText: question.text,
-                    studentAnswer: studentAnswer,
                     correctAnswer: question.correctAnswer,
                     isCorrect: isCorrect,
                     questionType: question.type,
@@ -1590,6 +1733,30 @@
             document.getElementById('studentInfoForm').classList.add('hidden');
             document.getElementById('quizContent').classList.add('hidden');
             window.showResultsPage();
+
+            // Apply theme to the results content
+            const resultsContentElement = document.getElementById('resultsContent');
+            if (quiz.theme) {
+                resultsContentElement.style.backgroundColor = quiz.theme.backgroundColor;
+                resultsContentElement.style.color = quiz.theme.textColor;
+                resultsContentElement.style.fontFamily = quiz.theme.fontFamily;
+                resultsContentElement.style.fontSize = `${quiz.theme.fontSize}px`;
+
+                 resultsContentElement.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(h => {
+                    h.style.color = quiz.theme.textColor;
+                    h.style.fontFamily = quiz.theme.fontFamily;
+                });
+            } else {
+                 // Reset to default if no theme is defined (for older quizzes)
+                resultsContentElement.style.backgroundColor = '';
+                resultsContentElement.style.color = '';
+                resultsContentElement.style.fontFamily = '';
+                resultsContentElement.style.fontSize = '';
+                 resultsContentElement.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(h => {
+                    h.style.color = '';
+                    h.style.fontFamily = '';
+                });
+            }
 
 
             let resultsHTML = `
@@ -1755,6 +1922,18 @@
 
             document.getElementById('resultsContent').innerHTML = resultsHTML;
             document.getElementById('resultsContent').querySelector('[data-translate-key="close_window_button"]').textContent = translations[currentLang].close_window_button;
+
+            // Apply theme font and size to question titles (h4 in results) and options (span within div)
+            if (quiz.theme) {
+                resultsContentElement.querySelectorAll('.mb-6 h3, .mb-6 h4').forEach(heading => { // Target both h3 and h4 in results review
+                    heading.style.fontFamily = quiz.theme.fontFamily;
+                    heading.style.fontSize = `${quiz.theme.fontSize}px`;
+                });
+                resultsContentElement.querySelectorAll('.space-y-2 span').forEach(span => { // Adjust selector for options in results
+                    span.style.fontFamily = quiz.theme.fontFamily;
+                    span.style.fontSize = `${quiz.theme.fontSize}px`;
+                });
+            }
         };
 
 
