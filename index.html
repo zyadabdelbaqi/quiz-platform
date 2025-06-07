@@ -10,15 +10,13 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     
     <style>
+        /* الأنماط العامة */
         body {
             font-family: 'Tajawal', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3f4f6; /* لون خلفية افتراضي */
         }
         h1, h2, h3, h4, h5, h6 {
             font-family: 'Amiri', serif;
-        }
-        #studentInfoForm {
-            max-width: 600px;
-            margin: 0 auto;
         }
         .quiz-container { max-width: 800px; margin: 0 auto; }
         .question-card { transition: all 0.3s ease; }
@@ -27,6 +25,7 @@
         .btn-primary:hover { background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%); }
         .student-mode { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
         .teacher-mode { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        #studentInfoForm { max-width: 600px; margin: 0 auto; }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -63,7 +62,7 @@
                     <h3 class="text-lg font-semibold text-gray-700 mb-4">الأسئلة</h3>
                 </div>
 
-                <div class="flex gap-4 mb-6">
+                <div class="flex gap-4 mb-6 flex-wrap">
                     <button onclick="addQuestion('multiple')" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition">
                         <i class="fas fa-list mr-2"></i>إضافة سؤال اختيار متعدد
                     </button>
@@ -90,6 +89,7 @@
                     الكويزات المحفوظة
                 </h2>
                 <div id="savedQuizzes" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- سيتم تحميل الكويزات المحفوظة هنا -->
                 </div>
             </div>
         </div>
@@ -103,6 +103,9 @@
                     صفحة الطالب
                 </h1>
                 <p class="text-center text-lg opacity-90">أجب على الأسئلة بعناية</p>
+                <p class="text-center text-sm mt-2">
+                     <i class="fas fa-id-badge ml-1"></i> معرف المستخدم: <span id="studentUserId"></span>
+                </p>
             </div>
         </div>
 
@@ -118,10 +121,11 @@
                 </button>
             </div>
             <div id="quizContent" class="bg-white rounded-lg shadow-lg p-6 hidden">
+                <!-- سيتم تحميل محتوى الكويز هنا -->
             </div>
         </div>
     </div>
-    
+
     <div id="resultsPage" class="hidden">
         <div class="student-mode text-white py-8">
             <div class="container mx-auto px-4">
@@ -134,53 +138,108 @@
 
         <div class="quiz-container px-4 py-8">
             <div id="resultsContent" class="bg-white rounded-lg shadow-lg p-6">
+                <!-- سيتم تحميل النتائج هنا -->
             </div>
         </div>
     </div>
 
-    <script>
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, addDoc, collection, query, where, getDocs, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase configuration - Using the provided configuration OR Canvas global if available
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : `{
+            "apiKey": "AIzaSyCTyHb79TSlbjwuebsb_Pd8VoqvWHEh-RI",
+            "authDomain": "my-quiz-app-77c96.firebaseapp.com",
+            "projectId": "my-quiz-app-77c96",
+            "storageBucket": "my-quiz-app-77c96.firebasestorage.app",
+            "messagingSenderId": "692482795107",
+            "appId": "1:692482795107:web:10ad0a80e523dfdaaa3a56"
+        }`);
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // Global variables for Firebase instances and user ID
+        let currentUserId = null;
+        let isAuthReady = false; // Flag to ensure auth is ready before Firestore ops
+
+        // Global variables for quiz management
         let questions = [];
         let currentQuiz = null;
         let studentAnswers = {};
 
-        // التحقق من نوع الصفحة عند التحميل
-        window.onload = function() {
+        // App ID for Firestore paths (from Canvas environment or default)
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-quiz-app';
+
+        // Firebase Authentication Listener
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUserId = user.uid;
+            } else {
+                // Sign in anonymously if no user is logged in
+                try {
+                    // Check if __initial_auth_token is provided, otherwise sign in anonymously
+                    if (typeof __initial_auth_token !== 'undefined') {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                    currentUserId = auth.currentUser?.uid || crypto.randomUUID(); // Fallback for anonymous
+                } catch (error) {
+                    console.error("Error signing in anonymously:", error);
+                    showMessageBox("حدث خطأ في المصادقة: " + error.message + ". يرجى المحاولة مرة أخرى.");
+                }
+            }
+            isAuthReady = true;
+            // Update UI with user ID if visible
+            const studentUserIdElement = document.getElementById('studentUserId');
+            if (studentUserIdElement) {
+                studentUserIdElement.textContent = currentUserId;
+            }
+            // Once auth is ready, proceed with loading quiz data
+            initializePage();
+        });
+
+        // Function to initialize the page based on URL parameters
+        function initializePage() {
             const urlParams = new URLSearchParams(window.location.search);
             const quizId = urlParams.get('quiz');
             const results = urlParams.get('results');
             
             if (results && quizId) {
-                showResults(quizId);
+                window.showResults(quizId);
             } else if (quizId) {
-                loadQuizForStudent(quizId);
+                window.loadQuizForStudent(quizId);
             } else {
-                showTeacherPage();
+                window.showTeacherPage();
             }
-        };
+        }
 
-        // وظائف لعرض الصفحات المختلفة
-        function showTeacherPage() {
+        // --- Teacher Functions ---
+        window.showTeacherPage = function() { // Made global
             document.getElementById('teacherPage').classList.remove('hidden');
             document.getElementById('studentPage').classList.add('hidden');
             document.getElementById('resultsPage').classList.add('hidden');
-            loadSavedQuizzes();
+            if (isAuthReady) {
+                window.loadSavedQuizzes();
+            } else {
+                // Wait for auth to be ready
+                const unsubscribe = onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        window.loadSavedQuizzes();
+                        unsubscribe(); // Stop listening after auth is ready
+                    }
+                });
+            }
         }
 
-        function showStudentPage() {
-            document.getElementById('teacherPage').classList.add('hidden');
-            document.getElementById('studentPage').classList.remove('hidden');
-            document.getElementById('resultsPage').classList.add('hidden');
-        }
-
-        function showResultsPage() {
-            document.getElementById('teacherPage').classList.add('hidden');
-            document.getElementById('studentPage').classList.add('hidden');
-            document.getElementById('resultsPage').classList.remove('hidden');
-        }
-
-        // إضافة سؤال جديد لنموذج الكويز
-        function addQuestion(type, questionData = {}) {
-            const questionId = questionData.id || Date.now();
+        window.addQuestion = function(type, questionData = {}) { // Made global
+            const questionId = questionData.id || Date.now().toString(); // Use string for ID
             const questionDiv = document.createElement('div');
             questionDiv.className = 'question-card bg-gray-50 p-4 rounded-lg border border-gray-200 mb-4';
             questionDiv.id = `question-${questionId}`;
@@ -256,35 +315,37 @@
             }
         }
 
-        // إزالة سؤال من نموذج الكويز
-        function removeQuestion(questionId) {
+        window.removeQuestion = function(questionId) { // Made global
             document.getElementById(`question-${questionId}`).remove();
             questions = questions.filter(q => q.id != questionId);
         }
 
-        // حفظ الكويز الحالي
-        async function saveQuiz() {
+        window.saveQuiz = async function() { // Made global
+            if (!isAuthReady || !currentUserId) {
+                window.showMessageBox('الرجاء الانتظار حتى يتم تهيئة المصادقة.');
+                return;
+            }
+
             const title = document.getElementById('quizTitle').value;
             const description = document.getElementById('quizDescription').value;
             const editQuizId = document.getElementById('editQuizId').value;
 
             if (!title.trim()) {
-                // Using a custom message box instead of alert
-                showMessageBox('يرجى إدخال عنوان الكويز');
+                window.showMessageBox('يرجى إدخال عنوان الكويز');
                 return;
             }
 
             if (questions.length === 0) {
-                showMessageBox('يرجى إضافة سؤال واحد على الأقل');
+                window.showMessageBox('يرجى إضافة سؤال واحد على الأقل');
                 return;
             }
 
             const quiz = {
-                id: editQuizId || Date.now().toString(), // Use existing ID or generate new
                 title: title,
                 description: description,
                 questions: [],
-                createdAt: new Date().toLocaleString('ar-EG')
+                createdAt: new Date().toLocaleString('ar-EG'),
+                teacherId: currentUserId // Link quiz to the teacher
             };
 
             for (const q of questions) {
@@ -294,20 +355,16 @@
                 const imageFile = questionDiv.querySelector('.question-image-upload').files[0];
                 let imageUrl = '';
 
-                if (!questionText.trim()) {
-                    showMessageBox('يرجى ملء جميع الأسئلة');
-                    return;
+                if (!imageFile) {
+                    // If no new image is uploaded, check if there's an existing one from previous save/edit
+                    const existingImgElement = questionDiv.querySelector(`img[alt="صورة السؤال"]`);
+                    if (existingImgElement) {
+                        imageUrl = existingImgElement.src;
+                    }
+                } else {
+                    imageUrl = await window.encodeImageFileAsURL(imageFile);
                 }
 
-                if (imageFile) {
-                    imageUrl = await encodeImageFileAsURL(imageFile);
-                } else {
-                    // Retain existing image if no new one is uploaded during edit
-                    const existingImg = questionDiv.querySelector('img');
-                    if (existingImg) {
-                        imageUrl = existingImg.src;
-                    }
-                }
 
                 const questionData = {
                     id: q.id,
@@ -317,12 +374,18 @@
                     imageUrl: imageUrl
                 };
 
+                if (!questionText.trim()) {
+                    window.showMessageBox('يرجى ملء جميع الأسئلة');
+                    return;
+                }
+
+
                 if (q.type === 'multiple') {
                     const options = Array.from(questionDiv.querySelectorAll('.option-text')).map(input => input.value);
                     const correctAnswer = questionDiv.querySelector('input[name="correct-' + q.id + '"]:checked');
                     
                     if (!correctAnswer) {
-                        showMessageBox('يرجى اختيار الإجابة الصحيحة لجميع الأسئلة');
+                        window.showMessageBox('يرجى اختيار الإجابة الصحيحة لجميع الأسئلة');
                         return;
                     }
 
@@ -332,7 +395,7 @@
                     const correctAnswer = questionDiv.querySelector('input[name="correct-' + q.id + '"]:checked');
                     
                     if (!correctAnswer) {
-                        showMessageBox('يرجى اختيار الإجابة الصحيحة لجميع الأسئلة');
+                        window.showMessageBox('يرجى اختيار الإجابة الصحيحة لجميع الأسئلة');
                         return;
                     }
 
@@ -341,7 +404,7 @@
                     const correctText = questionDiv.querySelector('.correct-text').value;
                     
                     if (!correctText.trim()) {
-                        showMessageBox('يرجى إدخال الإجابة الصحيحة لجميع الأسئلة');
+                        window.showMessageBox('يرجى إدخال الإجابة الصحيحة لجميع الأسئلة');
                         return;
                     }
 
@@ -351,28 +414,27 @@
                 quiz.questions.push(questionData);
             }
 
-            // حفظ الكويز في sessionStorage
-            let savedQuizzes = JSON.parse(sessionStorage.getItem('quizzes') || '[]');
-
-            if (editQuizId) {
-                // Update existing quiz
-                savedQuizzes = savedQuizzes.map(q => q.id === editQuizId ? quiz : q);
-            } else {
-                // Add new quiz
-                savedQuizzes.push(quiz);
+            try {
+                const quizDocRef = collection(db, `artifacts/${appId}/users/${currentUserId}/quizzes`);
+                if (editQuizId) {
+                    // Update existing quiz in Firestore
+                    await setDoc(doc(quizDocRef, editQuizId), quiz);
+                    window.showMessageBox('تم تعديل الكويز بنجاح!');
+                } else {
+                    // Add new quiz to Firestore
+                    await addDoc(quizDocRef, quiz);
+                    window.showMessageBox('تم حفظ الكويز بنجاح!');
+                }
+            } catch (e) {
+                console.error("Error saving quiz: ", e);
+                window.showMessageBox("حدث خطأ أثناء حفظ الكويز. يرجى المحاولة مرة أخرى.");
             }
             
-            sessionStorage.setItem('quizzes', JSON.stringify(savedQuizzes));
-
-            showMessageBox('تم حفظ الكويز بنجاح!');
-            
-            // إعادة تعيين النموذج
-            clearQuizForm();
-            loadSavedQuizzes();
+            window.clearQuizForm();
+            window.loadSavedQuizzes();
         }
 
-        // ترميز ملف الصورة كعنوان URL للتخزين
-        function encodeImageFileAsURL(file) {
+        window.encodeImageFileAsURL = function(file) { // Made global
             return new Promise((resolve) => {
                 const reader = new FileReader();
                 reader.onloadend = () => {
@@ -382,8 +444,7 @@
             });
         }
 
-        // مسح نموذج إنشاء الكويز
-        function clearQuizForm() {
+        window.clearQuizForm = function() { // Made global
             document.getElementById('quizTitle').value = '';
             document.getElementById('quizDescription').value = '';
             document.getElementById('questionsContainer').innerHTML = '<h3 class="text-lg font-semibold text-gray-700 mb-4">الأسئلة</h3>';
@@ -391,133 +452,165 @@
             questions = [];
         }
 
-        // تحميل وعرض الكويزات المحفوظة
-        function loadSavedQuizzes() {
-            let savedQuizzes = JSON.parse(sessionStorage.getItem('quizzes') || '[]');
+        window.loadSavedQuizzes = async function() { // Made global
+            if (!isAuthReady || !currentUserId) {
+                console.log("Waiting for authentication to load quizzes...");
+                return;
+            }
+
             const container = document.getElementById('savedQuizzes');
-
-            // منطق الترحيل: التحقق من localStorage كخيار احتياطي
-            if (savedQuizzes.length === 0) {
-                const localStorageQuizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
-                if (localStorageQuizzes.length > 0) {
-                    // ترحيل الكويزات من localStorage إلى sessionStorage
-                    savedQuizzes = localStorageQuizzes;
-                    sessionStorage.setItem('quizzes', JSON.stringify(savedQuizzes));
-                    localStorage.removeItem('quizzes'); // مسح localStorage بعد الترحيل
-                    
-                    // ترحيل نتائج الكويز أيضاً
-                    localStorageQuizzes.forEach(quiz => {
-                        const quizResults = localStorage.getItem('quiz_results_' + quiz.id);
-                        if (quizResults) {
-                            sessionStorage.setItem('quiz_results_' + quiz.id, quizResults);
-                            localStorage.removeItem('quiz_results_' + quiz.id);
-                        }
-                    });
-                    showMessageBox('تم نقل الكويزات والنتائج المحفوظة سابقاً إلى الجلسة الحالية.');
-                }
-            }
-
-            if (savedQuizzes.length === 0) {
-                container.innerHTML = '<p class="text-gray-500 text-center col-span-full">لا توجد كويزات محفوظة</p>';
-                return;
-            }
-
-            container.innerHTML = savedQuizzes.map(quiz => `
-                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-200">
-                    <h3 class="font-bold text-lg text-gray-800 mb-2">${quiz.title}</h3>
-                    <p class="text-gray-600 mb-2">${quiz.description}</p>
-                    <p class="text-sm text-gray-500 mb-3">
-                        <i class="fas fa-calendar ml-1"></i>${quiz.createdAt} | 
-                        <i class="fas fa-question-circle ml-1"></i>${quiz.questions.length} سؤال
-                    </p>
-                    <div class="flex gap-2 flex-wrap">
-                        <button onclick="copyQuizLink('${quiz.id}')" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm transition">
-                            <i class="fas fa-link ml-1"></i>نسخ الرابط
-                        </button>
-                        <button onclick="viewQuizResults('${quiz.id}')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition">
-                            <i class="fas fa-chart-bar ml-1"></i>النتائج
-                        </button>
-                        <button onclick="editQuiz('${quiz.id}')" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm transition">
-                            <i class="fas fa-edit ml-1"></i>تعديل
-                        </button>
-                        <button onclick="deleteQuiz('${quiz.id}')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition">
-                            <i class="fas fa-trash ml-1"></i>حذف
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // تعديل كويز موجود
-        function editQuiz(quizId) {
-            const savedQuizzes = JSON.parse(sessionStorage.getItem('quizzes') || '[]');
-            const quizToEdit = savedQuizzes.find(q => q.id === quizId);
-
-            if (!quizToEdit) {
-                showMessageBox('الكويز المراد تعديله غير موجود.');
-                return;
-            }
-
-            document.getElementById('quizTitle').value = quizToEdit.title;
-            document.getElementById('quizDescription').value = quizToEdit.description;
-            document.getElementById('editQuizId').value = quizToEdit.id; // Set ID for editing
-
-            // Clear current questions and load questions from the quiz to edit
-            document.getElementById('questionsContainer').innerHTML = '<h3 class="text-lg font-semibold text-gray-700 mb-4">الأسئلة</h3>';
-            questions = []; // Reset questions array
-
-            quizToEdit.questions.forEach(q => {
-                addQuestion(q.type, q); // Pass existing question data
-            });
-
-            // Scroll to the top of the form
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        // نسخ رابط الكويز إلى الحافظة
-        function copyQuizLink(quizId) {
-            const link = window.location.origin + window.location.pathname + '?quiz=' + quizId;
-            
-            // Create a temporary textarea element
-            const tempInput = document.createElement('textarea');
-            tempInput.value = link;
-            document.body.appendChild(tempInput);
-            tempInput.select(); // Select the text
-            tempInput.setSelectionRange(0, 99999); // For mobile devices
+            container.innerHTML = '<p class="text-gray-500 text-center col-span-full">جاري تحميل الكويزات...</p>';
 
             try {
-                // Execute the copy command
-                document.execCommand('copy');
-                showMessageBox('تم نسخ الرابط! يمكنك مشاركته مع الطلاب');
-            } catch (err) {
-                console.error('Failed to copy text: ', err);
-                showMessageBox('فشل في نسخ الرابط. يرجى النسخ يدوياً: ' + link);
-            } finally {
-                // Remove the temporary element
-                document.body.removeChild(tempInput);
+                const q = query(collection(db, `artifacts/${appId}/users/${currentUserId}/quizzes`));
+                const querySnapshot = await getDocs(q);
+                const savedQuizzes = [];
+                querySnapshot.forEach((doc) => {
+                    savedQuizzes.push({ id: doc.id, ...doc.data() });
+                });
+
+                if (savedQuizzes.length === 0) {
+                    container.innerHTML = '<p class="text-gray-500 text-center col-span-full">لا توجد كويزات محفوظة</p>';
+                    return;
+                }
+
+                container.innerHTML = savedQuizzes.map(quiz => `
+                    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-200">
+                        <h3 class="font-bold text-lg text-gray-800 mb-2">${quiz.title}</h3>
+                        <p class="text-gray-600 mb-2">${quiz.description}</p>
+                        <p class="text-sm text-gray-500 mb-3">
+                            <i class="fas fa-calendar ml-1"></i>${quiz.createdAt} | 
+                            <i class="fas fa-question-circle ml-1"></i>${quiz.questions.length} سؤال
+                        </p>
+                        <div class="flex gap-2 flex-wrap">
+                            <button onclick="copyQuizLink('${quiz.id}', '${quiz.teacherId}')" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm transition">
+                                <i class="fas fa-link ml-1"></i>نسخ الرابط
+                            </button>
+                            <button onclick="viewQuizResultsForTeacher('${quiz.id}')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition">
+                                <i class="fas fa-chart-bar ml-1"></i>النتائج
+                            </button>
+                            <button onclick="editQuiz('${quiz.id}')" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm transition">
+                                <i class="fas fa-edit ml-1"></i>تعديل
+                            </button>
+                            <button onclick="deleteQuiz('${quiz.id}')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition">
+                                <i class="fas fa-trash ml-1"></i>حذف
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                console.error("Error loading quizzes: ", e);
+                container.innerHTML = '<p class="text-red-500 text-center col-span-full">حدث خطأ أثناء تحميل الكويزات.</p>';
             }
         }
 
-        // حذف كويز
-        function deleteQuiz(quizId) {
-            // Using a custom confirmation dialog instead of confirm()
-            showConfirmBox('هل أنت متأكد من حذف هذا الكويز؟', () => {
-                let savedQuizzes = JSON.parse(sessionStorage.getItem('quizzes') || '[]');
-                savedQuizzes = savedQuizzes.filter(quiz => quiz.id !== quizId);
-                sessionStorage.setItem('quizzes', JSON.stringify(savedQuizzes));
-                
-                // حذف نتائج الكويز أيضاً
-                sessionStorage.removeItem('quiz_results_' + quizId);
-                
-                loadSavedQuizzes();
-                showMessageBox('تم حذف الكويز بنجاح');
+        window.editQuiz = async function(quizId) { // Made global
+            if (!isAuthReady || !currentUserId) {
+                window.showMessageBox('الرجاء الانتظار حتى يتم تهيئة المصادقة.');
+                return;
+            }
+            try {
+                const quizDocRef = doc(db, `artifacts/${appId}/users/${currentUserId}/quizzes`, quizId);
+                const quizDocSnap = await getDoc(quizDocRef);
+
+                if (!quizDocSnap.exists()) {
+                    window.showMessageBox('الكويز المراد تعديله غير موجود.');
+                    return;
+                }
+
+                const quizToEdit = { id: quizDocSnap.id, ...quizDocSnap.data() };
+
+                document.getElementById('quizTitle').value = quizToEdit.title;
+                document.getElementById('quizDescription').value = quizToEdit.description;
+                document.getElementById('editQuizId').value = quizToEdit.id; // Set ID for editing
+
+                // Clear current questions and load questions from the quiz to edit
+                document.getElementById('questionsContainer').innerHTML = '<h3 class="text-lg font-semibold text-gray-700 mb-4">الأسئلة</h3>';
+                questions = []; // Reset questions array
+
+                quizToEdit.questions.forEach(q => {
+                    window.addQuestion(q.type, q); // Pass existing question data
+                });
+
+                // Scroll to the top of the form
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } catch (e) {
+                console.error("Error editing quiz:", e);
+                window.showMessageBox("حدث خطأ أثناء تحميل الكويز للتعديل.");
+            }
+        }
+
+        window.copyQuizLink = function(quizId, teacherId) { // Made global
+            // Include teacherId in the URL for student to access public quiz
+            const link = `${window.location.origin}${window.location.pathname}?quiz=${quizId}&teacher=${teacherId}`;
+            const tempInput = document.createElement('input');
+            tempInput.value = link;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            
+            window.showMessageBox('تم نسخ الرابط! يمكنك مشاركته مع الطلاب');
+        }
+
+        window.deleteQuiz = function(quizId) { // Made global
+            window.showConfirmBox('هل أنت متأكد من حذف هذا الكويز؟', async () => {
+                if (!isAuthReady || !currentUserId) {
+                    window.showMessageBox('الرجاء الانتظار حتى يتم تهيئة المصادقة.');
+                    return;
+                }
+                try {
+                    // Delete quiz document
+                    await deleteDoc(doc(db, `artifacts/${appId}/users/${currentUserId}/quizzes`, quizId));
+                    // Delete all results associated with this quiz
+                    const resultsRef = collection(db, `artifacts/${appId}/public/data/quiz_results`);
+                    // IMPORTANT: Filter by quizId and teacherId to ensure proper deletion permissions
+                    const q = query(resultsRef, where("quizId", "==", quizId), where("teacherId", "==", currentUserId));
+                    const querySnapshot = await getDocs(q);
+                    const deletePromises = [];
+                    querySnapshot.forEach((doc) => {
+                        deletePromises.push(deleteDoc(doc.ref));
+                    });
+                    await Promise.all(deletePromises);
+
+                    window.loadSavedQuizzes();
+                    window.showMessageBox('تم حذف الكويز ونتائجه بنجاح');
+                } catch (e) {
+                    console.error("Error deleting quiz:", e);
+                    window.showMessageBox("حدث خطأ أثناء حذف الكويز.");
+                }
             });
         }
 
-        // تحميل الكويز للطالب
-        function loadQuizForStudent(quizId) {
-            const savedQuizzes = JSON.parse(sessionStorage.getItem('quizzes') || '[]');
-            const quiz = savedQuizzes.find(q => q.id === quizId);
+        // --- Student Functions ---
+        window.loadQuizForStudent = async function(quizId) { // Made global
+            if (!isAuthReady) {
+                console.log("Waiting for authentication to load student quiz...");
+                const unsubscribe = onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        window.loadQuizForStudent(quizId);
+                        unsubscribe(); // Stop listening after auth is ready
+                    }
+                });
+                return;
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const teacherId = urlParams.get('teacher');
+
+            let quiz = null;
+            if (teacherId) {
+                // Try to load quiz from the teacher's collection
+                try {
+                    const quizDocRef = doc(db, `artifacts/${appId}/users/${teacherId}/quizzes`, quizId);
+                    const quizDocSnap = await getDoc(quizDocRef);
+                    if (quizDocSnap.exists()) {
+                        quiz = { id: quizDocSnap.id, ...quizDocSnap.data() };
+                    }
+                } catch (e) {
+                    console.error("Error loading quiz for student:", e);
+                }
+            }
 
             if (!quiz) {
                 document.getElementById('quizContent').innerHTML = `
@@ -527,12 +620,31 @@
                         <p class="text-gray-600">الرابط الذي تحاول الوصول إليه غير صحيح أو تم حذف الكويز</p>
                     </div>
                 `;
-                showStudentPage();
+                document.getElementById('studentInfoForm').classList.add('hidden'); // Hide info form
+                window.showStudentPage(); // Show student page (with error message)
                 return;
             }
 
             currentQuiz = quiz;
-            studentAnswers = {};
+            studentAnswers = {}; // Reset student answers for a new attempt or session
+
+            // Show student user ID
+            const studentUserIdElement = document.getElementById('studentUserId');
+            if (studentUserIdElement) {
+                studentUserIdElement.textContent = currentUserId;
+            }
+
+            const storedStudentName = sessionStorage.getItem('currentStudentName');
+
+            if (storedStudentName) {
+                studentAnswers.studentName = storedStudentName;
+                document.getElementById('studentInfoForm').classList.add('hidden');
+                document.getElementById('quizContent').classList.remove('hidden');
+                document.getElementById('studentName').value = storedStudentName; // Pre-fill the input
+            } else {
+                document.getElementById('studentInfoForm').classList.remove('hidden');
+                document.getElementById('quizContent').classList.add('hidden');
+            }
 
             const quizHTML = `
                 <div class="text-center mb-6">
@@ -571,11 +683,11 @@
                         } else if (question.type === 'boolean') {
                             questionHTML += `
                                 <div class="space-y-3">
-                                    <label class="flex items-center p-3 bg-white rounded-lg border border-gray-200 hover:bg-blue-50 cursor-pointer transition">
+                                    <label class="flex items-center">
                                         <input type="radio" name="question_${question.id}" value="true" class="ml-3 text-blue-500 focus:ring-blue-500">
                                         <span class="flex-1">صحيح</span>
                                     </label>
-                                    <label class="flex items-center p-3 bg-white rounded-lg border border-gray-200 hover:bg-blue-50 cursor-pointer transition">
+                                    <label class="flex items-center">
                                         <input type="radio" name="question_${question.id}" value="false" class="ml-3 text-blue-500 focus:ring-blue-500">
                                         <span class="flex-1">خطأ</span>
                                     </label>
@@ -604,27 +716,31 @@
             `;
 
             document.getElementById('quizContent').innerHTML = quizHTML;
-            showStudentPage();
+            window.showStudentPage();
         }
 
-        // بدء الكويز للطالب
-        function startQuiz() {
+        window.startQuiz = function() { // Made global
             const studentName = document.getElementById('studentName').value;
             if (!studentName.trim()) {
-                showMessageBox('يرجى إدخال اسم الطالب');
+                window.showMessageBox('يرجى إدخال اسم الطالب');
                 return;
             }
             
             studentAnswers.studentName = studentName;
+            sessionStorage.setItem('currentStudentName', studentName); // Save student name to sessionStorage
             document.getElementById('studentInfoForm').classList.add('hidden');
             document.getElementById('quizContent').classList.remove('hidden');
         }
+            
+        window.submitStudentQuiz = async function() { // Made global
+            if (!isAuthReady || !currentUserId) {
+                window.showMessageBox('الرجاء الانتظار حتى يتم تهيئة المصادقة.');
+                return;
+            }
 
-        // إرسال إجابات الطالب
-        function submitStudentQuiz() {
             const studentName = studentAnswers.studentName;
             if (!studentName) {
-                showMessageBox('حدث خطأ في بيانات الطالب، يرجى إعادة تحميل الصفحة');
+                window.showMessageBox('حدث خطأ في بيانات الطالب، يرجى إعادة تحميل الصفحة');
                 return;
             }
 
@@ -642,7 +758,7 @@
             });
 
             if (!allAnswered) {
-                showMessageBox('يرجى الإجابة على جميع الأسئلة قبل الإرسال');
+                window.showMessageBox('يرجى الإجابة على جميع الأسئلة قبل الإرسال');
                 return;
             }
 
@@ -652,7 +768,9 @@
             const results = {
                 quizId: currentQuiz.id,
                 quizTitle: currentQuiz.title,
-                studentName: studentName, // إضافة اسم الطالب هنا
+                studentName: studentName,
+                studentId: currentUserId, // Save student's Firebase UID
+                teacherId: currentQuiz.teacherId, // Save the teacher's ID from the quiz
                 totalQuestions: currentQuiz.questions.length,
                 answers: [],
                 submittedAt: new Date().toLocaleString('ar-EG')
@@ -687,144 +805,259 @@
             results.correctAnswers = correctAnswers;
             results.score = Math.round((correctAnswers / currentQuiz.questions.length) * 100);
 
-            // حفظ النتيجة في sessionStorage
-            const existingResults = JSON.parse(sessionStorage.getItem('quiz_results_' + currentQuiz.id) || '[]');
-            existingResults.push(results);
-            sessionStorage.setItem('quiz_results_' + currentQuiz.id, JSON.stringify(existingResults));
-
-            // توجيه إلى صفحة النتائج
-            window.location.href = window.location.pathname + '?quiz=' + currentQuiz.id + '&results=true';
+            try {
+                // Save results to a public collection accessible by the teacher (via teacherId)
+                await addDoc(collection(db, `artifacts/${appId}/public/data/quiz_results`), results);
+                window.showMessageBox('تم إرسال إجاباتك بنجاح!');
+                // توجيه إلى صفحة النتائج
+                window.location.href = `${window.location.pathname}?quiz=${currentQuiz.id}&results=true&studentId=${currentUserId}`;
+            } catch (e) {
+                console.error("Error submitting quiz results: ", e);
+                window.showMessageBox("حدث خطأ أثناء إرسال النتائج. يرجى المحاولة مرة أخرى.");
+            }
         }
 
-        // عرض نتائج الكويز
-        function showResults(quizId) {
-            const savedQuizzes = JSON.parse(sessionStorage.getItem('quizzes') || '[]');
-            const quiz = savedQuizzes.find(q => q.id === quizId);
-            const allResults = JSON.parse(sessionStorage.getItem('quiz_results_' + quizId) || '[]');
-            
-            if (!quiz || allResults.length === 0) {
-                document.getElementById('resultsContent').innerHTML = `
-                    <div class="text-center py-8">
-                        <i class="fas fa-chart-bar text-gray-400 text-6xl mb-4"></i>
-                        <h2 class="text-2xl font-bold text-gray-800 mb-2">لا توجد نتائج</h2>
-                        <p class="text-gray-600">لم يتم العثور على نتائج لهذا الكويز</p>
+        window.showResults = async function(quizId) { // Made global
+            if (!isAuthReady || !currentUserId) {
+                console.log("Waiting for authentication to show results...");
+                const unsubscribe = onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        window.showResults(quizId);
+                        unsubscribe();
+                    }
+                });
+                return;
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const studentIdParam = urlParams.get('studentId'); // The student whose results we want to see
+
+            let latestResult = null;
+            let quiz = null;
+
+            try {
+                // Fetch the specific quiz first to get teacherId and questions
+                // Try to get teacherId from URL first.
+                let teacherIdFromUrl = urlParams.get('teacher'); 
+                let foundQuizDoc = null;
+
+                if (teacherIdFromUrl) {
+                    const specificQuizDocRef = doc(db, `artifacts/${appId}/users/${teacherIdFromUrl}/quizzes`, quizId);
+                    const specificQuizSnap = await getDoc(specificQuizDocRef);
+                    if (specificQuizSnap.exists()) {
+                        foundQuizDoc = specificQuizSnap;
+                    }
+                } else {
+                    // Fallback: search all teacher quizzes for the quizId (less efficient, but handles direct navigation)
+                    const usersCollectionRef = collection(db, `artifacts/${appId}/users`);
+                    const usersSnapshot = await getDocs(usersCollectionRef);
+                    for (const userDoc of usersSnapshot.docs) {
+                        const quizzesCollectionRef = collection(db, `artifacts/${appId}/users/${userDoc.id}/quizzes`);
+                        // Use a query on the document ID
+                        const qQuiz = query(quizzesCollectionRef, where("__name__", "==", quizId));
+                        const quizSnapshot = await getDocs(qQuiz);
+                        if (!quizSnapshot.empty) {
+                            foundQuizDoc = quizSnapshot.docs[0];
+                            teacherIdFromUrl = userDoc.id; // Set teacherId if found
+                            break;
+                        }
+                    }
+                }
+
+                if (foundQuizDoc) {
+                    quiz = { id: foundQuizDoc.id, ...foundQuizDoc.data() };
+                } else {
+                     document.getElementById('resultsContent').innerHTML = `
+                        <div class="text-center py-8">
+                            <i class="fas fa-exclamation-triangle text-yellow-500 text-6xl mb-4"></i>
+                            <h2 class="text-2xl font-bold text-gray-800 mb-2">الكويز غير موجود</h2>
+                            <p class="text-gray-600">لم يتم العثور على الكويز المرتبط بهذه النتائج.</p>
+                        </div>
+                    `;
+                    window.showResultsPage();
+                    return;
+                }
+
+                // Fetch results for the specific quiz and student
+                const resultsRef = collection(db, `artifacts/${appId}/public/data/quiz_results`);
+                const qResults = query(resultsRef, 
+                    where("quizId", "==", quizId),
+                    where("studentId", "==", studentIdParam || currentUserId), // Use param if available, else current user
+                    where("teacherId", "==", quiz.teacherId) // Crucial for security rules
+                );
+                const querySnapshot = await getDocs(qResults);
+                const allResultsForStudent = [];
+                querySnapshot.forEach((doc) => {
+                    allResultsForStudent.push({ id: doc.id, ...doc.data() });
+                });
+
+                if (allResultsForStudent.length === 0) {
+                    document.getElementById('resultsContent').innerHTML = `
+                        <div class="text-center py-8">
+                            <i class="fas fa-chart-bar text-gray-400 text-6xl mb-4"></i>
+                            <h2 class="text-2xl font-bold text-gray-800 mb-2">لا توجد نتائج</h2>
+                            <p class="text-gray-600">لم يتم العثور على نتائج لهذا الكويز للطالب الحالي.</p>
+                        </div>
+                    `;
+                    window.showResultsPage();
+                    return;
+                }
+
+                latestResult = allResultsForStudent[allResultsForStudent.length - 1]; // Get the latest attempt
+
+                let resultsHTML = `
+                    <div class="text-center mb-8">
+                        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full ${latestResult.score >= 60 ? 'bg-green-100' : 'bg-red-100'} mb-4">
+                            <i class="fas fa-${latestResult.score >= 60 ? 'check' : 'times'} text-3xl ${latestResult.score >= 60 ? 'text-green-500' : 'text-red-500'}"></i>
+                        </div>
+                        <h1 class="text-3xl font-bold text-gray-800 mb-2">نتيجة الكويز</h1>
+                        <h2 class="text-xl text-gray-600 mb-4">${latestResult.quizTitle}</h2>
+                        <div class="bg-gray-100 p-3 rounded-lg inline-block mb-4">
+                            <i class="fas fa-user ml-2"></i>
+                            اسم الطالب: ${latestResult.studentName}
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                <div class="text-2xl font-bold text-blue-600">${latestResult.score}%</div>
+                                <div class="text-sm text-gray-600">النسبة المئوية</div>
+                            </div>
+                            <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                                <div class="text-2xl font-bold text-green-600">${latestResult.correctAnswers}</div>
+                                <div class="text-sm text-gray-600">إجابات صحيحة</div>
+                            </div>
+                            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                                <div class="text-2xl font-bold text-gray-600">${latestResult.totalQuestions}</div>
+                                <div class="text-sm text-gray-600">إجمالي الأسئلة</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4">مراجعة الإجابات</h3>
+                        ${latestResult.answers.map((answer, index) => {
+                            let correctAnswerText = '';
+                            const question = quiz.questions.find(q => q.id == answer.questionId);
+
+                            if (!question) { // Handle case where question might be missing (shouldn't happen with correct data)
+                                return `<div class="text-red-500">خطأ: لم يتم العثور على السؤال #${answer.questionId}</div>`;
+                            }
+
+                            if (answer.questionType === 'multiple') {
+                                correctAnswerText = question.options[answer.correctAnswer];
+                            } else if (answer.questionType === 'boolean') {
+                                correctAnswerText = answer.correctAnswer ? 'صحيح' : 'خطأ';
+                            } else {
+                                correctAnswerText = answer.correctAnswer;
+                            }
+
+                            let studentAnswerText = '';
+                            if (answer.questionType === 'multiple') {
+                                studentAnswerText = question.options[parseInt(answer.studentAnswer)];
+                            } else if (answer.questionType === 'boolean') {
+                                studentAnswerText = answer.studentAnswer === 'true' ? 'صحيح' : 'خطأ';
+                            } else {
+                                studentAnswerText = answer.studentAnswer;
+                            }
+
+                            return `
+                                <div class="bg-gray-50 p-6 rounded-lg border-r-4 ${answer.isCorrect ? 'border-green-500' : 'border-red-500'} mb-4">
+                                    <div class="flex items-start justify-between mb-3">
+                                        <h4 class="text-lg font-semibold text-gray-800">
+                                            <span class="bg-gray-500 text-white rounded-full w-8 h-8 inline-flex items-center justify-center ml-2 text-sm">
+                                                ${index + 1}
+                                            </span>
+                                            ${answer.questionText}
+                                        </h4>
+                                        <span class="text-2xl ${answer.isCorrect ? 'text-green-500' : 'text-red-500'}">
+                                            <i class="fas fa-${answer.isCorrect ? 'check-circle' : 'times-circle'}"></i>
+                                        </span>
+                                    </div>
+                                    ${question.imageUrl ? `<img src="${question.imageUrl}" class="mt-2 mb-4 rounded-lg max-w-full h-auto" alt="صورة السؤال">` : ''}
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div class="bg-white p-3 rounded border">
+                                            <div class="text-sm font-medium text-gray-600 mb-1">إجابتك:</div>
+                                            <div class="text-lg ${answer.isCorrect ? 'text-green-700' : 'text-red-700'}">${studentAnswerText}</div>
+                                        </div>
+                                        <div class="bg-white p-3 rounded border">
+                                            <div class="text-sm font-medium text-gray-600 mb-1">الإجابة الصحيحة:</div>
+                                            <div class="text-lg text-green-700">${correctAnswerText}</div>
+                                        </div>
+                                    </div>
+                                    ${answer.explanation ? `
+                                        <div class="bg-blue-50 border border-blue-200 p-3 rounded-lg mt-4">
+                                            <div class="text-sm font-medium text-blue-700 mb-1">هامش توضيحي:</div>
+                                            <p class="text-blue-800">${answer.explanation}</p>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+
+                    <div class="text-center">
+                        <button onclick="window.close()" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold transition">
+                            <i class="fas fa-times ml-2"></i>إغلاق النافذة
+                        </button>
                     </div>
                 `;
-                showResultsPage();
-                return;
+
+                document.getElementById('resultsContent').innerHTML = resultsHTML;
+                window.showResultsPage();
+
+            } catch (e) {
+                console.error("Error showing results:", e);
+                document.getElementById('resultsContent').innerHTML = `
+                    <div class="text-center py-8">
+                        <i class="fas fa-exclamation-triangle text-red-500 text-6xl mb-4"></i>
+                        <h2 class="text-2xl font-bold text-gray-800 mb-2">خطأ في تحميل النتائج</h2>
+                        <p class="text-gray-600">حدث خطأ أثناء محاولة عرض النتائج. يرجى التأكد من صحة الرابط.</p>
+                    </div>
+                `;
+                window.showResultsPage();
             }
-
-            // أحدث نتيجة للطالب
-            const latestResult = allResults[allResults.length - 1];
-
-            let resultsHTML = `
-                <div class="text-center mb-8">
-                    <div class="inline-flex items-center justify-center w-20 h-20 rounded-full ${latestResult.score >= 60 ? 'bg-green-100' : 'bg-red-100'} mb-4">
-                        <i class="fas fa-${latestResult.score >= 60 ? 'check' : 'times'} text-3xl ${latestResult.score >= 60 ? 'text-green-500' : 'text-red-500'}"></i>
-                    </div>
-                    <h1 class="text-3xl font-bold text-gray-800 mb-2">نتيجة الكويز</h1>
-                    <h2 class="text-xl text-gray-600 mb-4">${latestResult.quizTitle}</h2>
-                    <div class="bg-gray-100 p-3 rounded-lg inline-block mb-4">
-                        <i class="fas fa-user ml-2"></i>
-                        اسم الطالب: ${latestResult.studentName}
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                            <div class="text-2xl font-bold text-blue-600">${latestResult.score}%</div>
-                            <div class="text-sm text-gray-600">النسبة المئوية</div>
-                        </div>
-                        <div class="bg-green-50 border border-green-200 rounded-lg p-4">
-                            <div class="text-2xl font-bold text-green-600">${latestResult.correctAnswers}</div>
-                            <div class="text-sm text-gray-600">إجابات صحيحة</div>
-                        </div>
-                        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                            <div class="text-2xl font-bold text-gray-600">${latestResult.totalQuestions}</div>
-                            <div class="text-sm text-gray-600">إجمالي الأسئلة</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mb-6">
-                    <h3 class="text-2xl font-bold text-gray-800 mb-4">مراجعة الإجابات</h3>
-                    ${latestResult.answers.map((answer, index) => {
-                        let correctAnswerText = '';
-                        const question = quiz.questions.find(q => q.id == answer.questionId);
-
-                        if (answer.questionType === 'multiple') {
-                            correctAnswerText = quiz.questions.find(q => q.id == answer.questionId).options[answer.correctAnswer];
-                        } else if (answer.questionType === 'boolean') {
-                            correctAnswerText = answer.correctAnswer ? 'صحيح' : 'خطأ';
-                        } else {
-                            correctAnswerText = answer.correctAnswer;
-                        }
-
-                        let studentAnswerText = '';
-                        if (answer.questionType === 'multiple') {
-                            studentAnswerText = quiz.questions.find(q => q.id == answer.questionId).options[parseInt(answer.studentAnswer)];
-                        } else if (answer.questionType === 'boolean') {
-                            studentAnswerText = answer.studentAnswer === 'true' ? 'صحيح' : 'خطأ';
-                        } else {
-                            studentAnswerText = answer.studentAnswer;
-                        }
-
-                        return `
-                            <div class="bg-gray-50 p-6 rounded-lg border-r-4 ${answer.isCorrect ? 'border-green-500' : 'border-red-500'} mb-4">
-                                <div class="flex items-start justify-between mb-3">
-                                    <h4 class="text-lg font-semibold text-gray-800">
-                                        <span class="bg-gray-500 text-white rounded-full w-8 h-8 inline-flex items-center justify-center ml-2 text-sm">
-                                            ${index + 1}
-                                        </span>
-                                        ${answer.questionText}
-                                    </h4>
-                                    <span class="text-2xl ${answer.isCorrect ? 'text-green-500' : 'text-red-500'}">
-                                        <i class="fas fa-${answer.isCorrect ? 'check-circle' : 'times-circle'}"></i>
-                                    </span>
-                                </div>
-                                ${question.imageUrl ? `<img src="${question.imageUrl}" class="mt-2 mb-4 rounded-lg max-w-full h-auto" alt="صورة السؤال">` : ''}
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div class="bg-white p-3 rounded border">
-                                        <div class="text-sm font-medium text-gray-600 mb-1">إجابتك:</div>
-                                        <div class="text-lg ${answer.isCorrect ? 'text-green-700' : 'text-red-700'}">${studentAnswerText}</div>
-                                    </div>
-                                    <div class="bg-white p-3 rounded border">
-                                        <div class="text-sm font-medium text-gray-600 mb-1">الإجابة الصحيحة:</div>
-                                        <div class="text-lg text-green-700">${correctAnswerText}</div>
-                                    </div>
-                                </div>
-                                ${answer.explanation ? `
-                                    <div class="bg-blue-50 border border-blue-200 p-3 rounded-lg mt-4">
-                                        <div class="text-sm font-medium text-blue-700 mb-1">هامش توضيحي:</div>
-                                        <p class="text-blue-800">${answer.explanation}</p>
-                                    </div>
-                                ` : ''}
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
-
-                <div class="text-center">
-                    <button onclick="window.close()" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold transition">
-                        <i class="fas fa-times ml-2"></i>إغلاق النافذة
-                    </button>
-                </div>
-            `;
-
-            document.getElementById('resultsContent').innerHTML = resultsHTML;
-            showResultsPage();
         }
 
-        // عرض نتائج الكويز العامة (عرض المعلم)
-        function viewQuizResults(quizId) {
-            const allResults = JSON.parse(sessionStorage.getItem('quiz_results_' + quizId) || '[]');
-            const savedQuizzes = JSON.parse(sessionStorage.getItem('quizzes') || '[]');
-            const quiz = savedQuizzes.find(q => q.id === quizId);
-
-            if (allResults.length === 0) {
-                showMessageBox('لا توجد نتائج لهذا الكويز بعد');
+        // --- Teacher View Results ---
+        window.viewQuizResultsForTeacher = async function(quizId) { // Made global
+            if (!isAuthReady || !currentUserId) {
+                window.showMessageBox('الرجاء الانتظار حتى يتم تهيئة المصادقة.');
                 return;
             }
 
-            // الإحصائيات العامة
+            let quizTitle = "الكويز"; // Default title
+            try {
+                const quizDocRef = doc(db, `artifacts/${appId}/users/${currentUserId}/quizzes`, quizId);
+                const quizDocSnap = await getDoc(quizDocRef);
+                if (quizDocSnap.exists()) {
+                    quizTitle = quizDocSnap.data().title;
+                }
+            } catch (e) {
+                console.error("Error fetching quiz title for results:", e);
+            }
+
+            const allResults = [];
+            try {
+                const resultsRef = collection(db, `artifacts/${appId}/public/data/quiz_results`);
+                const q = query(resultsRef, 
+                    where("quizId", "==", quizId),
+                    where("teacherId", "==", currentUserId) // Filter results by teacherId
+                );
+                const querySnapshot = await getDocs(q);
+                querySnapshot.forEach((doc) => {
+                    allResults.push({ id: doc.id, ...doc.data() });
+                });
+            } catch (e) {
+                console.error("Error loading all quiz results for teacher:", e);
+                window.showMessageBox("حدث خطأ أثناء تحميل نتائج الطلاب.");
+                return;
+            }
+
+            if (allResults.length === 0) {
+                window.showMessageBox('لا توجد نتائج لهذا الكويز بعد.');
+                return;
+            }
+
+            // إحصائيات عامة
             const totalAttempts = allResults.length;
             const avgScore = Math.round(allResults.reduce((sum, result) => sum + result.score, 0) / totalAttempts);
             const passCount = allResults.filter(result => result.score >= 60).length;
@@ -832,11 +1065,11 @@
             const statsHTML = `
                 <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onclick="closeStatsModal(event)">
                     <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto m-4" onclick="event.stopPropagation()">
-                        <div class="p-6 border-b border-gray-200">
+                        <div class="p-6 border-b border-200">
                             <div class="flex justify-between items-center">
                                 <h2 class="text-2xl font-bold text-gray-800">
                                     <i class="fas fa-chart-line text-blue-500 ml-2"></i>
-                                    إحصائيات الكويز: ${quiz.title}
+                                    إحصائيات الكويز: ${quizTitle}
                                 </h2>
                                 <button onclick="closeStatsModal()" class="text-gray-500 hover:text-gray-700">
                                     <i class="fas fa-times text-2xl"></i>
@@ -871,6 +1104,7 @@
                                         <div class="flex justify-between items-center">
                                             <div>
                                                 <div class="font-semibold text-gray-800">${result.studentName || 'طالب'}</div>
+                                                <div class="text-sm text-gray-600">معرف الطالب: ${result.studentId || 'غير متوفر'}</div>
                                                 <div class="text-sm text-gray-600">محاولة #${index + 1} - ${result.submittedAt}</div>
                                             </div>
                                             <div class="text-left">
@@ -889,81 +1123,62 @@
             document.body.insertAdjacentHTML('beforeend', statsHTML);
         }
 
-        // إغلاق نافذة الإحصائيات
-        function closeStatsModal(event) {
+        window.closeStatsModal = function(event) { // Made global
             if (event && event.target.closest('.bg-white')) return;
             const modal = document.querySelector('.fixed.inset-0');
-            if (modal) {
-                modal.remove();
-            }
+            if (modal) modal.remove();
         }
 
-        // منع الوصول المباشر للصفحة الرئيسية من صفحة الطالب
-        window.addEventListener('popstate', function(event) {
-            const urlParams = new URLSearchParams(window.location.search);
-            const quizId = urlParams.get('quiz');
-            const results = urlParams.get('results');
-            
-            if (results && quizId) {
-                showResults(quizId);
-            } else if (quizId) {
-                loadQuizForStudent(quizId);
-            } else {
-                showTeacherPage();
-            }
-        });
+        // --- Utility/UI Functions ---
+        window.showStudentPage = function() { // Made global
+            document.getElementById('teacherPage').classList.add('hidden');
+            document.getElementById('studentPage').classList.remove('hidden');
+            document.getElementById('resultsPage').classList.add('hidden');
+        }
 
-        // منع تحديث F5/Ctrl+R في صفحة الطالب
-        document.addEventListener('keydown', function(event) {
-            const urlParams = new URLSearchParams(window.location.search);
-            const quizId = urlParams.get('quiz');
-            
-            if (quizId && (event.key === 'F5' || (event.ctrlKey && event.key === 'r'))) {
-                event.preventDefault();
-                location.reload();
-            }
-        });
+        window.showResultsPage = function() { // Made global
+            document.getElementById('teacherPage').classList.add('hidden');
+            document.getElementById('studentPage').classList.add('hidden');
+            document.getElementById('resultsPage').classList.remove('hidden');
+        }
 
-        // دالة مخصصة لعرض رسالة بدلاً من alert()
-        function showMessageBox(message) {
-            const messageBoxHTML = `
-                <div id="customMessageBox" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        // دالة لعرض مربع رسالة مخصص بدلاً من alert
+        window.showMessageBox = function(message) { // Made global
+            const modalHTML = `
+                <div id="customAlertModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full text-center">
-                        <p class="text-lg text-gray-800 mb-6">${message}</p>
-                        <button onclick="document.getElementById('customMessageBox').remove()" 
-                                class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold transition">
-                            موافق
-                        </button>
+                        <p class="text-gray-800 text-lg mb-4">${message}</p>
+                        <button onclick="document.getElementById('customAlertModal').remove()" class="btn-primary text-white px-6 py-2 rounded-lg font-semibold transition">حسناً</button>
                     </div>
                 </div>
             `;
-            document.body.insertAdjacentHTML('beforeend', messageBoxHTML);
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
         }
 
-        // دالة مخصصة لعرض مربع تأكيد بدلاً من confirm()
-        function showConfirmBox(message, onConfirm) {
-            const confirmBoxHTML = `
-                <div id="customConfirmBox" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        // دالة لعرض مربع تأكيد مخصص بدلاً من confirm
+        window.showConfirmBox = function(message, onConfirmCallback) { // Made global
+            const modalHTML = `
+                <div id="customConfirmModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full text-center">
-                        <p class="text-lg text-gray-800 mb-6">${message}</p>
+                        <p class="text-gray-800 text-lg mb-4">${message}</p>
                         <div class="flex justify-center gap-4">
-                            <button onclick="document.getElementById('customConfirmBox').remove(); window.tempOnConfirm();" 
-                                    class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg font-semibold transition">
-                                نعم
-                            </button>
-                            <button onclick="document.getElementById('customConfirmBox').remove()" 
-                                    class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-semibold transition">
-                                لا
-                            </button>
+                            <button id="confirmYesBtn" class="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg font-semibold transition">نعم</button>
+                            <button id="confirmNoBtn" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-semibold transition">إلغاء</button>
                         </div>
                     </div>
                 </div>
             `;
-            document.body.insertAdjacentHTML('beforeend', confirmBoxHTML);
-            // هذا حل بديل لاستدعاء الوظيفة بعد إزالة النافذة المنبثقة
-            // في تطبيق حقيقي، ستمرر مرجعًا وتستدعيه مباشرة.
-            window.tempOnConfirm = onConfirm; 
-            document.querySelector('#customConfirmBox button.bg-green-500').setAttribute('onclick', "document.getElementById('customConfirmBox').remove(); window.tempOnConfirm(); delete window.tempOnConfirm;");
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+            document.getElementById('confirmYesBtn').onclick = () => {
+                document.getElementById('customConfirmModal').remove();
+                if (onConfirmCallback) {
+                    onConfirmCallback();
+                }
+            };
+            document.getElementById('confirmNoBtn').onclick = () => {
+                document.getElementById('customConfirmModal').remove();
+            };
         }
     </script>
 </body>
