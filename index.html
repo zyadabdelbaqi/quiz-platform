@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة الكويزات التعليمية</title>
+    <title>كويزات MET</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
@@ -168,10 +168,13 @@
         // Global variables for quiz management
         let questions = [];
         let currentQuiz = null;
-        let studentAnswers = {};
+        let studentAnswers = {}; // This will hold current answers in session
 
         // App ID for Firestore paths (from Canvas environment or default)
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-quiz-app';
+
+        // localStorage key for saving partial quiz progress
+        const QUIZ_PROGRESS_STORAGE_KEY = 'quiz_student_progress';
 
         // Firebase Authentication Listener
         onAuthStateChanged(auth, async (user) => {
@@ -206,13 +209,18 @@
         function initializePage() {
             const urlParams = new URLSearchParams(window.location.search);
             const quizId = urlParams.get('quiz');
-            const results = urlParams.get('results');
-            
-            if (results && quizId) {
-                window.showResults(quizId);
+            const resultsParam = urlParams.get('results');
+            const studentIdParam = urlParams.get('studentId'); // Passed when showing results on refresh
+            const teacherIdParam = urlParams.get('teacher'); // Passed when showing results on refresh
+
+            if (resultsParam && quizId && studentIdParam && teacherIdParam) {
+                // If direct link to results page, show results
+                window.showResults(quizId, studentIdParam, teacherIdParam);
             } else if (quizId) {
-                window.loadQuizForStudent(quizId);
+                // If direct link to quiz (student mode), load quiz for student
+                window.loadQuizForStudent(quizId, teacherIdParam); // Pass teacherId to load quiz
             } else {
+                // Default to teacher page if no specific quiz is requested
                 window.showTeacherPage();
             }
         }
@@ -273,7 +281,7 @@
                     <div class="flex gap-4">
                         <label class="flex items-center">
                             <input type="radio" name="correct-${questionId}" value="true" class="correct-answer ml-2" ${questionData.correctAnswer === true ? 'checked' : ''}>
-                            صحيح
+                            صح
                         </label>
                         <label class="flex items-center">
                             <input type="radio" name="correct-${questionId}" value="false" class="correct-answer ml-2" ${questionData.correctAnswer === false ? 'checked' : ''}>
@@ -580,33 +588,46 @@
         }
 
         // --- Student Functions ---
-        window.loadQuizForStudent = async function(quizId) { // Made global
+        window.loadQuizForStudent = async function(quizId, teacherIdFromUrl) { // Made global
             if (!isAuthReady) {
                 console.log("Waiting for authentication to load student quiz...");
                 const unsubscribe = onAuthStateChanged(auth, (user) => {
                     if (user) {
-                        window.loadQuizForStudent(quizId);
+                        window.loadQuizForStudent(quizId, teacherIdFromUrl);
                         unsubscribe(); // Stop listening after auth is ready
                     }
                 });
                 return;
             }
 
-            const urlParams = new URLSearchParams(window.location.search);
-            const teacherId = urlParams.get('teacher');
-
             let quiz = null;
-            if (teacherId) {
-                // Try to load quiz from the teacher's collection
-                try {
-                    const quizDocRef = doc(db, `artifacts/${appId}/users/${teacherId}/quizzes`, quizId);
-                    const quizDocSnap = await getDoc(quizDocRef);
-                    if (quizDocSnap.exists()) {
-                        quiz = { id: quizDocSnap.id, ...quizDocSnap.data() };
+            let actualTeacherId = teacherIdFromUrl; // Use URL teacherId if provided
+
+            // Try to load quiz from the teacher's collection
+            try {
+                const quizDocRef = doc(db, `artifacts/${appId}/users/${actualTeacherId}/quizzes`, quizId);
+                const quizDocSnap = await getDoc(quizDocRef);
+                if (quizDocSnap.exists()) {
+                    quiz = { id: quizDocSnap.id, ...quizDocSnap.data() };
+                } else {
+                    // Fallback: if teacherId from URL is missing or incorrect, search for quiz by ID across all teachers
+                    // This is less efficient but ensures quiz loads if link is incomplete
+                    const usersCollectionRef = collection(db, `artifacts/${appId}/users`);
+                    const usersSnapshot = await getDocs(usersCollectionRef);
+                    for (const userDoc of usersSnapshot.docs) {
+                        const quizzesCollectionRef = collection(db, `artifacts/${appId}/users/${userDoc.id}/quizzes`);
+                        const qQuiz = query(quizzesCollectionRef, where("__name__", "==", quizId));
+                        const quizSnapshot = await getDocs(qQuiz);
+                        if (!quizSnapshot.empty) {
+                            foundQuizDoc = quizSnapshot.docs[0];
+                            quiz = { id: foundQuizDoc.id, ...foundQuizDoc.data() };
+                            actualTeacherId = userDoc.id; // Update actualTeacherId
+                            break;
+                        }
                     }
-                } catch (e) {
-                    console.error("Error loading quiz for student:", e);
                 }
+            } catch (e) {
+                console.error("Error loading quiz for student:", e);
             }
 
             if (!quiz) {
@@ -632,6 +653,50 @@
             }
 
             const storedStudentName = sessionStorage.getItem('currentStudentName');
+
+            // Try to load saved progress from localStorage for this specific quiz and student
+            let savedProgress = null;
+            try {
+                const storedData = localStorage.getItem(QUIZ_PROGRESS_STORAGE_KEY);
+                if (storedData) {
+                    const parsedData = JSON.parse(storedData);
+                    if (parsedData.quizId === quiz.id && parsedData.studentId === currentUserId) {
+                        savedProgress = parsedData;
+                    } else {
+                        // Clear stale progress if it's for a different quiz/student
+                        localStorage.removeItem(QUIZ_PROGRESS_STORAGE_KEY);
+                    }
+                }
+            } catch (e) {
+                console.error("Error loading quiz progress from localStorage:", e);
+                localStorage.removeItem(QUIZ_PROGRESS_STORAGE_KEY); // Clear corrupted data
+            }
+
+            // Check if there are already submitted results for this student on this quiz
+            // If so, automatically show them their results.
+            try {
+                const resultsRef = collection(db, `artifacts/${appId}/public/data/quiz_results`);
+                const qResults = query(resultsRef,
+                    where("quizId", "==", quiz.id),
+                    where("studentId", "==", currentUserId),
+                    where("teacherId", "==", actualTeacherId || quiz.teacherId) // Use actualTeacherId if found, else quiz.teacherId
+                );
+                const querySnapshot = await getDocs(qResults);
+                if (!querySnapshot.empty) {
+                    // Sort results by submission time and show the latest
+                    const latestResult = querySnapshot.docs
+                        .map(doc => doc.data())
+                        .sort((a, b) => new Date(a.submittedAt) - new Date(b.submittedAt))
+                        .pop();
+                    
+                    window.displayInlineResults(latestResult, quiz);
+                    return; // Stop here, show results instead of quiz
+                }
+            } catch (e) {
+                console.error("Error checking for previous quiz results:", e);
+                // Continue to show quiz if check fails
+            }
+
 
             if (storedStudentName) {
                 studentAnswers.studentName = storedStudentName;
@@ -666,12 +731,15 @@
                                 ${question.imageUrl ? `<img src="${question.imageUrl}" class="mt-2 mb-4 rounded-lg max-w-full h-auto" alt="صورة السؤال">` : ''}
                         `;
 
+                        // Retrieve saved answer for this question
+                        const savedAnswer = savedProgress?.answers?.[question.id]; // Can be undefined or null
+
                         if (question.type === 'multiple') {
                             questionHTML += `
                                 <div class="space-y-3">
                                     ${question.options.map((option, optionIndex) => `
                                         <label class="flex items-center p-3 bg-white rounded-lg border border-gray-200 hover:bg-blue-50 cursor-pointer transition">
-                                            <input type="radio" name="question_${question.id}" value="${optionIndex}" class="ml-3 text-blue-500 focus:ring-blue-500">
+                                            <input type="radio" name="question_${question.id}" value="${optionIndex}" class="ml-3 text-blue-500 focus:ring-blue-500" ${savedAnswer !== undefined && savedAnswer !== null && parseInt(savedAnswer) === optionIndex ? 'checked' : ''} onchange="saveQuizProgress()">
                                             <span class="flex-1">${option}</span>
                                         </label>
                                     `).join('')}
@@ -680,12 +748,12 @@
                         } else if (question.type === 'boolean') {
                             questionHTML += `
                                 <div class="space-y-3">
-                                    <label class="flex items-center">
-                                        <input type="radio" name="question_${question.id}" value="true" class="ml-3 text-blue-500 focus:ring-blue-500">
-                                        <span class="flex-1">صحيح</span>
+                                    <label class="flex items-center p-3 bg-white rounded-lg border border-gray-200 hover:bg-blue-50 cursor-pointer transition">
+                                        <input type="radio" name="question_${question.id}" value="true" class="ml-3 text-blue-500 focus:ring-blue-500" ${savedAnswer === 'true' ? 'checked' : ''} onchange="saveQuizProgress()">
+                                        <span class="flex-1">صح</span>
                                     </label>
-                                    <label class="flex items-center">
-                                        <input type="radio" name="question_${question.id}" value="false" class="ml-3 text-blue-500 focus:ring-blue-500">
+                                    <label class="flex items-center p-3 bg-white rounded-lg border border-gray-200 hover:bg-blue-50 cursor-pointer transition">
+                                        <input type="radio" name="question_${question.id}" value="false" class="ml-3 text-blue-500 focus:ring-blue-500" ${savedAnswer === 'false' ? 'checked' : ''} onchange="saveQuizProgress()">
                                         <span class="flex-1">خطأ</span>
                                     </label>
                                 </div>
@@ -694,7 +762,7 @@
                             questionHTML += `
                                 <input type="text" name="question_${question.id}" 
                                        class="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-lg"
-                                       placeholder="اكتب إجابتك هنا...">
+                                       placeholder="اكتب إجابتك هنا..." value="${savedAnswer || ''}" oninput="saveQuizProgress()">
                             `;
                         }
 
@@ -714,7 +782,36 @@
 
             document.getElementById('quizContent').innerHTML = quizHTML;
             window.showStudentPage();
+            // Automatically set studentAnswers from loaded progress if it exists
+            if (savedProgress) {
+                studentAnswers = { ...studentAnswers, ...savedProgress.answers };
+            }
         }
+
+        window.saveQuizProgress = function() {
+            if (!currentQuiz || !currentUserId) return;
+
+            const form = document.getElementById('studentQuizForm');
+            const formData = new FormData(form);
+            const currentAnswers = {};
+
+            currentQuiz.questions.forEach(question => {
+                const answer = formData.get(`question_${question.id}`);
+                // Only save if an answer exists (not null or empty string for radios/text)
+                if (answer !== null && answer !== '') {
+                    currentAnswers[question.id] = answer;
+                }
+            });
+
+            const progressState = {
+                quizId: currentQuiz.id,
+                studentId: currentUserId,
+                answers: currentAnswers,
+                timestamp: Date.now()
+            };
+            localStorage.setItem(QUIZ_PROGRESS_STORAGE_KEY, JSON.stringify(progressState));
+        };
+
 
         window.startQuiz = function() { // Made global
             const studentName = document.getElementById('studentName').value;
@@ -727,6 +824,9 @@
             sessionStorage.setItem('currentStudentName', studentName); // Save student name to sessionStorage
             document.getElementById('studentInfoForm').classList.add('hidden');
             document.getElementById('quizContent').classList.remove('hidden');
+
+            // Initial save of progress (empty answers)
+            window.saveQuizProgress();
         }
             
         window.submitStudentQuiz = async function() { // Made global
@@ -751,7 +851,7 @@
                 if (!answer || answer.trim() === '') {
                     allAnswered = false;
                 }
-                studentAnswers[question.id] = answer;
+                studentAnswers[question.id] = answer; // Update studentAnswers with final selections
             });
 
             if (!allAnswered) {
@@ -795,7 +895,8 @@
                     isCorrect: isCorrect,
                     questionType: question.type,
                     options: question.options || null,
-                    explanation: question.explanation || null // Include explanation
+                    explanation: question.explanation || null, // Include explanation
+                    imageUrl: question.imageUrl || null // Include question image URL for review
                 });
             });
 
@@ -807,7 +908,18 @@
                 await addDoc(collection(db, `artifacts/${appId}/public/data/quiz_results`), results);
                 window.showMessageBox('تم إرسال إجاباتك بنجاح!');
                 
-                // **** التغيير هنا: عرض النتائج مباشرة بدلاً من إعادة التوجيه ****
+                // Clear quiz progress from localStorage after successful submission
+                localStorage.removeItem(QUIZ_PROGRESS_STORAGE_KEY);
+
+                // Update URL to reflect results page state
+                // This makes direct refresh on results page work correctly
+                const currentUrl = new URL(window.location.href);
+                currentUrl.searchParams.set('results', 'true');
+                currentUrl.searchParams.set('studentId', currentUserId);
+                currentUrl.searchParams.set('teacher', currentQuiz.teacherId);
+                window.history.pushState({}, '', currentUrl.toString());
+
+                // **** عرض النتائج مباشرة ****
                 window.displayInlineResults(results, currentQuiz);
 
             } catch (e) {
@@ -818,6 +930,12 @@
 
         // **** دالة جديدة لعرض النتائج مباشرة في الصفحة ****
         window.displayInlineResults = function(results, quiz) {
+            // Hide quiz and student info forms, show results page
+            document.getElementById('studentInfoForm').classList.add('hidden');
+            document.getElementById('quizContent').classList.add('hidden');
+            window.showResultsPage();
+
+
             let resultsHTML = `
                 <div class="text-center mb-8">
                     <div class="inline-flex items-center justify-center w-20 h-20 rounded-full ${results.score >= 60 ? 'bg-green-100' : 'bg-red-100'} mb-4">
@@ -848,7 +966,6 @@
                 <div class="mb-6">
                     <h3 class="text-2xl font-bold text-gray-800 mb-4">مراجعة الإجابات</h3>
                     ${results.answers.map((answer, index) => {
-                        let correctAnswerText = '';
                         // Find the original question from the quiz to get options/details
                         const originalQuestion = quiz.questions.find(q => q.id == answer.questionId);
 
@@ -856,22 +973,19 @@
                             return `<div class="text-red-500">خطأ: لم يتم العثور على السؤال #${answer.questionId} في الكويز الأصلي.</div>`;
                         }
 
-                        if (answer.questionType === 'multiple') {
-                            correctAnswerText = originalQuestion.options[answer.correctAnswer];
-                        } else if (answer.questionType === 'boolean') {
-                            correctAnswerText = answer.correctAnswer ? 'صحيح' : 'خطأ';
-                        } else {
-                            correctAnswerText = answer.correctAnswer;
-                        }
+                        // Determine the student's answer text and correct answer text for display
+                        let studentAnswerDisplay = '';
+                        let correctAnswerDisplay = '';
 
-                        let studentAnswerText = '';
                         if (answer.questionType === 'multiple') {
-                            // Ensure studentAnswer is parsed as integer for array access
-                            studentAnswerText = originalQuestion.options[parseInt(answer.studentAnswer)];
+                            studentAnswerDisplay = originalQuestion.options[parseInt(answer.studentAnswer)];
+                            correctAnswerDisplay = originalQuestion.options[originalQuestion.correctAnswer];
                         } else if (answer.questionType === 'boolean') {
-                            studentAnswerText = answer.studentAnswer === 'true' ? 'صحيح' : 'خطأ';
-                        } else {
-                            studentAnswerText = answer.studentAnswer;
+                            studentAnswerDisplay = answer.studentAnswer === 'true' ? 'صح' : 'خطأ';
+                            correctAnswerDisplay = originalQuestion.correctAnswer ? 'صح' : 'خطأ';
+                        } else if (answer.questionType === 'text') {
+                            studentAnswerDisplay = answer.studentAnswer;
+                            correctAnswerDisplay = originalQuestion.correctAnswer;
                         }
 
                         return `
@@ -888,20 +1002,86 @@
                                     </span>
                                 </div>
                                 ${originalQuestion.imageUrl ? `<img src="${originalQuestion.imageUrl}" class="mt-2 mb-4 rounded-lg max-w-full h-auto" alt="صورة السؤال">` : ''}
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div class="bg-white p-3 rounded border">
-                                        <div class="text-sm font-medium text-gray-600 mb-1">إجابتك:</div>
-                                        <div class="text-lg ${answer.isCorrect ? 'text-green-700' : 'text-red-700'}">${studentAnswerText}</div>
+                                
+                                ${answer.questionType === 'multiple' ? `
+                                    <div class="space-y-2 mt-4">
+                                        ${originalQuestion.options.map((option, optionIndex) => {
+                                            let optionClass = 'p-3 rounded-lg border text-gray-800 flex items-center';
+                                            let iconHtml = '';
+                                            const isStudentChoice = (originalQuestion.type === 'multiple' && parseInt(answer.studentAnswer) === optionIndex);
+                                            const isCorrectOption = (originalQuestion.type === 'multiple' && originalQuestion.correctAnswer === optionIndex);
+
+                                            if (isStudentChoice) {
+                                                if (answer.isCorrect) {
+                                                    optionClass = 'bg-green-100 border-green-500 text-green-800 font-semibold';
+                                                    iconHtml = '<i class="fas fa-check-circle ml-2 text-green-500"></i>';
+                                                } else {
+                                                    optionClass = 'bg-red-100 border-red-500 text-red-800 font-semibold';
+                                                    iconHtml = '<i class="fas fa-times-circle ml-2 text-red-500"></i>';
+                                                }
+                                            } else if (isCorrectOption) { // If it's the correct option but not student's choice
+                                                optionClass = 'bg-green-50 border-green-300 text-green-700 font-semibold';
+                                                iconHtml = '<i class="fas fa-check-circle ml-2 text-green-500"></i>';
+                                            } else {
+                                                // Default styling for other options
+                                                optionClass = 'bg-white border-gray-200 text-gray-700';
+                                            }
+                                            return `
+                                                <div class="${optionClass} flex items-center">
+                                                    ${iconHtml}
+                                                    <span class="flex-1">${option}</span>
+                                                </div>
+                                            `;
+                                        }).join('')}
                                     </div>
-                                    <div class="bg-white p-3 rounded border">
-                                        <div class="text-sm font-medium text-gray-600 mb-1">الإجابة الصحيحة:</div>
-                                        <div class="text-lg text-green-700">${correctAnswerText}</div>
+                                ` : answer.questionType === 'boolean' ? `
+                                    <div class="space-y-2 mt-4">
+                                        ${[true, false].map(boolValue => {
+                                            const optionText = boolValue ? 'صح' : 'خطأ';
+                                            let optionClass = 'p-3 rounded-lg border text-gray-800 flex items-center';
+                                            let iconHtml = '';
+                                            const isStudentChoice = (answer.studentAnswer === String(boolValue));
+                                            const isCorrectOption = (originalQuestion.correctAnswer === boolValue);
+
+                                            if (isStudentChoice) {
+                                                if (answer.isCorrect) {
+                                                    optionClass = 'bg-green-100 border-green-500 text-green-800 font-semibold';
+                                                    iconHtml = '<i class="fas fa-check-circle ml-2 text-green-500"></i>';
+                                                } else {
+                                                    optionClass = 'bg-red-100 border-red-500 text-red-800 font-semibold';
+                                                    iconHtml = '<i class="fas fa-times-circle ml-2 text-red-500"></i>';
+                                                }
+                                            } else if (isCorrectOption) {
+                                                optionClass = 'bg-green-50 border-green-300 text-green-700 font-semibold';
+                                                iconHtml = '<i class="fas fa-check-circle ml-2 text-green-500"></i>';
+                                            } else {
+                                                optionClass = 'bg-white border-gray-200 text-gray-700';
+                                            }
+                                            return `
+                                                <div class="${optionClass} flex items-center">
+                                                    ${iconHtml}
+                                                    <span class="flex-1">${optionText}</span>
+                                                </div>
+                                            `;
+                                        }).join('')}
                                     </div>
-                                </div>
-                                ${answer.explanation ? `
+                                ` : `
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div class="bg-white p-3 rounded border">
+                                            <div class="text-sm font-medium text-gray-600 mb-1">إجابتك:</div>
+                                            <div class="text-lg ${answer.isCorrect ? 'text-green-700' : 'text-red-700'}">${studentAnswerDisplay}</div>
+                                        </div>
+                                        <div class="bg-white p-3 rounded border">
+                                            <div class="text-sm font-medium text-gray-600 mb-1">الإجابة الصحيحة:</div>
+                                            <div class="text-lg text-green-700">${correctAnswerDisplay}</div>
+                                        </div>
+                                    </div>
+                                `}
+
+                                ${originalQuestion.explanation ? `
                                     <div class="bg-blue-50 border border-blue-200 p-3 rounded-lg mt-4">
                                         <div class="text-sm font-medium text-blue-700 mb-1">هامش توضيحي:</div>
-                                        <p class="text-blue-800">${answer.explanation}</p>
+                                        <p class="text-blue-800">${originalQuestion.explanation}</p>
                                     </div>
                                 ` : ''}
                             </div>
@@ -918,52 +1098,44 @@
             `;
 
             document.getElementById('resultsContent').innerHTML = resultsHTML;
-            window.showResultsPage(); // عرض قسم النتائج
         };
 
 
-        window.showResults = async function(quizId) { // Made global
+        window.showResults = async function(quizId, studentIdParam, teacherIdParam) { // Made global
             if (!isAuthReady || !currentUserId) {
                 console.log("Waiting for authentication to show results...");
                 const unsubscribe = onAuthStateChanged(auth, (user) => {
                     if (user) {
-                        window.showResults(quizId);
+                        window.showResults(quizId, studentIdParam, teacherIdParam);
                         unsubscribe();
                     }
                 });
                 return;
             }
 
-            const urlParams = new URLSearchParams(window.location.search);
-            const studentIdParam = urlParams.get('studentId'); // The student whose results we want to see
-
             let latestResult = null;
             let quiz = null;
 
             try {
                 // Fetch the specific quiz first to get teacherId and questions
-                // Try to get teacherId from URL first.
-                let teacherIdFromUrl = urlParams.get('teacher'); 
                 let foundQuizDoc = null;
-
-                if (teacherIdFromUrl) {
-                    const specificQuizDocRef = doc(db, `artifacts/${appId}/users/${teacherIdFromUrl}/quizzes`, quizId);
+                if (teacherIdParam) {
+                    const specificQuizDocRef = doc(db, `artifacts/${appId}/users/${teacherIdParam}/quizzes`, quizId);
                     const specificQuizSnap = await getDoc(specificQuizDocRef);
                     if (specificQuizSnap.exists()) {
                         foundQuizDoc = specificQuizSnap;
                     }
                 } else {
-                    // Fallback: search all teacher quizzes for the quizId (less efficient, but handles direct navigation)
+                     // Fallback: search all teacher quizzes for the quizId (less efficient, but handles direct navigation)
                     const usersCollectionRef = collection(db, `artifacts/${appId}/users`);
                     const usersSnapshot = await getDocs(usersCollectionRef);
                     for (const userDoc of usersSnapshot.docs) {
                         const quizzesCollectionRef = collection(db, `artifacts/${appId}/users/${userDoc.id}/quizzes`);
-                        // Use a query on the document ID
                         const qQuiz = query(quizzesCollectionRef, where("__name__", "==", quizId));
                         const quizSnapshot = await getDocs(qQuiz);
                         if (!quizSnapshot.empty) {
                             foundQuizDoc = quizSnapshot.docs[0];
-                            teacherIdFromUrl = userDoc.id; // Set teacherId if found
+                            teacherIdParam = userDoc.id; // Set teacherId if found
                             break;
                         }
                     }
@@ -987,8 +1159,8 @@
                 const resultsRef = collection(db, `artifacts/${appId}/public/data/quiz_results`);
                 const qResults = query(resultsRef, 
                     where("quizId", "==", quizId),
-                    where("studentId", "==", studentIdParam || currentUserId), // Use param if available, else current user
-                    where("teacherId", "==", quiz.teacherId) // Crucial for security rules
+                    where("studentId", "==", studentIdParam), // Use studentIdParam from URL
+                    where("teacherId", "==", teacherIdParam) // Use teacherIdParam from URL
                 );
                 const querySnapshot = await getDocs(qResults);
                 const allResultsForStudent = [];
