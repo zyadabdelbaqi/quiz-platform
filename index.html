@@ -5,35 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>كويزات MET</title>
     <!-- Improved Arabic and English Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&family=Amiri:wght@400;500;700&family=Noto+Sans+Arabic:wght@440;500;700&family=Inter:wght@400;500;700&family=Cairo:wght@400;700&family=Changa:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@400;700&family=Lateef&family=Reem+Kufi:wght@400;700&family=El+Messiri:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&family=Amiri:wght@400;500;700&family=Noto+Sans+Arabic:wght@440;500;700&family=Inter:wght@400;500;700&family=Cairo:wght@400;700&family=Changa:wght@440;700&family=IBM+Plex+Sans+Arabic:wght@400;700&family=Lateef&family=Reem+Kufi:wght@400;700&family=El+Messiri:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     
     <style>
-        /* الأنماط العامة */
+        /* General Styles */
         body {
             /* Default font for general content, will be overridden by html[lang] */
             font-family: 'Inter', sans-serif; /* Neutral default */
-            background-color: #f3f4f6; /* لون خلفية افتراضي */
-            line-height: 1.6; /* تحسين تباعد الأسطر */
-            text-align: left; /* محاذاة النص لليسار افتراضياً (لالإنجليزية) */
+            background-color: #f3f4f6; /* Default background color */
+            line-height: 1.6; /* Improved line spacing */
+            text-align: left; /* Default text alignment (for English) */
         }
 
-        /* تعيين الخط الأساسي للمحتوى العربي ليكون Amiri */
+        /* Set base font for Arabic content to Tajawal */
         html[lang="ar"] body {
-            font-family: 'Amiri', 'Noto Sans Arabic', 'Tajawal', 'Cairo', 'Changa', 'IBM Plex Sans Arabic', 'Lateef', 'Reem Kufi', 'El Messiri', serif;
+            font-family: 'Tajawal', 'Noto Sans Arabic', 'Amiri', 'Changa', 'IBM Plex Sans Arabic', 'Lateef', 'Reem Kufi', 'El Messiri', serif;
             text-align: right;
         }
-        /* تعيين الخط الأساسي للمحتوى الإنجليزي ليكون Inter */
+        /* Set base font for English content to Inter */
         html[lang="en"] body {
             font-family: 'Inter', sans-serif;
             text-align: left;
         }
 
-        /* Override specific Tailwind defaults for RTL if needed, or ensure proper usage */
-        .text-center { text-align: center; } /* Keep center aligned elements centered */
-        .text-left { text-align: left; } /* For explicit left alignment (e.g., student ID) */
-        .text-right { text-align: right; } /* For explicit right alignment */
+        .text-center { text-align: center; }
+        .text-left { text-align: left; }
+        .text-right { text-align: right; }
 
         .quiz-container { max-width: 800px; margin: 0 auto; }
         .question-card { transition: all 0.3s ease; }
@@ -54,9 +53,6 @@
             text-align: center;
         }
 
-        /* Language selector positioning for mobile to prevent overlap */
-        /* Adjusted positioning to top-4 right-4 for Arabic (RTL) and top-4 left-4 for English (LTR) */
-        /* Increased z-index and added responsive padding to main content */
         .language-selector {
             position: absolute;
             top: 1rem; /* 16px */
@@ -79,17 +75,13 @@
             right: auto;
         }
 
-        /* Add top padding to main content areas to prevent overlap with the language selector */
-        /* This applies to all main content areas that might be under the selector */
         .main-content-area {
             padding-top: 4rem; /* Adjust as needed, considering selector height + some margin */
-            /* Default horizontal padding remains px-4 or similar */
         }
 
-        /* Specific adjustments for smaller screens if needed */
-        @media (max-width: 640px) { /* Tailwind's sm breakpoint */
+        @media (max-width: 640px) {
             .main-content-area {
-                padding-top: 5rem; /* More padding for smaller screens if selector is larger or content is higher */
+                padding-top: 5rem;
             }
         }
 
@@ -100,6 +92,7 @@
             width: 100%;
         }
 
+        /* Adjust background-position for the custom select arrow */
         .custom-select {
             display: block;
             width: 100%;
@@ -116,8 +109,16 @@
             color: #1f2937; /* text-gray-900 */
             background-image: url('data:image/svg+xml;utf8,<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>');
             background-repeat: no-repeat;
-            background-position: right 0.75rem center;
+            /* Adjust position based on language direction */
+            background-position: calc(100% - 0.75rem) center; /* For LTR (English) */
             background-size: 1.5em;
+            padding-right: 2.5rem; /* Make space for the arrow for LTR */
+        }
+
+        html[lang="ar"] .custom-select {
+            background-position: 0.75rem center; /* For RTL (Arabic) */
+            padding-left: 2.5rem; /* Make space for the arrow for RTL */
+            padding-right: 0.75rem; /* Reset right padding for RTL */
         }
 
         .custom-select:focus {
@@ -126,10 +127,99 @@
             box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5); /* focus:ring-2 focus:ring-blue-500 */
         }
 
-        /* Specific styles for quiz content based on theme */
         .quiz-content-themed {
             transition: all 0.3s ease-in-out;
         }
+
+        /* Custom styles for spacing between radio buttons/checkboxes and text */
+        html[lang="ar"] input[type="radio"], html[lang="ar"] input[type="checkbox"] {
+            margin-left: 0.5rem; /* Equivalent to ml-2 in Tailwind */
+            margin-right: 0;
+        }
+
+        html[lang="en"] input[type="radio"], html[lang="en"] input[type="checkbox"] {
+            margin-right: 0.5rem; /* Equivalent to mr-2 in Tailwind */
+            margin-left: 0;
+        }
+
+        /* Spacing for Font Awesome icons when they are part of a text string or button */
+        html[lang="ar"] .fa, html[lang="ar"] .fas, html[lang="ar"] .far, html[lang="ar"] .fab {
+            margin-left: 0.5rem; /* Space to the left of the icon for Arabic */
+            margin-right: 0;
+        }
+        html[lang="en"] .fa, html[lang="en"] .fas, html[lang="en"] .far, html[lang="en"] .fab {
+            margin-right: 0.5rem; /* Space to the right of the icon for English */
+            margin-left: 0;
+        }
+
+        .btn-primary .fa, .btn-primary .fas, .btn-primary .far, .btn-primary .fab,
+        .bg-green-500 .fa, .bg-yellow-500 .fa, .bg-purple-500 .fa, .bg-gray-500 .fa {
+            margin-right: 0.5rem !important; /* Forces a right margin for LTR icons */
+            margin-left: 0 !important;
+        }
+
+        html[lang="ar"] .btn-primary .fa, html[lang="ar"] .btn-primary .fas, html[lang="ar"] .btn-primary .far, html[lang="ar"] .btn-primary .fab,
+        html[lang="ar"] .bg-green-500 .fa, html[lang="ar"] .bg-yellow-500 .fa, html[lang="ar"] .bg-purple-500 .fa, html[lang="ar"] .bg-gray-500 .fa {
+            margin-left: 0.5rem !important; /* Forces a left margin for RTL icons */
+            margin-right: 0 !important;
+        }
+        
+        /* --- RTL Overrides for Tailwind's Directional Margin utilities --- */
+        /* This block ensures that classes like mr-2 (margin-right) are flipped to margin-left in RTL mode. */
+        /* No overrides are needed for LTR (English) as that is the default behavior. */
+        html[lang="ar"] .mr-1 { margin-left: 0.25rem !important; margin-right: unset !important; }
+        html[lang="ar"] .mr-2 { margin-left: 0.5rem !important; margin-right: unset !important; }
+        html[lang="ar"] .mr-3 { margin-left: 0.75rem !important; margin-right: unset !important; }
+        html[lang="ar"] .mr-4 { margin-left: 1rem !important; margin-right: unset !important; }
+
+        html[lang="ar"] .ml-1 { margin-right: 0.25rem !important; margin-left: unset !important; }
+        html[lang="ar"] .ml-2 { margin-right: 0.5rem !important; margin-left: unset !important; }
+        html[lang="ar"] .ml-3 { margin-right: 0.75rem !important; margin-left: unset !important; }
+        html[lang="ar"] .ml-4 { margin-right: 1rem !important; margin-left: unset !important; }
+
+        html[lang="ar"] .custom-radio-outer {
+            margin-right: 0 !important; /* Remove default mr-3 if applied by Tailwind on RTL */
+            margin-left: 0.75rem !important; /* Equivalent to ml-3 for Arabic */
+        }
+
+        html[lang="en"] .custom-radio-outer {
+             margin-left: 0 !important; /* Remove default ml-3 if applied by Tailwind on LTR */
+             margin-right: 0.75rem !important; /* Equivalent to mr-3 for English */
+        }
+
+        html[lang="ar"] .teacher-mode input[type="radio"].ml-2 {
+            margin-left: 0 !important;
+            margin-right: 0.5rem !important; /* Override with specific RTL margin */
+        }
+
+        html[lang="en"] .teacher-mode input[type="radio"].ml-2 {
+            margin-right: 0 !important;
+            margin-left: 0.5rem !important; /* Override with specific LTR margin */
+        }
+
+        /* Specific adjustments for buttons in saved quizzes section */
+        .saved-quiz-button {
+            /* This class will be applied to the buttons inside savedQuizzes container */
+            display: inline-flex; /* Use flexbox to align icon and text */
+            align-items: center; /* Vertically center items */
+            padding: 0.25rem 0.75rem; /* py-1 px-3 for sm button */
+            border-radius: 0.25rem; /* rounded */
+            font-size: 0.875rem; /* text-sm */
+            transition: all 0.15s ease-in-out;
+        }
+
+        /* Ensure consistent spacing between icon and text in buttons */
+        .saved-quiz-button .fa, .saved-quiz-button .fas, .saved-quiz-button .far, .saved-quiz-button .fab {
+            /* For LTR, icon should have margin-right */
+            margin-right: 0.25rem; /* A small margin */
+            margin-left: 0;
+        }
+        html[lang="ar"] .saved-quiz-button .fa, html[lang="ar"] .saved-quiz-button .fas, html[lang="ar"] .saved-quiz-button .far, html[lang="ar"] .saved-quiz-button .fab {
+            /* For RTL, icon should have margin-left */
+            margin-left: 0.25rem; /* A small margin */
+            margin-right: 0;
+        }
+        
     </style>
 </head>
 <body class="bg-gray-100">
@@ -139,7 +229,7 @@
         <button onclick="setLanguage('en')" class="px-3 py-1 rounded-md text-sm font-semibold hover:bg-gray-300 transition" data-lang-btn="en">English</button>
     </div>
 
-    <!-- صفحة تسجيل الدخول (جديدة) -->
+    <!-- Login Page (New) -->
     <div id="loginPage" class="flex items-center justify-center min-h-screen bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 main-content-area">
         <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full text-center transform hover:scale-105 transition duration-300">
             <h1 class="text-3xl font-bold text-gray-800 mb-6">
@@ -158,7 +248,7 @@
             
             <!-- New Remember Me checkbox -->
             <div class="flex items-center justify-center mb-6">
-                <input type="checkbox" id="rememberMe" class="form-checkbox h-4 w-4 text-purple-600 rounded mr-2">
+                <input type="checkbox" id="rememberMe" class="form-checkbox h-4 w-4 text-purple-600 rounded">
                 <label for="rememberMe" class="text-gray-700" data-translate-key="remember_me">تذكرني</label>
             </div>
 
@@ -170,7 +260,7 @@
         </div>
     </div>
 
-    <!-- صفحة المعلم -->
+    <!-- Teacher Page -->
     <div id="teacherPage" class="hidden">
         <div class="teacher-mode text-white py-8 main-content-area">
             <div class="container mx-auto px-4">
@@ -275,13 +365,13 @@
                     <span data-translate-key="saved_quizzes_title">الكويزات المحفوظة</span>
                 </h2>
                 <div id="savedQuizzes" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <!-- سيتم تحميل الكويزات المحفوظة هنا -->
+                    <!-- Saved quizzes will be loaded here -->
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- صفحة الطالب -->
+    <!-- Student Page -->
     <div id="studentPage" class="hidden">
         <div class="student-mode text-white py-8 main-content-area">
             <div class="container mx-auto px-4">
@@ -308,12 +398,12 @@
                 </button>
             </div>
             <div id="quizContent" class="bg-white rounded-lg shadow-lg p-6 hidden quiz-content-themed">
-                <!-- سيتم تحميل محتوى الكويز هنا -->
+                <!-- Quiz content will be loaded here -->
             </div>
         </div>
     </div>
 
-    <!-- صفحة النتائج -->
+    <!-- Results Page -->
     <div id="resultsPage" class="hidden">
         <div class="student-mode text-white py-8 main-content-area">
             <div class="container mx-auto px-4">
@@ -326,7 +416,7 @@
 
         <div class="quiz-container px-4 py-8">
             <div id="resultsContent" class="bg-white rounded-lg shadow-lg p-6 quiz-content-themed">
-                <!-- سيتم تحميل النتائج هنا -->
+                <!-- Results will be loaded here -->
             </div>
         </div>
     </div>
@@ -353,6 +443,8 @@
         // Global variables for Firebase instances and user ID
         let currentUserId = null;
         let isAuthReady = false; // Flag to ensure auth is ready before Firestore ops
+        let unsubscribeTeacherResults = null; // To store the unsubscribe function for teacher results listener
+
 
         // Global variables for quiz management
         let questions = [];
@@ -920,13 +1012,15 @@
             const optionsContainer = document.querySelector(`#question-${questionId} .options-container`);
             if (!optionsContainer) return;
 
-            const optionIndex = optionsContainer.children.length; // Get the next index
-
             const optionDiv = document.createElement('div');
             optionDiv.className = 'option-item flex items-center gap-2 mb-2';
+            
+            // Check if this option should be pre-selected as correct for editing
+            const isChecked = isCorrect ? 'checked' : '';
+
             optionDiv.innerHTML = `
-                <input type="radio" name="correct-${questionId}" value="${optionIndex}" class="correct-answer ml-2" ${isCorrect ? 'checked' : ''}>
-                <input type="text" placeholder="${translations[currentLang].option_placeholder} ${optionIndex + 1}" class="option-text flex-1 p-2 border border-gray-300 rounded" value="${optionText}">
+                <input type="radio" name="correct-${questionId}" value="${optionsContainer.children.length}" class="correct-answer ml-2" ${isChecked}>
+                <input type="text" placeholder="${translations[currentLang].option_placeholder} ${optionsContainer.children.length + 1}" class="option-text flex-1 p-2 border border-gray-300 rounded" value="${optionText}">
                 <button type="button" onclick="removeOption(this)" class="text-red-500 hover:text-red-700 p-1 rounded-full">
                     <i class="fas fa-times-circle"></i>
                 </button>
@@ -1140,6 +1234,11 @@
             questions = [];
         }
 
+        // Utility function to escape single quotes for HTML attributes
+        window.escapeHtmlAttribute = function(s) {
+            return s.replace(/'/g, '&#39;');
+        };
+
         window.loadSavedQuizzes = async function() { // Made global
             if (!isAuthReady || !currentUserId) {
                 console.log(translations[currentLang].awaiting_auth_load_quiz);
@@ -1171,17 +1270,17 @@
                             <i class="fas fa-question-circle ml-1"></i>${quiz.questions.length} ${translations[currentLang].question_number}
                         </p>
                         <div class="flex gap-2 flex-wrap">
-                            <button onclick="copyQuizLink('${quiz.id}', '${quiz.teacherId}')" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm transition">
-                                <i class="fas fa-link ml-1"></i><span data-translate-key="copy_link_button_dynamic"></span>
+                            <button onclick="copyQuizLink('${escapeHtmlAttribute(encodeURIComponent(quiz.id))}', '${escapeHtmlAttribute(encodeURIComponent(quiz.teacherId))}')" class="bg-green-500 hover:bg-green-600 text-white saved-quiz-button">
+                                <i class="fas fa-link"></i><span data-translate-key="copy_link_button_dynamic"></span>
                             </button>
-                            <button onclick="viewQuizResultsForTeacher('${quiz.id}')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition">
-                                <i class="fas fa-chart-bar ml-1"></i><span data-translate-key="results_button_dynamic"></span>
+                            <button onclick="viewQuizResultsForTeacher('${escapeHtmlAttribute(encodeURIComponent(quiz.id))}')" class="bg-blue-500 hover:bg-blue-600 text-white saved-quiz-button">
+                                <i class="fas fa-chart-bar"></i><span data-translate-key="results_button_dynamic"></span>
                             </button>
-                            <button onclick="editQuiz('${quiz.id}')" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm transition">
-                                <i class="fas fa-edit ml-1"></i><span data-translate-key="edit_button_dynamic"></span>
+                            <button onclick="editQuiz('${escapeHtmlAttribute(encodeURIComponent(quiz.id))}')" class="bg-yellow-500 hover:bg-yellow-600 text-white saved-quiz-button">
+                                <i class="fas fa-edit"></i><span data-translate-key="edit_button_dynamic"></span>
                             </button>
-                            <button onclick="deleteQuiz('${quiz.id}')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition">
-                                <i class="fas fa-trash ml-1"></i><span data-translate-key="delete_button_dynamic"></span>
+                            <button onclick="deleteQuiz('${escapeHtmlAttribute(encodeURIComponent(quiz.id))}')" class="bg-red-500 hover:bg-red-600 text-white saved-quiz-button">
+                                <i class="fas fa-trash"></i><span data-translate-key="delete_button_dynamic"></span>
                             </button>
                         </div>
                     </div>
@@ -1204,7 +1303,7 @@
                     } else if (span.parentNode.onclick.toString().includes('editQuiz')) {
                         span.textContent = translations[currentLang].edit_button_dynamic || 'Edit';
                     } else if (span.parentNode.onclick.toString().includes('deleteQuiz')) {
-                        span.textContent = translations[currentLang].delete_button_dynamic || 'Delete';
+                        span.textContent = translations[currentLang].delete_quiz_dynamic || 'Delete'; /* Changed key name here */
                     }
                 });
 
@@ -1221,7 +1320,9 @@
                 return;
             }
             try {
-                const quizDocRef = doc(db, `artifacts/${appId}/users/${currentUserId}/quizzes`, quizId);
+                // Decode quizId received from URL before using it in Firestore
+                const decodedQuizId = decodeURIComponent(quizId);
+                const quizDocRef = doc(db, `artifacts/${appId}/users/${currentUserId}/quizzes`, decodedQuizId);
                 const quizDocSnap = await getDoc(quizDocRef);
 
                 if (!quizDocSnap.exists()) {
@@ -1262,7 +1363,7 @@
 
         window.copyQuizLink = function(quizId, teacherId) { // Made global
             // Include teacherId in the URL for student to access public quiz
-            const link = `${window.location.origin}${window.location.pathname}?quiz=${quizId}&teacher=${teacherId}`;
+            const link = `${window.location.origin}${window.location.pathname}?quiz=${encodeURIComponent(quizId)}&teacher=${encodeURIComponent(teacherId)}`;
             const tempInput = document.createElement('input');
             tempInput.value = link;
             document.body.appendChild(tempInput);
@@ -1280,12 +1381,14 @@
                     return;
                 }
                 try {
+                    // Decode quizId received from URL before using it in Firestore
+                    const decodedQuizId = decodeURIComponent(quizId);
                     // Delete quiz document
-                    await deleteDoc(doc(db, `artifacts/${appId}/users/${currentUserId}/quizzes`, quizId));
+                    await deleteDoc(doc(db, `artifacts/${appId}/users/${currentUserId}/quizzes`, decodedQuizId));
                     // Delete all results associated with this quiz
                     const resultsRef = collection(db, `artifacts/${appId}/public/data/quiz_results`);
                     // IMPORTANT: Filter by quizId and teacherId to ensure proper deletion permissions
-                    const q = query(resultsRef, where("quizId", "==", quizId), where("teacherId", "==", currentUserId));
+                    const q = query(resultsRef, where("quizId", "==", decodedQuizId), where("teacherId", "==", currentUserId));
                     const querySnapshot = await getDocs(q);
                     const deletePromises = [];
                     querySnapshot.forEach((doc) => {
@@ -1303,6 +1406,38 @@
         }
 
         // --- Student Functions ---
+
+        // Helper function to update the visual state of custom radio buttons
+        window.handleOptionSelection = function(radioInput) {
+            const parentLabel = radioInput.closest('label');
+            const optionsContainer = parentLabel.closest('.space-y-3'); // Works for both multiple and boolean
+
+            // Remove selected styles from all other labels in the same question
+            optionsContainer.querySelectorAll('label').forEach(label => {
+                label.classList.remove('bg-blue-50', 'border-blue-500', 'shadow-md');
+                const customRadioOuter = label.querySelector('.custom-radio-outer');
+                const customRadioInner = label.querySelector('.custom-radio-inner');
+                if (customRadioOuter) customRadioOuter.classList.remove('bg-blue-500', 'border-blue-500');
+                if (customRadioInner) {
+                    customRadioInner.classList.add('hidden');
+                    customRadioInner.classList.remove('block');
+                }
+            });
+
+            // Add selected styles to the current label
+            parentLabel.classList.add('bg-blue-50', 'border-blue-500', 'shadow-md');
+            const currentCustomRadioOuter = parentLabel.querySelector('.custom-radio-outer');
+            const currentCustomRadioInner = parentLabel.querySelector('.custom-radio-inner');
+            if (currentCustomRadioOuter) currentCustomRadioOuter.classList.add('bg-blue-500', 'border-blue-500');
+            if (currentCustomRadioInner) {
+                currentCustomRadioInner.classList.add('block');
+                currentCustomRadioInner.classList.remove('hidden');
+            }
+
+            // Then save progress
+            saveQuizProgress();
+        };
+
         window.loadQuizForStudent = async function(quizId, teacherIdFromUrl) { // Made global
             if (!isAuthReady) {
                 console.log(translations[currentLang].awaiting_auth_load_quiz);
@@ -1316,11 +1451,13 @@
             }
 
             let quiz = null;
-            let actualTeacherId = teacherIdFromUrl; // Use URL teacherId if provided
+            // Decode quizId and teacherIdFromUrl received from the URL before using them
+            const decodedQuizId = decodeURIComponent(quizId);
+            let actualTeacherId = decodeURIComponent(teacherIdFromUrl); 
 
             // Try to load quiz from the teacher's collection
             try {
-                const quizDocRef = doc(db, `artifacts/${appId}/users/${actualTeacherId}/quizzes`, quizId);
+                const quizDocRef = doc(db, `artifacts/${appId}/users/${actualTeacherId}/quizzes`, decodedQuizId);
                 const quizDocSnap = await getDoc(quizDocRef);
                 if (quizDocSnap.exists()) {
                     quiz = { id: quizDocSnap.id, ...quizDocSnap.data() };
@@ -1331,7 +1468,7 @@
                     const usersSnapshot = await getDocs(usersCollectionRef);
                     for (const userDoc of usersSnapshot.docs) {
                         const quizzesCollectionRef = collection(db, `artifacts/${appId}/users/${userDoc.id}/quizzes`);
-                        const qQuiz = query(quizzesCollectionRef, where("__name__", "==", quizId));
+                        const qQuiz = query(quizzesCollectionRef, where("__name__", "==", decodedQuizId));
                         const quizSnapshot = await getDocs(qQuiz);
                         if (!quizSnapshot.empty) {
                             foundQuizDoc = quizSnapshot.docs[0];
@@ -1421,7 +1558,7 @@
                 const storedData = localStorage.getItem(QUIZ_PROGRESS_STORAGE_KEY);
                 if (storedData) {
                     const parsedData = JSON.parse(storedData);
-                    if (parsedData.quizId === quiz.id && parsedData.studentId === currentUserId) {
+                    if (parsedData.quizId === decodedQuizId && parsedData.studentId === currentUserId) {
                         savedProgress = parsedData;
                     } else {
                         // Clear stale progress if it's for a different quiz/student
@@ -1438,7 +1575,7 @@
             try {
                 const resultsRef = collection(db, `artifacts/${appId}/public/data/quiz_results`);
                 const qResults = query(resultsRef,
-                    where("quizId", "==", quiz.id),
+                    where("quizId", "==", decodedQuizId),
                     where("studentId", "==", currentUserId),
                     where("teacherId", "==", actualTeacherId || quiz.teacherId) // Use actualTeacherId if found, else quiz.teacherId
                 );
@@ -1484,7 +1621,7 @@
                     <h1 class="text-3xl font-bold text-gray-800 mb-2">${quiz.title}</h1>
                     <p class="text-gray-600 text-lg">${quiz.description}</p>
                     <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-4">
-                        <i class="fas fa-info-circle text-blue-500 ml-2"></i>
+                        <i class="fas fa-info-circle ml-2"></i>
                         ${translations[currentLang].total_questions_count}: ${quiz.questions.length}
                     </div>
                 </div>
@@ -1509,9 +1646,15 @@
                             questionHTML += `
                                 <div class="space-y-3">
                                     ${question.options.map((option, optionIndex) => `
-                                        <label class="flex items-center p-3 bg-white rounded-lg border border-gray-200 hover:bg-blue-50 cursor-pointer transition">
-                                            <input type="radio" name="question_${question.id}" value="${optionIndex}" class="ml-3 text-blue-500 focus:ring-blue-500" ${savedAnswer !== undefined && savedAnswer !== null && parseInt(savedAnswer) === optionIndex ? 'checked' : ''} onchange="saveQuizProgress()">
-                                            <span class="flex-1">${option}</span>
+                                        <label class="flex items-center p-4 rounded-xl shadow-sm border-2 transition-all duration-200 ease-in-out cursor-pointer 
+                                            ${savedAnswer !== undefined && savedAnswer !== null && parseInt(savedAnswer) === optionIndex ? 'bg-blue-50 border-blue-500 shadow-md' : 'bg-white border-gray-200 hover:border-blue-400 hover:shadow-md'}">
+                                            <input type="radio" name="question_${question.id}" value="${optionIndex}" class="hidden" onchange="handleOptionSelection(this)">
+                                            <div class="custom-radio-outer w-6 h-6 rounded-full border-2 flex items-center justify-center mr-3 flex-shrink-0 
+                                                ${savedAnswer !== undefined && savedAnswer !== null && parseInt(savedAnswer) === optionIndex ? 'bg-blue-500 border-blue-500' : 'border-gray-400'}">
+                                                <div class="custom-radio-inner w-3 h-3 rounded-full bg-white 
+                                                    ${savedAnswer !== undefined && savedAnswer !== null && parseInt(savedAnswer) === optionIndex ? 'block' : 'hidden'}"></div>
+                                            </div>
+                                            <span class="flex-1 text-gray-800">${option}</span>
                                         </label>
                                     `).join('')}
                                 </div>
@@ -1519,12 +1662,24 @@
                         } else if (question.type === 'boolean') {
                             questionHTML += `
                                 <div class="space-y-3">
-                                    <label class="flex items-center p-3 bg-white rounded-lg border border-gray-200 hover:bg-blue-50 cursor-pointer transition">
-                                        <input type="radio" name="question_${question.id}" value="true" class="ml-3 text-blue-500 focus:ring-blue-500" ${savedAnswer === 'true' ? 'checked' : ''} onchange="saveQuizProgress()">
+                                    <label class="flex items-center p-4 rounded-xl shadow-sm border-2 transition-all duration-200 ease-in-out cursor-pointer 
+                                        ${savedAnswer === 'true' ? 'bg-blue-50 border-blue-500 shadow-md' : 'bg-white border-gray-200 hover:border-blue-400 hover:shadow-md'}">
+                                        <input type="radio" name="question_${question.id}" value="true" class="hidden" onchange="handleOptionSelection(this)">
+                                        <div class="custom-radio-outer w-6 h-6 rounded-full border-2 flex items-center justify-center mr-3 flex-shrink-0 
+                                            ${savedAnswer === 'true' ? 'bg-blue-500 border-blue-500' : 'border-gray-400'}">
+                                            <div class="custom-radio-inner w-3 h-3 rounded-full bg-white 
+                                                ${savedAnswer === 'true' ? 'block' : 'hidden'}"></div>
+                                        </div>
                                         <span class="flex-1">${translations[currentLang].true_text}</span>
                                     </label>
-                                    <label class="flex items-center p-3 bg-white rounded-lg border border-gray-200 hover:bg-blue-50 cursor-pointer transition">
-                                        <input type="radio" name="question_${question.id}" value="false" class="ml-3 text-blue-500 focus:ring-blue-500" ${savedAnswer === 'false' ? 'checked' : ''} onchange="saveQuizProgress()">
+                                    <label class="flex items-center p-4 rounded-xl shadow-sm border-2 transition-all duration-200 ease-in-out cursor-pointer 
+                                        ${savedAnswer === 'false' ? 'bg-blue-50 border-blue-500 shadow-md' : 'bg-white border-gray-200 hover:border-blue-400 hover:shadow-md'}">
+                                        <input type="radio" name="question_${question.id}" value="false" class="hidden" onchange="handleOptionSelection(this)">
+                                        <div class="custom-radio-outer w-6 h-6 rounded-full border-2 flex items-center justify-center mr-3 flex-shrink-0 
+                                            ${savedAnswer === 'false' ? 'bg-blue-500 border-blue-500' : 'border-gray-400'}">
+                                            <div class="custom-radio-inner w-3 h-3 rounded-full bg-white 
+                                                ${savedAnswer === 'false' ? 'block' : 'hidden'}"></div>
+                                        </div>
                                         <span class="flex-1">${translations[currentLang].false_text}</span>
                                     </label>
                                 </div>
@@ -1636,7 +1791,7 @@
             const form = document.getElementById('studentQuizForm');
             const formData = new FormData(form);
             
-            // التحقق من أن جميع الأسئلة تم الإجابة عليها
+            // Validate that all questions have been answered
             let allAnswered = true;
             currentQuiz.questions.forEach(question => {
                 const answer = formData.get(`question_${question.id}`);
@@ -1651,7 +1806,7 @@
                 return;
             }
 
-            // حساب النتيجة
+            // Calculate the score
             let correctAnswers = 0;
            
             const results = {
@@ -1727,7 +1882,7 @@
             }
         }
 
-        // **** دالة جديدة لعرض النتائج مباشرة في الصفحة ****
+        // **** New function to display results directly on the page ****
         window.displayInlineResults = function(results, quiz) {
             // Hide quiz and student info forms, show results page
             document.getElementById('studentInfoForm').classList.add('hidden');
@@ -1829,29 +1984,38 @@
                                 ${answer.questionType === 'multiple' ? `
                                     <div class="space-y-2 mt-4">
                                         ${originalQuestion.options.map((option, optionIndex) => {
-                                            let optionClass = 'p-3 rounded-lg border text-gray-800 flex items-center';
-                                            let iconHtml = '';
-                                            const isStudentChoice = (originalQuestion.type === 'multiple' && parseInt(answer.studentAnswer) === optionIndex);
+                                            let optionClasses = 'p-4 rounded-xl shadow-sm border-2 flex items-center transition-all duration-200 ease-in-out';
+                                            let outerRadioClasses = 'w-6 h-6 rounded-full border-2 flex items-center justify-center mr-3 flex-shrink-0';
+                                            let innerRadioClasses = 'w-3 h-3 rounded-full bg-white';
+                                            
+                                            const isStudentChoiceOption = (originalQuestion.type === 'multiple' && parseInt(answer.studentAnswer) === optionIndex);
                                             const isCorrectOption = (originalQuestion.type === 'multiple' && originalQuestion.correctAnswer === optionIndex);
 
-                                            if (isStudentChoice) {
+                                            if (isStudentChoiceOption) {
                                                 if (answer.isCorrect) {
-                                                    optionClass = 'bg-green-100 border-green-500 text-green-800 font-semibold';
-                                                    iconHtml = '<i class="fas fa-check-circle ml-2 text-green-500"></i>';
+                                                    optionClasses += ' bg-green-100 border-green-500 shadow-md';
+                                                    outerRadioClasses += ' bg-green-500 border-green-500';
+                                                    innerRadioClasses += ' block';
                                                 } else {
-                                                    optionClass = 'bg-red-100 border-red-500 text-red-800 font-semibold';
-                                                    iconHtml = '<i class="fas fa-times-circle ml-2 text-red-500"></i>';
+                                                    optionClasses += ' bg-red-100 border-red-500 shadow-md';
+                                                    outerRadioClasses += ' bg-red-500 border-red-500';
+                                                    innerRadioClasses += ' block';
                                                 }
-                                            } else if (isCorrectOption) { // If it's the correct option but not student's choice
-                                                optionClass = 'bg-green-50 border-green-300 text-green-700 font-semibold';
-                                                iconHtml = '<i class="fas fa-check-circle ml-2 text-green-500"></i>';
-                                            } else {
-                                                // Default styling for other options
-                                                optionClass = 'bg-white border-gray-200 text-gray-700';
+                                            } else if (isCorrectOption) { // Correct option but not chosen by student
+                                                optionClasses += ' bg-green-50 border-green-300';
+                                                outerRadioClasses += ' bg-green-300 border-green-300';
+                                                innerRadioClasses += ' block';
+                                            } else { // Neither student's choice nor correct
+                                                optionClasses += ' bg-white border-gray-200';
+                                                outerRadioClasses += ' border-gray-400';
+                                                innerRadioClasses += ' hidden';
                                             }
+
                                             return `
-                                                <div class="${optionClass} flex items-center">
-                                                    ${iconHtml}
+                                                <div class="${optionClasses}">
+                                                    <div class="${outerRadioClasses}">
+                                                        <div class="${innerRadioClasses}"></div>
+                                                    </div>
                                                     <span class="flex-1">${option}</span>
                                                 </div>
                                             `;
@@ -1861,28 +2025,37 @@
                                     <div class="space-y-2 mt-4">
                                         ${[true, false].map(boolValue => {
                                             const optionText = boolValue ? translations[currentLang].true_text : translations[currentLang].false_text;
-                                            let optionClass = 'p-3 rounded-lg border text-gray-800 flex items-center';
-                                            let iconHtml = '';
-                                            const isStudentChoice = (answer.studentAnswer === String(boolValue));
+                                            let optionClasses = 'p-4 rounded-xl shadow-sm border-2 flex items-center transition-all duration-200 ease-in-out';
+                                            let outerRadioClasses = 'w-6 h-6 rounded-full border-2 flex items-center justify-center mr-3 flex-shrink-0';
+                                            let innerRadioClasses = 'w-3 h-3 rounded-full bg-white';
+
+                                            const isStudentChoiceOption = (answer.studentAnswer === String(boolValue));
                                             const isCorrectOption = (originalQuestion.correctAnswer === boolValue);
 
-                                            if (isStudentChoice) {
+                                            if (isStudentChoiceOption) {
                                                 if (answer.isCorrect) {
-                                                    optionClass = 'bg-green-100 border-green-500 text-green-800 font-semibold';
-                                                    iconHtml = '<i class="fas fa-check-circle ml-2 text-green-500"></i>';
+                                                    optionClasses += ' bg-green-100 border-green-500 shadow-md';
+                                                    outerRadioClasses += ' bg-green-500 border-green-500';
+                                                    innerRadioClasses += ' block';
                                                 } else {
-                                                    optionClass = 'bg-red-100 border-red-500 text-red-800 font-semibold';
-                                                    iconHtml = '<i class="fas fa-times-circle ml-2 text-red-500"></i>';
+                                                    optionClasses += ' bg-red-100 border-red-500 shadow-md';
+                                                    outerRadioClasses += ' bg-red-500 border-red-500';
+                                                    innerRadioClasses += ' block';
                                                 }
                                             } else if (isCorrectOption) {
-                                                optionClass = 'bg-green-50 border-green-300 text-green-700 font-semibold';
-                                                iconHtml = '<i class="fas fa-check-circle ml-2 text-green-500"></i>';
+                                                optionClasses += ' bg-green-50 border-green-300';
+                                                outerRadioClasses += ' bg-green-300 border-green-300';
+                                                innerRadioClasses += ' block';
                                             } else {
-                                                optionClass = 'bg-white border-gray-200 text-gray-700';
+                                                optionClasses += ' bg-white border-gray-200';
+                                                outerRadioClasses += ' border-gray-400';
+                                                innerRadioClasses += ' hidden';
                                             }
                                             return `
-                                                <div class="${optionClass} flex items-center">
-                                                    ${iconHtml}
+                                                <div class="${optionClasses}">
+                                                    <div class="${outerRadioClasses}">
+                                                        <div class="${innerRadioClasses}"></div>
+                                                    </div>
                                                     <span class="flex-1">${optionText}</span>
                                                 </div>
                                             `;
@@ -1911,17 +2084,10 @@
                         `;
                     }).join('')}
                 </div>
-
-                <div class="text-center">
-                    <button onclick="window.close()" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold transition">
-                        <i class="fas fa-times ml-2"></i><span data-translate-key="close_window_button"></span>
-                    </button>
-                    <!-- يمكنك إضافة زر للعودة إلى صفحة الطالب أو الصفحة الرئيسية هنا -->
-                </div>
             `;
 
             document.getElementById('resultsContent').innerHTML = resultsHTML;
-            document.getElementById('resultsContent').querySelector('[data-translate-key="close_window_button"]').textContent = translations[currentLang].close_window_button;
+            // The close window button has been removed as per request.
 
             // Apply theme font and size to question titles (h4 in results) and options (span within div)
             if (quiz.theme) {
@@ -1952,11 +2118,17 @@
             let latestResult = null;
             let quiz = null;
 
+            // Decode quizId, studentIdParam, teacherIdParam received from the URL
+            const decodedQuizId = decodeURIComponent(quizId);
+            const decodedStudentIdParam = decodeURIComponent(studentIdParam);
+            const decodedTeacherIdParam = decodeURIComponent(teacherIdParam);
+
+
             try {
                 // Fetch the specific quiz first to get teacherId and questions
                 let foundQuizDoc = null;
-                if (teacherIdParam) {
-                    const specificQuizDocRef = doc(db, `artifacts/${appId}/users/${teacherIdParam}/quizzes`, quizId);
+                if (decodedTeacherIdParam) {
+                    const specificQuizDocRef = doc(db, `artifacts/${appId}/users/${decodedTeacherIdParam}/quizzes`, decodedQuizId);
                     const specificQuizSnap = await getDoc(specificQuizDocRef);
                     if (specificQuizSnap.exists()) {
                         foundQuizDoc = specificQuizSnap;
@@ -1967,12 +2139,12 @@
                     const usersSnapshot = await getDocs(usersCollectionRef);
                     for (const userDoc of usersSnapshot.docs) {
                         const quizzesCollectionRef = collection(db, `artifacts/${appId}/users/${userDoc.id}/quizzes`);
-                        const qQuiz = query(quizzesCollectionRef, where("__name__", "==", quizId));
+                        const qQuiz = query(quizzesCollectionRef, where("__name__", "==", decodedQuizId));
                         const quizSnapshot = await getDocs(qQuiz);
                         if (!quizSnapshot.empty) {
                             foundQuizDoc = quizSnapshot.docs[0];
                             quiz = { id: foundQuizDoc.id, ...foundQuizDoc.data() };
-                            teacherIdParam = userDoc.id; // Set teacherId if found
+                            // teacherIdParam = userDoc.id; // Set teacherId if found - this was already done, no need to update original variable
                             break;
                         }
                     }
@@ -1995,9 +2167,9 @@
                 // Fetch results for the specific quiz and student
                 const resultsRef = collection(db, `artifacts/${appId}/public/data/quiz_results`);
                 const qResults = query(resultsRef, 
-                    where("quizId", "==", quizId),
-                    where("studentId", "==", studentIdParam), // Use studentIdParam from URL
-                    where("teacherId", "==", teacherIdParam) // Use teacherIdParam from URL
+                    where("quizId", "==", decodedQuizId),
+                    where("studentId", "==", decodedStudentIdParam), // Use decoded studentIdParam from URL
+                    where("teacherId", "==", decodedTeacherIdParam) // Use decoded teacherIdParam from URL
                 );
                 const querySnapshot = await getDocs(qResults);
                 const allResultsForStudent = [];
@@ -2028,7 +2200,7 @@
                     <div class="text-center py-8">
                         <i class="fas fa-exclamation-triangle text-red-500 text-6xl mb-4"></i>
                         <h2 class="text-2xl font-bold text-gray-800 mb-2">${translations[currentLang].error_loading_results}</h2>
-                        <p class="text-gray-600">${translations[currentLang].error_loading_results_desc}</p>
+                        <p class="text-600">${translations[currentLang].error_loading_results_desc}</p>
                     </div>
                 `;
                 window.showResultsPage();
@@ -2043,8 +2215,11 @@
             }
 
             let quizTitle = translations[currentLang].quiz_results_title; // Default title
+            // Decode quizId received from URL before using it in Firestore
+            const decodedQuizId = decodeURIComponent(quizId);
+
             try {
-                const quizDocRef = doc(db, `artifacts/${appId}/users/${currentUserId}/quizzes`, quizId);
+                const quizDocRef = doc(db, `artifacts/${appId}/users/${currentUserId}/quizzes`, decodedQuizId);
                 const quizDocSnap = await getDoc(quizDocRef);
                 if (quizDocSnap.exists()) {
                     quizTitle = quizDocSnap.data().title;
@@ -2053,99 +2228,125 @@
                 console.error(translations[currentLang].error_fetching_quiz_title, e);
             }
 
-            const allResults = [];
-            try {
-                const resultsRef = collection(db, `artifacts/${appId}/public/data/quiz_results`);
-                const q = query(resultsRef, 
-                    where("quizId", "==", quizId),
-                    where("teacherId", "==", currentUserId) // Filter results by teacherId
-                );
-                const querySnapshot = await getDocs(q);
+            // If there's an existing listener, unsubscribe it to prevent multiple listeners
+            if (unsubscribeTeacherResults) {
+                unsubscribeTeacherResults();
+            }
+
+            const resultsRef = collection(db, `artifacts/${appId}/public/data/quiz_results`);
+            const q = query(resultsRef, 
+                where("quizId", "==", decodedQuizId),
+                where("teacherId", "==", currentUserId) // Filter results by teacherId
+            );
+
+            // Use onSnapshot for real-time updates
+            unsubscribeTeacherResults = onSnapshot(q, (querySnapshot) => {
+                const allResults = [];
                 querySnapshot.forEach((doc) => {
                     allResults.push({ id: doc.id, ...doc.data() });
                 });
-            } catch (e) {
-                console.error("خطأ في تحميل جميع نتائج الكويز للمعلم:", e);
-                window.showMessageBox(translations[currentLang].error_loading_teacher_results);
-                return;
-            }
 
-            if (allResults.length === 0) {
-                window.showMessageBox(translations[currentLang].no_results_yet);
-                return;
-            }
+                if (allResults.length === 0) {
+                    window.showMessageBox(translations[currentLang].no_results_yet);
+                    // Close the modal if it's open and there are no results
+                    closeStatsModal();
+                    return;
+                }
 
-            // إحصائيات عامة
-            const totalAttempts = allResults.length;
-            const avgScore = Math.round(allResults.reduce((sum, result) => sum + result.score, 0) / totalAttempts);
-            const passCount = allResults.filter(result => result.score >= 60).length;
+                // General statistics
+                const totalAttempts = allResults.length;
+                const avgScore = Math.round(allResults.reduce((sum, result) => sum + result.score, 0) / totalAttempts);
+                const passCount = allResults.filter(result => result.score >= 60).length;
 
-            const statsHTML = `
-                <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onclick="closeStatsModal(event)">
-                    <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto m-4" onclick="event.stopPropagation()">
-                        <div class="p-6 border-b border-200">
-                            <div class="flex justify-between items-center">
-                                <h2 class="text-2xl font-bold text-gray-800">
-                                    <i class="fas fa-chart-line text-blue-500 ml-2"></i>
-                                    ${translations[currentLang].quiz_stats_title} ${quizTitle}
-                                </h2>
-                                <button onclick="closeStatsModal()" class="text-gray-500 hover:text-gray-700">
-                                    <i class="fas fa-times text-2xl"></i>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="p-6">
-                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
-                                    <div class="text-2xl font-bold text-blue-600">${totalAttempts}</div>
-                                    <div class="text-sm text-gray-600">${translations[currentLang].total_attempts}</div>
-                                </div>
-                                <div class="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
-                                    <div class="text-2xl font-bold text-green-600">${avgScore}%</div>
-                                    <div class="text-sm text-gray-600">${translations[currentLang].average_score}</div>
-                                </div>
-                                <div class="bg-purple-50 border border-purple-200 rounded-lg p-4 text-center">
-                                    <div class="text-2xl font-bold text-purple-600">${passCount}</div>
-                                    <div class="text-sm text-gray-600">${translations[currentLang].passed_students}</div>
-                                </div>
-                                <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 text-center">
-                                    <div class="text-2xl font-bold text-orange-600">${totalAttempts - passCount}</div>
-                                    <div class="text-sm text-gray-600">${translations[currentLang].failed_students}</div>
+                // Build the HTML for the stats modal
+                const statsModalHTML = `
+                    <div id="statsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onclick="closeStatsModal(event)">
+                        <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto m-4" onclick="event.stopPropagation()">
+                            <div class="p-6 border-b border-gray-200">
+                                <div class="flex justify-between items-center">
+                                    <h2 class="text-2xl font-bold text-gray-800">
+                                        <i class="fas fa-chart-line text-blue-500 ml-2"></i>
+                                        ${translations[currentLang].quiz_stats_title} ${quizTitle}
+                                    </h2>
+                                    <button onclick="closeStatsModal()" class="text-gray-500 hover:text-gray-700">
+                                        <i class="fas fa-times text-2xl"></i>
+                                    </button>
                                 </div>
                             </div>
+                            
+                            <div class="p-6">
+                                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
+                                        <div class="text-2xl font-bold text-blue-600">${totalAttempts}</div>
+                                        <div class="text-sm text-gray-600">${translations[currentLang].total_attempts}</div>
+                                    </div>
+                                    <div class="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
+                                        <div class="text-2xl font-bold text-green-600">${avgScore}%</div>
+                                        <div class="text-sm text-gray-600">${translations[currentLang].average_score}</div>
+                                    </div>
+                                    <div class="bg-purple-50 border border-purple-200 rounded-lg p-4 text-center">
+                                        <div class="text-2xl font-bold text-purple-600">${passCount}</div>
+                                        <div class="text-sm text-gray-600">${translations[currentLang].passed_students}</div>
+                                    </div>
+                                    <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 text-center">
+                                        <div class="text-2xl font-bold text-orange-600">${totalAttempts - passCount}</div>
+                                        <div class="text-sm text-gray-600">${translations[currentLang].failed_students}</div>
+                                    </div>
+                                </div>
 
-                            <h3 class="text-xl font-bold text-gray-800 mb-4">${translations[currentLang].all_attempts}</h3>
-                            <div class="space-y-3 max-h-96 overflow-y-auto">
-                                ${allResults.map((result, index) => `
-                                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                                        <div class="flex justify-between items-center">
-                                            <div>
-                                                <div class="font-semibold text-gray-800">${result.studentName || translations[currentLang].student_name_display}</div>
-                                                <div class="text-sm text-gray-600">${translations[currentLang].student_id_display} ${result.studentId || 'N/A'}</div>
-                                                <div class="text-sm text-gray-600">${result.submittedAt}</div>
-                                            </div>
-                                            <div class="text-left">
-                                                <div class="text-2xl font-bold ${result.score >= 60 ? 'text-green-600' : 'text-red-600'}">${result.score}%</div>
-                                                <div class="text-sm text-gray-600">${result.correctAnswers}/${result.totalQuestions}</div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4">${translations[currentLang].all_attempts}</h3>
+                                <div class="space-y-3 max-h-96 overflow-y-auto">
+                                    ${allResults.map((result, index) => `
+                                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                            <div class="flex justify-between items-center">
+                                                <div>
+                                                    <div class="font-semibold text-gray-800">${result.studentName || translations[currentLang].student_name_display}</div>
+                                                    <div class="text-sm text-gray-600">${translations[currentLang].student_id_display} ${result.studentId || 'N/A'}</div>
+                                                    <div class="text-sm text-gray-600">${result.submittedAt}</div>
+                                                </div>
+                                                <div class="text-left">
+                                                    <div class="text-2xl font-bold ${result.score >= 60 ? 'text-green-600' : 'text-red-600'}">${result.score}%</div>
+                                                    <div class="text-sm text-gray-600">${result.correctAnswers}/${result.totalQuestions}</div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                `).join('')}
+                                    `).join('')}
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            `;
+                `;
 
-            document.body.insertAdjacentHTML('beforeend', statsHTML);
+                // If the modal already exists, update its content; otherwise, create it
+                const existingModal = document.getElementById('statsModal');
+                if (existingModal) {
+                    existingModal.outerHTML = statsModalHTML; // Replace with updated content
+                } else {
+                    document.body.insertAdjacentHTML('beforeend', statsModalHTML);
+                }
+
+            }, (error) => {
+                console.error("خطأ في تحميل جميع نتائج الكويز للمعلم (onSnapshot):", error);
+                window.showMessageBox(translations[currentLang].error_loading_teacher_results);
+            });
         }
 
         window.closeStatsModal = function(event) { // Made global
-            if (event && event.target.closest('.bg-white')) return;
-            const modal = document.querySelector('.fixed.inset-0');
-            if (modal) modal.remove();
+            // Check if the click was inside the modal content to prevent closing when interacting with modal
+            if (event && event.target.closest('.bg-white')) {
+                return;
+            }
+            const modal = document.getElementById('statsModal');
+            if (modal) {
+                modal.remove();
+                // If there's an active listener, unsubscribe it when the modal is closed
+                if (unsubscribeTeacherResults) {
+                    unsubscribeTeacherResults();
+                    unsubscribeTeacherResults = null; // Clear the reference
+                }
+            }
         }
+
 
         // --- Utility/UI Functions ---
         window.showStudentPage = function() { // Made global
@@ -2164,7 +2365,7 @@
             renderContent(); // Re-render content for results page
         }
 
-        // دالة لعرض مربع رسالة مخصص بدلاً من alert
+        // Function to display a custom message box instead of alert
         window.showMessageBox = function(message) { // Made global
             const modalHTML = `
                 <div id="customAlertModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -2177,7 +2378,7 @@
             document.body.insertAdjacentHTML('beforeend', modalHTML);
         }
 
-        // دالة لعرض مربع تأكيد مخصص بدلاً من confirm
+        // Function to display a custom confirmation box instead of confirm
         window.showConfirmBox = function(message, onConfirmCallback) { // Made global
             const modalHTML = `
                 <div id="customConfirmModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -2215,11 +2416,11 @@
         translations.ar.copy_link_button_dynamic = 'نسخ الرابط';
         translations.ar.results_button_dynamic = 'النتائج';
         translations.ar.edit_button_dynamic = 'تعديل';
-        translations.ar.delete_button_dynamic = 'حذف';
+        translations.ar.delete_quiz_dynamic = 'حذف'; // Changed key name for delete button
         translations.en.copy_link_button_dynamic = 'Copy Link';
         translations.en.results_button_dynamic = 'Results';
         translations.en.edit_button_dynamic = 'Edit';
-        translations.en.delete_button_dynamic = 'Delete';
+        translations.en.delete_quiz_dynamic = 'Delete'; // Changed key name for delete button
 
 
     </script>
