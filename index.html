@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>كويزات MET</title>
     <!-- Improved Arabic and English Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&family=Amiri:wght@400;500;700&family=Noto+Sans+Arabic:wght@440;500;700&family=Inter:wght@400;500;700&family=Cairo:wght@400;700&family=Changa:wght@440;700&family=IBM+Plex+Sans+Arabic:wght@400;700&family=Lateef&family=Reem+Kufi:wght@400;700&family=El+Messiri:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&family=Amiri:wght@400;500;700&family=Noto+Sans+Arabic:wght@440;500;700&family=Inter:wght@400;500;700&family=Cairo:wght@400;700&family=Changa:wght@440;700&family=IBM+Plex+Sans+Arabic:wght@400;700&family=Lateef&family=Reem+Kufi:wght@440;700&family=El+Messiri:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     
@@ -249,13 +249,13 @@
             <!-- New Remember Me checkbox -->
             <div class="flex items-center justify-center mb-6">
                 <input type="checkbox" id="rememberMe" class="form-checkbox h-4 w-4 text-purple-600 rounded">
-                <label for="rememberMe" class="text-gray-700" data-translate-key="remember_me">تذكرني</label>
+                <label for="rememberMe" class="text-gray-700" data-translate-key="remember_me"></label>
             </div>
 
             <button onclick="checkTeacherPassword()" 
                     class="btn-primary text-white px-8 py-4 rounded-lg font-semibold text-lg transition hover:shadow-xl hover:translate-y-1">
                 <i class="fas fa-sign-in-alt mr-2" data-translate-key="enter_icon"></i>
-                <span data-translate-key="enter_button">دخول</span>
+                <span data-translate-key="enter_button"></span>
             </button>
         </div>
     </div>
@@ -266,7 +266,7 @@
             <div class="container mx-auto px-4">
                 <h1 class="text-4xl font-bold text-center mb-2">
                     <i class="fas fa-graduation-cap mr-3" data-translate-key="platform_icon"></i>
-                    <span data-translate-key="platform_title">منصة كويزات MET</span>
+                    <span data-translate-key="platform_title"></span>
                 </h1>
                 <p class="text-center text-lg opacity-90" data-translate-key="teacher_welcome"></p>
             </div>
@@ -276,17 +276,22 @@
             <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
                 <h2 class="text-2xl font-bold text-gray-800 mb-6">
                     <i class="fas fa-plus-circle text-blue-500 mr-2" data-translate-key="create_edit_icon"></i>
-                    <span data-translate-key="create_edit_quiz_title">إنشاء / تعديل كويز</span>
+                    <span data-translate-key="create_edit_quiz_title"></span>
                 </h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
-                        <label class="block text-gray-700 font-semibold mb-2" data-translate-key="quiz_title_label">عنوان الكويز</label>
-                        <input type="text" id="quizTitle" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" data-translate-key="quiz_title_placeholder" placeholder="أدخل عنوان الكويز">
+                        <label class="block text-gray-700 font-semibold mb-2" data-translate-key="quiz_title_label"></label>
+                        <input type="text" id="quizTitle" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" data-translate-key="quiz_title_placeholder" placeholder="">
                     </div>
                     <div>
-                        <label class="block text-gray-700 font-semibold mb-2" data-translate-key="quiz_description_label">وصف الكويز</label>
-                        <input type="text" id="quizDescription" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" data-translate-key="quiz_description_placeholder" placeholder="وصف مختصر للكويز">
+                        <label class="block text-gray-700 font-semibold mb-2" data-translate-key="quiz_description_label"></label>
+                        <input type="text" id="quizDescription" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" data-translate-key="quiz_description_placeholder" placeholder="">
+                    </div>
+                    <!-- New: Quiz Duration Input -->
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2" data-translate-key="quiz_duration_label"></label>
+                        <input type="number" id="quizDuration" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" data-translate-key="quiz_duration_placeholder" placeholder="" value="" min="0">
                     </div>
                 </div>
 
@@ -294,67 +299,67 @@
                 <div class="mb-4">
                     <label class="flex items-center cursor-pointer">
                         <input type="checkbox" id="showResultsToStudents" class="form-checkbox h-5 w-5 text-blue-600 rounded focus:ring-blue-500" checked>
-                        <span class="ml-2 text-gray-700 font-semibold" data-translate-key="show_results_option">السماح للطلاب بمشاهدة النتائج فوراً</span>
+                        <span class="ml-2 text-gray-700 font-semibold" data-translate-key="show_results_option"></span>
                     </label>
                 </div>
 
                 <!-- Theme Options Section -->
                 <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6">
-                    <h3 class="text-lg font-semibold text-gray-700 mb-4" data-translate-key="theme_options_title">خيارات المظهر (للطلاب)</h3>
+                    <h3 class="text-lg font-semibold text-gray-700 mb-4" data-translate-key="theme_options_title"></h3>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
-                            <label class="block text-gray-700 font-semibold mb-2" data-translate-key="background_color_label">لون الخلفية</label>
+                            <label class="block text-gray-700 font-semibold mb-2" data-translate-key="background_color_label"></label>
                             <input type="color" id="themeBackgroundColor" class="w-full h-10 border border-gray-300 rounded-lg" value="#f3f4f6">
                         </div>
                         <div>
-                            <label class="block text-gray-700 font-semibold mb-2" data-translate-key="text_color_label">لون النص</label>
+                            <label class="block text-gray-700 font-semibold mb-2" data-translate-key="text_color_label"></label>
                             <input type="color" id="themeTextColor" class="w-full h-10 border border-gray-300 rounded-lg" value="#1f2937">
                         </div>
                         <div>
-                            <label class="block text-gray-700 font-semibold mb-2" data-translate-key="font_family_label">نوع الخط</label>
+                            <label class="block text-gray-700 font-semibold mb-2" data-translate-key="font_family_label"></label>
                             <div class="custom-select-wrapper">
                                 <select id="themeFontFamily" class="custom-select">
-                                    <option value="Tajawal, Noto Sans Arabic, sans-serif" data-translate-key="font_tajawal">Tajawal (عربي)</option>
-                                    <option value="Amiri, Noto Sans Arabic, serif" data-translate-key="font_amiri">Amiri (عربي)</option>
-                                    <option value="Cairo, sans-serif" data-translate-key="font_cairo">Cairo (عربي)</option>
-                                    <option value="Changa, sans-serif" data-translate-key="font_changa">Changa (عربي)</option>
-                                    <option value="IBM Plex Sans Arabic, sans-serif" data-translate-key="font_ibm_plex_sans_arabic">IBM Plex Sans Arabic (عربي)</option>
-                                    <option value="Lateef, serif" data-translate-key="font_lateef">Lateef (عربي)</option>
-                                    <option value="Reem Kufi, sans-serif" data-translate-key="font_reem_kufi">Reem Kufi (عربي)</option>
-                                    <option value="El Messiri, sans-serif" data-translate-key="font_el_messiri">El Messiri (عربي)</option>
-                                    <option value="Inter, sans-serif" data-translate-key="font_inter">Inter (إنجليزي)</option>
-                                    <option value="system-ui, sans-serif" data-translate-key="font_system_ui">System UI</option>
+                                    <option value="Tajawal, Noto Sans Arabic, sans-serif" data-translate-key="font_tajawal"></option>
+                                    <option value="Amiri, Noto Sans Arabic, serif" data-translate-key="font_amiri"></option>
+                                    <option value="Cairo, sans-serif" data-translate-key="font_cairo"></option>
+                                    <option value="Changa, sans-serif" data-translate-key="font_changa"></option>
+                                    <option value="IBM Plex Sans Arabic, sans-serif" data-translate-key="font_ibm_plex_sans_arabic"></option>
+                                    <option value="Lateef, serif" data-translate-key="font_lateef"></option>
+                                    <option value="Reem Kufi, sans-serif" data-translate-key="font_reem_kufi"></option>
+                                    <option value="El Messiri, sans-serif" data-translate-key="font_el_messiri"></option>
+                                    <option value="Inter, sans-serif" data-translate-key="font_inter"></option>
+                                    <option value="system-ui, sans-serif" data-translate-key="font_system_ui"></option>
                                 </select>
                             </div>
                         </div>
                         <div>
-                            <label class="block text-gray-700 font-semibold mb-2" data-translate-key="font_size_label">حجم الخط</label>
+                            <label class="block text-gray-700 font-semibold mb-2" data-translate-key="font_size_label"></label>
                             <input type="number" id="themeFontSize" class="w-full p-3 border border-gray-300 rounded-lg" value="16" min="12" max="24">
                         </div>
                     </div>
                 </div>
 
                 <div id="questionsContainer" class="mb-6">
-                    <h3 class="text-lg font-semibold text-gray-700 mb-4" data-translate-key="questions_section_title">الأسئلة</h3>
+                    <h3 class="text-lg font-semibold text-gray-700 mb-4" data-translate-key="questions_section_title"></h3>
                 </div>
 
                 <div class="flex gap-4 mb-6 flex-wrap">
                     <button onclick="addQuestion('multiple')" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition">
-                        <i class="fas fa-list mr-2" data-translate-key="add_multiple_choice_icon"></i><span data-translate-key="add_multiple_choice">إضافة سؤال اختيار متعدد</span>
+                        <i class="fas fa-list mr-2" data-translate-key="add_multiple_choice_icon"></i><span data-translate-key="add_multiple_choice"></span>
                     </button>
                     <button onclick="addQuestion('boolean')" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg transition">
-                        <i class="fas fa-check-circle mr-2" data-translate-key="add_true_false_icon"></i><span data-translate-key="add_true_false">إضافة سؤال صح/خطأ</span>
+                        <i class="fas fa-check-circle mr-2" data-translate-key="add_true_false_icon"></i><span data-translate-key="add_true_false"></span>
                     </button>
                     <button onclick="addQuestion('text')" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg transition">
-                        <i class="fas fa-edit mr-2" data-translate-key="add_text_icon"></i><span data-translate-key="add_text">إضافة سؤال نصي</span>
+                        <i class="fas fa-edit mr-2" data-translate-key="add_text_icon"></i><span data-translate-key="add_text"></span>
                     </button>
                 </div>
 
                 <button onclick="saveQuiz()" class="btn-primary text-white px-8 py-3 rounded-lg font-semibold transition hover:shadow-lg">
-                    <i class="fas fa-save mr-2" data-translate-key="save_quiz_icon"></i><span data-translate-key="save_quiz_button">حفظ الكويز</span>
+                    <i class="fas fa-save mr-2" data-translate-key="save_quiz_icon"></i><span data-translate-key="save_quiz_button"></span>
                 </button>
                 <button onclick="clearQuizForm()" class="bg-gray-500 hover:bg-gray-600 text-white px-8 py-3 rounded-lg font-semibold transition hover:shadow-lg ml-2">
-                    <i class="fas fa-eraser mr-2" data-translate-key="clear_form_icon"></i><span data-translate-key="clear_form_button">مسح النموذج</span>
+                    <i class="fas fa-eraser mr-2" data-translate-key="clear_form_icon"></i><span data-translate-key="clear_form_button"></span>
                 </button>
                  <input type="hidden" id="editQuizId">
             </div>
@@ -362,7 +367,7 @@
             <div class="bg-white rounded-lg shadow-lg p-6">
                 <h2 class="text-2xl font-bold text-gray-800 mb-6">
                     <i class="fas fa-list text-green-500 mr-2" data-translate-key="saved_quizzes_icon"></i>
-                    <span data-translate-key="saved_quizzes_title">الكويزات المحفوظة</span>
+                    <span data-translate-key="saved_quizzes_title"></span>
                 </h2>
                 <div id="savedQuizzes" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <!-- Saved quizzes will be loaded here -->
@@ -377,28 +382,43 @@
             <div class="container mx-auto px-4">
                 <h1 class="text-4xl font-bold text-center mb-2">
                     <i class="fas fa-user-graduate mr-3" data-translate-key="student_page_icon"></i>
-                    <span data-translate-key="student_page_title">صفحة الطالب</span>
+                    <span data-translate-key="student_page_title"></span>
                 </h1>
-                <p class="text-center text-lg opacity-90" data-translate-key="student_page_subtitle">أجب على الأسئلة بعناية</p>
+                <p class="text-center text-lg opacity-90" data-translate-key="student_page_subtitle"></p>
                 <p class="text-center text-sm mt-2">
-                     <i class="fas fa-id-badge ml-1"></i> <span data-translate-key="user_id_label">معرف المستخدم:</span> <span id="studentUserId"></span>
+                     <i class="fas fa-id-badge ml-1"></i> <span data-translate-key="user_id_label"></span> <span id="studentUserId"></span>
                 </p>
+                <!-- New: Timer Display -->
+                <div id="quizTimerDisplay" class="text-center text-2xl font-bold mt-4 mb-4 hidden">
+                    <i class="fas fa-hourglass-half mr-2"></i>
+                    <span id="timerCountdown">00:00</span>
+                </div>
             </div>
         </div>
 
         <div class="quiz-container px-4 py-8">
             <div id="studentInfoForm" class="bg-white rounded-lg shadow-lg p-6 mb-6">
-                <h2 class="text-2xl font-bold text-gray-800 mb-4" data-translate-key="student_info_title">بيانات الطالب</h2>
+                <h2 class="text-2xl font-bold text-gray-800 mb-4" data-translate-key="student_info_title"></h2>
                 <div class="mb-4">
-                    <label class="block text-gray-700 font-semibold mb-2" data-translate-key="student_name_label">اسم الطالب</label>
-                    <input type="text" id="studentName" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" data-translate-key="student_name_placeholder" placeholder="أدخل اسمك الكامل">
+                    <label class="block text-gray-700 font-semibold mb-2" data-translate-key="student_name_label"></label>
+                    <input type="text" id="studentName" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" data-translate-key="student_name_placeholder" placeholder="">
                 </div>
                 <button onclick="startQuiz()" class="btn-primary text-white px-8 py-3 rounded-lg font-semibold transition hover:shadow-lg">
-                    <i class="fas fa-play mr-2" data-translate-key="start_quiz_icon"></i><span data-translate-key="start_quiz_button">بدء الاختبار</span>
+                    <i class="fas fa-play mr-2" data-translate-key="start_quiz_icon"></i><span data-translate-key="start_quiz_button"></span>
                 </button>
             </div>
             <div id="quizContent" class="bg-white rounded-lg shadow-lg p-6 hidden quiz-content-themed">
                 <!-- Quiz content will be loaded here -->
+            </div>
+            <!-- New div for message when results are not immediately shown -->
+            <div id="quizCompletedMessage" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative hidden mt-6" role="alert">
+                <strong class="font-bold" data-translate-key="answers_submitted_success"></strong>
+                <span class="block sm:inline" data-translate-key="results_not_shown_message"></span>
+                <p class="mt-2 text-sm text-center">
+                    <button onclick="window.location.reload();" class="text-blue-700 hover:text-blue-900 font-semibold underline">
+                         <i class="fas fa-redo mr-1"></i> <span data-translate-key="reload_page_button"></span>
+                    </button>
+                </p>
             </div>
         </div>
     </div>
@@ -409,7 +429,7 @@
             <div class="container mx-auto px-4">
                 <h1 class="text-4xl font-bold text-center mb-2">
                     <i class="fas fa-chart-bar mr-3" data-translate-key="quiz_results_icon"></i>
-                    <span data-translate-key="quiz_results_title">نتائج الكويز</span>
+                    <span data-translate-key="quiz_results_title"></span>
                 </h1>
             </div>
         </div>
@@ -432,7 +452,7 @@
         const firebaseConfig = JSON.parse(
             typeof __firebase_config !== 'undefined' && __firebase_config.length > 2 // Check if it's actually populated
                 ? __firebase_config
-                : '{"apiKey":"AIzaSyCTyHb79TSlbjwuebsb_Pd8VoqvWHEh-RI","authDomain":"my-quiz-app-77c96.firebaseapp.com","projectId":"my-quiz-app-77c96","storageBucket":"my-quiz-app-77c96.firebasestorage.app","messagingSenderId":"692482795107","appId":"1:692482795107:web:10ad0a80e523dfdaaa3a56"}'
+                : '{"apiKey":"AIzaSyCTyHb79TSlbjwuebsb_Pd8VoqvWHEh-RI","authDomain":"my-quiz-app-77c96.firebaseapp.com","projectId":"my-quiz-app-77c96","storageBucket":"my-quiz-app-77c96.firebaseapp.com","messagingSenderId":"692482795107","appId":"1:692482795107:web:10ad0a80e523dfdaaa3a56"}'
         );
 
         // Initialize Firebase
@@ -445,11 +465,12 @@
         let isAuthReady = false; // Flag to ensure auth is ready before Firestore ops
         let unsubscribeTeacherResults = null; // To store the unsubscribe function for teacher results listener
 
-
         // Global variables for quiz management
         let questions = [];
         let currentQuiz = null;
         let studentAnswers = {}; // This will hold current answers in session
+        let quizTimerInterval; // Variable to hold the timer interval
+        let timeLeft = 0; // Remaining time in seconds
 
         // App ID for Firestore paths (from Canvas environment or default)
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-quiz-app';
@@ -459,6 +480,8 @@
         // localStorage keys for remembering teacher login
         const REMEMBER_EMAIL_KEY = 'teacher_email';
         const REMEMBER_PASSWORD_KEY = 'teacher_password';
+        // New localStorage key for quiz submission status
+        const QUIZ_SUBMITTED_STATUS_KEY = 'quiz_submitted_status';
 
 
         // --- Language and Translation Setup ---
@@ -484,6 +507,8 @@
                 'quiz_title_placeholder': 'أدخل عنوان الكويز',
                 'quiz_description_label': 'وصف الكويز',
                 'quiz_description_placeholder': 'وصف مختصر للكويز',
+                'quiz_duration_label': 'مدة الامتحان (بالدقائق)', // New translation
+                'quiz_duration_placeholder': 'أدخل المدة بالدقائق (اختياري)', // Updated translation
                 'show_results_option': 'السماح للطلاب بمشاهدة النتائج فوراً', // New translation
                 'theme_options_title': 'خيارات المظهر (للطلاب)', // New translation
                 'background_color_label': 'لون الخلفية', // New translation
@@ -515,6 +540,7 @@
                 'saved_quizzes_icon': '', // Handled by font-awesome class
                 'please_wait_auth': 'الرجاء الانتظار حتى يتم تهيئة المصادقة.',
                 'enter_quiz_title': 'يرجى إدخال عنوان الكويز',
+                'enter_quiz_duration': 'يرجى إدخال مدة امتحان صحيحة (بالدقائق) أو تركها فارغة للمدة الاختيارية.', // Updated translation
                 'add_at_least_one_question': 'يرجى إضافة سؤال واحد على الأقل',
                 'fill_all_questions': 'يرجى ملء جميع الأسئلة',
                 'choose_correct_answer': 'يرجى اختيار الإجابة الصحيحة لجميع الأسئلة',
@@ -549,11 +575,11 @@
                 'start_quiz_icon': '', // Handled by font-awesome class
                 'enter_student_name': 'يرجى إدخال اسم الطالب',
                 'error_student_data': 'حدث خطأ في بيانات الطالب، يرجى إعادة تحميل الصفحة',
-                'answer_all_questions': 'يرجى الإجابة على جميع الأسئلة قبل الإرسال',
-                'submit_answers_button': 'إرسال الإجابات',
-                'submit_answers_icon': '', // Handled by font-awesome class
+                'answer_all_questions': 'يرجى الإجابة على جميع الأسئلة',
+                'end_quiz_button': 'إنهاء الكويز', // Changed from submit_answers_button
+                'end_quiz_icon': '', // Handled by font-awesome class
                 'answers_submitted_success': 'تم إرسال إجاباتك بنجاح!',
-                'results_not_shown_message': '', // New translation
+                'results_not_shown_message': 'النتائج ستكون متاحة لاحقًا.', // New translation
                 'error_submitting_answers': 'حدث خطأ أثناء إرسال النتائج. يرجى المحاولة مرة أخرى.',
                 'quiz_results_title': 'نتائج الكويز',
                 'quiz_results_icon': '', // Handled by font-awesome class
@@ -594,7 +620,10 @@
                 'email_required': 'الرجاء إدخال البريد الإلكتروني.',
                 'password_required': 'الرجاء إدخال كلمة المرور.',
                 'add_option_button': 'إضافة خيار', // New
-                'remove_option_button': 'إزالة خيار' // New
+                'remove_option_button': 'إزالة خيار', // New
+                'time_left': 'الوقت المتبقي:', // New
+                'quiz_auto_submitted': 'الكويز تم إرساله تلقائياً بسبب انتهاء الوقت.', // New translation
+                'reload_page_button': 'تحديث الصفحة' // New translation
             },
             'en': {
                 'login_title': 'Login',
@@ -615,6 +644,8 @@
                 'quiz_title_placeholder': 'Enter quiz title',
                 'quiz_description_label': 'Quiz Description',
                 'quiz_description_placeholder': 'Brief description of the quiz',
+                'quiz_duration_label': 'Quiz Duration (minutes)', // New translation
+                'quiz_duration_placeholder': 'Enter duration in minutes (optional)', // Updated translation
                 'show_results_option': 'Allow students to see results immediately', // New translation
                 'theme_options_title': 'Theme Options (for Students)', // New translation
                 'background_color_label': 'Background Color', // New translation
@@ -646,6 +677,7 @@
                 'saved_quizzes_icon': '', // Handled by font-awesome class
                 'please_wait_auth': 'Please wait until authentication is initialized.',
                 'enter_quiz_title': 'Please enter the quiz title',
+                'enter_quiz_duration': 'Please enter a valid quiz duration (in minutes) or leave it empty for no time limit.', // Updated translation
                 'add_at_least_one_question': 'Please add at least one question',
                 'fill_all_questions': 'Please fill in all questions',
                 'choose_correct_answer': 'Please select the correct answer for all questions',
@@ -681,10 +713,10 @@
                 'enter_student_name': 'Please enter student name',
                 'error_student_data': 'Error in student data, please reload the page',
                 'answer_all_questions': 'Please answer all questions before submitting',
-                'submit_answers_button': 'Submit Answers',
-                'submit_answers_icon': '', // Handled by font-awesome class
+                'end_quiz_button': 'End Quiz', // Changed from submit_answers_button
+                'end_quiz_icon': '', // Handled by font-awesome class
                 'answers_submitted_success': 'Your answers have been submitted successfully!',
-                'results_not_shown_message': 'Your answers have been submitted successfully. Results will be displayed later by the teacher.', // New translation
+                'results_not_shown_message': 'Results will be available later from the teacher.', // New translation
                 'error_submitting_answers': 'An error occurred while submitting results. Please try again.',
                 'quiz_results_title': 'Quiz Results',
                 'quiz_results_icon': '', // Handled by font-awesome class
@@ -725,7 +757,10 @@
                 'email_required': 'Please enter an email.',
                 'password_required': 'Please enter a password.',
                 'add_option_button': 'Add Option', // New
-                'remove_option_button': 'Remove Option' // New
+                'remove_option_button': 'Remove Option', // New
+                'time_left': 'Time Left:', // New
+                'quiz_auto_submitted': 'Quiz automatically submitted due to time out.', // New translation
+                'reload_page_button': 'Reload Page' // New translation
             }
         };
 
@@ -836,6 +871,7 @@
             document.getElementById('teacherPage').classList.add('hidden');
             document.getElementById('studentPage').classList.add('hidden');
             document.getElementById('resultsPage').classList.add('hidden');
+            document.getElementById('quizCompletedMessage').classList.add('hidden'); // Hide completion message
 
             // Load remembered credentials if they exist
             const rememberedEmail = localStorage.getItem(REMEMBER_EMAIL_KEY);
@@ -900,6 +936,7 @@
             document.getElementById('studentPage').classList.add('hidden');
             document.getElementById('resultsPage').classList.add('hidden');
             document.getElementById('loginPage').classList.add('hidden'); // Hide login page
+            document.getElementById('quizCompletedMessage').classList.add('hidden'); // Hide completion message
             if (isAuthReady) {
                 window.loadSavedQuizzes();
             } else {
@@ -1082,6 +1119,9 @@
 
             const title = document.getElementById('quizTitle').value;
             const description = document.getElementById('quizDescription').value;
+            // Get quiz duration, parse as integer. If empty string or invalid number, set to null.
+            const durationInput = document.getElementById('quizDuration').value;
+            const duration = durationInput === '' ? null : parseInt(durationInput); 
             const showResultsToStudents = document.getElementById('showResultsToStudents').checked; // Get the checkbox value
             
             // Get theme options
@@ -1096,6 +1136,12 @@
                 window.showMessageBox(translations[currentLang].enter_quiz_title);
                 return;
             }
+            // Validate duration only if it's not null and is not a positive number
+            if (duration !== null && (isNaN(duration) || duration < 0)) {
+                window.showMessageBox(translations[currentLang].enter_quiz_duration);
+                return;
+            }
+
 
             if (questions.length === 0) {
                 window.showMessageBox(translations[currentLang].add_at_least_one_question);
@@ -1105,6 +1151,7 @@
             const quiz = {
                 title: title,
                 description: description,
+                duration: duration, // Save duration (can be null or 0)
                 questions: [],
                 createdAt: new Date().toLocaleString(currentLang === 'ar' ? 'ar-EG' : 'en-US'), // Localized date
                 teacherId: currentUserId, // Link quiz to the teacher
@@ -1222,6 +1269,7 @@
         window.clearQuizForm = function() { // Made global
             document.getElementById('quizTitle').value = '';
             document.getElementById('quizDescription').value = '';
+            document.getElementById('quizDuration').value = ''; // Clear duration
             document.getElementById('showResultsToStudents').checked = true; // Reset checkbox to default true
             // Reset theme options to defaults
             document.getElementById('themeBackgroundColor').value = '#f3f4f6';
@@ -1268,6 +1316,7 @@
                         <p class="text-sm text-gray-500 mb-3">
                             <i class="fas fa-calendar ml-1"></i>${quiz.createdAt} | 
                             <i class="fas fa-question-circle ml-1"></i>${quiz.questions.length} ${translations[currentLang].question_number}
+                            ${(quiz.duration !== null && quiz.duration > 0) ? `<br><i class="fas fa-hourglass-half ml-1"></i> ${translations[currentLang].quiz_duration_label.replace('(بالدقائق)', '').trim()}: ${quiz.duration} ${currentLang === 'ar' ? 'دقيقة' : 'minutes'}` : (quiz.duration === 0 ? `<br><i class="fas fa-hourglass-half ml-1"></i> ${currentLang === 'ar' ? 'لا يوجد وقت محدد' : 'No time limit'}` : '')}
                         </p>
                         <div class="flex gap-2 flex-wrap">
                             <button onclick="copyQuizLink('${escapeHtmlAttribute(encodeURIComponent(quiz.id))}', '${escapeHtmlAttribute(encodeURIComponent(quiz.teacherId))}')" class="bg-green-500 hover:bg-green-600 text-white saved-quiz-button">
@@ -1334,6 +1383,7 @@
 
                 document.getElementById('quizTitle').value = quizToEdit.title;
                 document.getElementById('quizDescription').value = quizToEdit.description;
+                document.getElementById('quizDuration').value = quizToEdit.duration !== undefined && quizToEdit.duration !== null ? quizToEdit.duration : ''; // Set duration (can be empty)
                 // Set the checkbox state based on the saved quiz data, default to true if not found
                 document.getElementById('showResultsToStudents').checked = quizToEdit.showResultsToStudents !== undefined ? quizToEdit.showResultsToStudents : true;
                 
@@ -1558,17 +1608,45 @@
                 const storedData = localStorage.getItem(QUIZ_PROGRESS_STORAGE_KEY);
                 if (storedData) {
                     const parsedData = JSON.parse(storedData);
+                    // Check if the stored progress is for the same quiz and student
                     if (parsedData.quizId === decodedQuizId && parsedData.studentId === currentUserId) {
                         savedProgress = parsedData;
+                        // Calculate timeLeft based on original duration and saved elapsed time
+                        // Only calculate if duration is set (i.e., not null and greater than 0)
+                        if (currentQuiz.duration && currentQuiz.duration > 0) {
+                            const elapsedSeconds = Math.floor((Date.now() - parsedData.startTime) / 1000);
+                            const initialDurationSeconds = currentQuiz.duration * 60;
+                            timeLeft = Math.max(0, initialDurationSeconds - elapsedSeconds);
+                        } else {
+                            timeLeft = 0; // No time limit or duration set, so no timer needed
+                        }
                     } else {
                         // Clear stale progress if it's for a different quiz/student
                         localStorage.removeItem(QUIZ_PROGRESS_STORAGE_KEY);
+                        timeLeft = (currentQuiz.duration && currentQuiz.duration > 0) ? currentQuiz.duration * 60 : 0; // Set initial time for new quiz based on duration or 0
                     }
+                } else {
+                     timeLeft = (currentQuiz.duration && currentQuiz.duration > 0) ? currentQuiz.duration * 60 : 0; // Set initial time for new quiz based on duration or 0
                 }
             } catch (e) {
                 console.error("خطأ في تحميل تقدم الكويز من التخزين المحلي:", e);
                 localStorage.removeItem(QUIZ_PROGRESS_STORAGE_KEY); // Clear corrupted data
+                timeLeft = (currentQuiz.duration && currentQuiz.duration > 0) ? currentQuiz.duration * 60 : 0; // Set initial time for new quiz based on duration or 0
             }
+
+            // New logic: Check if quiz was submitted for this student and quizId
+            const quizSubmittedStatus = localStorage.getItem(`${QUIZ_SUBMITTED_STATUS_KEY}_${decodedQuizId}_${currentUserId}`);
+            if (quizSubmittedStatus === 'submitted') {
+                // If quiz was submitted and results are not shown, display the message
+                if (!currentQuiz.showResultsToStudents) {
+                    document.getElementById('studentInfoForm').classList.add('hidden');
+                    document.getElementById('quizContent').classList.add('hidden');
+                    document.getElementById('quizCompletedMessage').classList.remove('hidden');
+                    stopTimer(); // Ensure timer is stopped
+                    return; // Exit function, don't load quiz
+                }
+            }
+
 
             // Check if there are already submitted results for this student on this quiz
             // If so, automatically show them their results.
@@ -1581,6 +1659,10 @@
                 );
                 const querySnapshot = await getDocs(qResults);
                 if (!querySnapshot.empty) {
+                    // Stop any active timers if quiz was already submitted
+                    clearInterval(quizTimerInterval);
+                    document.getElementById('quizTimerDisplay').classList.add('hidden');
+
                     // Sort results by submission time and show the latest
                     const latestResult = querySnapshot.docs
                         .map(doc => doc.data())
@@ -1591,12 +1673,10 @@
                     if (currentQuiz.showResultsToStudents) {
                         window.displayInlineResults(latestResult, quiz);
                     } else {
-                        // If results are not to be shown, show a success message and then redirect to student info or a general page.
-                        window.showMessageBox(translations[currentLang].answers_submitted_success + '\n' + translations[currentLang].results_not_shown_message);
-                        // Hide quiz content and show student info form (or redirect to home/login)
+                        // If results are not to be shown, show the completion message
                         document.getElementById('quizContent').classList.add('hidden');
-                        document.getElementById('studentInfoForm').classList.remove('hidden');
-                        document.getElementById('studentName').value = storedStudentName || ''; // Clear or pre-fill student name
+                        document.getElementById('studentInfoForm').classList.add('hidden'); // Hide info form
+                        document.getElementById('quizCompletedMessage').classList.remove('hidden');
                     }
                     return; // Stop here, either show results or success message
                 }
@@ -1605,15 +1685,23 @@
                 // Continue to show quiz if check fails
             }
 
-
+            // If no previous submission, prepare for quiz
             if (storedStudentName) {
                 studentAnswers.studentName = storedStudentName;
                 document.getElementById('studentInfoForm').classList.add('hidden');
                 document.getElementById('quizContent').classList.remove('hidden');
                 document.getElementById('studentName').value = storedStudentName; // Pre-fill the input
+                 // Show timer if quiz has a duration and start it
+                if (currentQuiz.duration > 0) {
+                    document.getElementById('quizTimerDisplay').classList.remove('hidden');
+                    startTimer();
+                } else {
+                    document.getElementById('quizTimerDisplay').classList.add('hidden');
+                }
             } else {
                 document.getElementById('studentInfoForm').classList.remove('hidden');
                 document.getElementById('quizContent').classList.add('hidden');
+                document.getElementById('quizTimerDisplay').classList.add('hidden'); // Hide timer on info form
             }
 
             const quizHTML = `
@@ -1700,7 +1788,7 @@
                         <button type="button" onclick="submitStudentQuiz()" 
                                 class="btn-primary text-white px-8 py-4 rounded-lg font-semibold text-lg transition hover:shadow-lg">
                             <i class="fas fa-paper-plane ml-2"></i>
-                            <span data-translate-key="submit_answers_button"></span>
+                            <span data-translate-key="end_quiz_button"></span> <!-- Changed key to end_quiz_button -->
                         </button>
                     </div>
                 </form>
@@ -1708,7 +1796,7 @@
 
             document.getElementById('quizContent').innerHTML = quizHTML;
             // Apply translations to the dynamically created submit button
-            document.getElementById('quizContent').querySelector('[data-translate-key="submit_answers_button"]').textContent = translations[currentLang].submit_answers_button;
+            document.getElementById('quizContent').querySelector('[data-translate-key="end_quiz_button"]').textContent = translations[currentLang].end_quiz_button;
 
             window.showStudentPage();
             // Automatically set studentAnswers from loaded progress if it exists
@@ -1754,11 +1842,50 @@
                 quizId: currentQuiz.id,
                 studentId: currentUserId,
                 answers: currentAnswers,
+                // Store the start time to calculate elapsed time on reload
+                startTime: sessionStorage.getItem('quizStartTime') ? parseInt(sessionStorage.getItem('quizStartTime')) : Date.now(),
                 timestamp: Date.now()
             };
             localStorage.setItem(QUIZ_PROGRESS_STORAGE_KEY, JSON.stringify(progressState));
         };
 
+        // --- Timer Functions ---
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timerCountdown').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+            if (timeLeft <= 30) { // Highlight timer in last 30 seconds
+                document.getElementById('quizTimerDisplay').classList.add('text-red-500', 'animate-pulse');
+            } else {
+                document.getElementById('quizTimerDisplay').classList.remove('text-red-500', 'animate-pulse');
+            }
+        }
+
+        function startTimer() {
+            clearInterval(quizTimerInterval); // Clear any existing timer
+            sessionStorage.setItem('quizStartTime', Date.now()); // Store start time for timer calculation
+
+            updateTimerDisplay(); // Initial display
+
+            quizTimerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+
+                if (timeLeft <= 0) {
+                    clearInterval(quizTimerInterval);
+                    // No longer display the message
+                    // window.showMessageBox(translations[currentLang].quiz_auto_submitted);
+                    submitStudentQuiz(true); // Auto-submit when time runs out
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(quizTimerInterval);
+            document.getElementById('quizTimerDisplay').classList.add('hidden'); // Hide timer
+        }
 
         window.startQuiz = function() { // Made global
             const studentName = document.getElementById('studentName').value;
@@ -1769,14 +1896,27 @@
             
             studentAnswers.studentName = studentName;
             sessionStorage.setItem('currentStudentName', studentName); // Save student name to sessionStorage
+            sessionStorage.setItem('quizStartTime', Date.now()); // Store the actual start time when quiz begins
+
             document.getElementById('studentInfoForm').classList.add('hidden');
             document.getElementById('quizContent').classList.remove('hidden');
+            document.getElementById('quizCompletedMessage').classList.add('hidden'); // Hide completion message when starting quiz
 
             // Initial save of progress (empty answers)
             window.saveQuizProgress();
+
+            // Show timer if quiz has a duration and start it
+            // Only start timer if currentQuiz.duration is a positive number
+            if (currentQuiz.duration > 0) {
+                document.getElementById('quizTimerDisplay').classList.remove('hidden');
+                timeLeft = currentQuiz.duration * 60; // Reset time for a new start
+                startTimer();
+            } else {
+                document.getElementById('quizTimerDisplay').classList.add('hidden');
+            }
         }
             
-        window.submitStudentQuiz = async function() { // Made global
+        window.submitStudentQuiz = async function(isAutoSubmit = false) { // Made global
             if (!isAuthReady || !currentUserId) {
                 window.showMessageBox(translations[currentLang].please_wait_auth);
                 return;
@@ -1791,20 +1931,34 @@
             const form = document.getElementById('studentQuizForm');
             const formData = new FormData(form);
             
-            // Validate that all questions have been answered
+            // Validate that all questions have been answered only if not auto-submitting
+            // If auto-submitting, unanswered questions will be marked as incorrect.
             let allAnswered = true;
-            currentQuiz.questions.forEach(question => {
-                const answer = formData.get(`question_${question.id}`);
-                if (!answer || answer.trim() === '') {
-                    allAnswered = false;
-                }
-                studentAnswers[question.id] = answer; // Update studentAnswers with final selections
-            });
+            if (!isAutoSubmit) {
+                currentQuiz.questions.forEach(question => {
+                    const answer = formData.get(`question_${question.id}`);
+                    if (!answer || answer.trim() === '') {
+                        allAnswered = false;
+                    }
+                    studentAnswers[question.id] = answer; // Update studentAnswers with final selections
+                });
+            } else {
+                 // For auto-submit, ensure all questions have an entry in studentAnswers
+                 // and mark unanswered ones as null or empty string.
+                currentQuiz.questions.forEach(question => {
+                    const answer = formData.get(`question_${question.id}`);
+                    studentAnswers[question.id] = answer || null; // Mark unanswered as null
+                });
+            }
 
-            if (!allAnswered) {
+
+            if (!isAutoSubmit && !allAnswered) {
                 window.showMessageBox(translations[currentLang].answer_all_questions);
                 return;
             }
+
+            // If submission is successful (either all answered or auto-submitted), stop the timer
+            stopTimer();
 
             // Calculate the score
             let correctAnswers = 0;
@@ -1817,14 +1971,18 @@
                 teacherId: currentQuiz.teacherId, // Save the teacher's ID from the quiz
                 totalQuestions: currentQuiz.questions.length,
                 answers: [],
-                submittedAt: new Date().toLocaleString(currentLang === 'ar' ? 'ar-EG' : 'en-US') // Localized date
+                submittedAt: new Date().toLocaleString(currentLang === 'ar' ? 'ar-EG' : 'en-US'), // Localized date
+                autoSubmitted: isAutoSubmit // New field to indicate if it was auto-submitted
             };
 
             currentQuiz.questions.forEach(question => {
                 const studentAnswer = studentAnswers[question.id];
                 let isCorrect = false;
 
-                if (question.type === 'multiple') {
+                // Handle unanswered questions as incorrect if auto-submitted or user manually submits with blanks
+                if (studentAnswer === null || studentAnswer.trim() === '') {
+                    isCorrect = false; // Unanswered is incorrect
+                } else if (question.type === 'multiple') {
                     isCorrect = parseInt(studentAnswer) === question.correctAnswer;
                 } else if (question.type === 'boolean') {
                     isCorrect = (studentAnswer === 'true') === question.correctAnswer;
@@ -1842,7 +2000,8 @@
                     questionType: question.type,
                     options: question.options || null,
                     explanation: question.explanation || null, // Include explanation
-                    imageUrl: question.imageUrl || null // Include question image URL for review
+                    imageUrl: question.imageUrl || null, // Include question image URL for review
+                    studentAnswer: studentAnswer // Include the student's answer for review
                 });
             });
 
@@ -1855,10 +2014,14 @@
                 
                 // Clear quiz progress from localStorage after successful submission
                 localStorage.removeItem(QUIZ_PROGRESS_STORAGE_KEY);
+                sessionStorage.removeItem('quizStartTime'); // Clear start time
+                // Set the quiz submitted status
+                localStorage.setItem(`${QUIZ_SUBMITTED_STATUS_KEY}_${currentQuiz.id}_${currentUserId}`, 'submitted');
+
 
                 // Now, based on the teacher's setting (showResultsToStudents)
                 if (currentQuiz.showResultsToStudents) {
-                    window.showMessageBox(translations[currentLang].answers_submitted_success);
+                    // REMOVED: window.showMessageBox(translations[currentLang].answers_submitted_success);
                     // Update URL to reflect results page state
                     const currentUrl = new URL(window.location.href);
                     currentUrl.searchParams.set('results', 'true');
@@ -1868,12 +2031,11 @@
                     // Display results immediately
                     window.displayInlineResults(results, currentQuiz);
                 } else {
-                    // Do NOT update URL to results page
-                    window.showMessageBox(translations[currentLang].answers_submitted_success + '\n' + translations[currentLang].results_not_shown_message);
-                    // Hide quiz content and show student info form (or redirect to home/login)
+                    // If results are not to be shown, display the completion message
                     document.getElementById('quizContent').classList.add('hidden');
-                    document.getElementById('studentInfoForm').classList.remove('hidden');
-                    document.getElementById('studentName').value = studentName; // Keep student name
+                    document.getElementById('studentInfoForm').classList.add('hidden');
+                    document.getElementById('quizCompletedMessage').classList.remove('hidden');
+                    // Do NOT update URL to results page
                 }
 
             } catch (e) {
@@ -1887,6 +2049,7 @@
             // Hide quiz and student info forms, show results page
             document.getElementById('studentInfoForm').classList.add('hidden');
             document.getElementById('quizContent').classList.add('hidden');
+            document.getElementById('quizCompletedMessage').classList.add('hidden'); // Hide completion message
             window.showResultsPage();
 
             // Apply theme to the results content
@@ -1955,16 +2118,26 @@
                         let studentAnswerDisplay = '';
                         let correctAnswerDisplay = '';
 
-                        if (answer.questionType === 'multiple') {
+                        // Determine student's answer for display (can be null/undefined if unanswered)
+                        if (answer.studentAnswer === null || answer.studentAnswer === undefined || answer.studentAnswer.toString().trim() === '') {
+                             studentAnswerDisplay = currentLang === 'ar' ? 'لم يتم الإجابة' : 'Not Answered';
+                        } else if (answer.questionType === 'multiple') {
                             studentAnswerDisplay = originalQuestion.options[parseInt(answer.studentAnswer)];
-                            correctAnswerDisplay = originalQuestion.options[originalQuestion.correctAnswer];
                         } else if (answer.questionType === 'boolean') {
                             studentAnswerDisplay = answer.studentAnswer === 'true' ? translations[currentLang].true_text : translations[currentLang].false_text;
-                            correctAnswerDisplay = originalQuestion.correctAnswer ? translations[currentLang].true_text : translations[currentLang].false_text;
                         } else if (answer.questionType === 'text') {
                             studentAnswerDisplay = answer.studentAnswer;
+                        }
+
+                        // Determine correct answer for display
+                        if (originalQuestion.type === 'multiple') {
+                            correctAnswerDisplay = originalQuestion.options[originalQuestion.correctAnswer];
+                        } else if (originalQuestion.type === 'boolean') {
+                            correctAnswerDisplay = originalQuestion.correctAnswer ? translations[currentLang].true_text : translations[currentLang].false_text;
+                        } else if (originalQuestion.type === 'text') {
                             correctAnswerDisplay = originalQuestion.correctAnswer;
                         }
+
 
                         return `
                             <div class="bg-gray-50 p-6 rounded-lg border-r-4 ${answer.isCorrect ? 'border-green-500' : 'border-red-500'} mb-4">
@@ -2303,6 +2476,7 @@
                                                     <div class="font-semibold text-gray-800">${result.studentName || translations[currentLang].student_name_display}</div>
                                                     <div class="text-sm text-gray-600">${translations[currentLang].student_id_display} ${result.studentId || 'N/A'}</div>
                                                     <div class="text-sm text-gray-600">${result.submittedAt}</div>
+                                                    ${result.autoSubmitted ? `<div class="text-xs text-red-500 mt-1">${translations[currentLang].quiz_auto_submitted}</div>` : ''}
                                                 </div>
                                                 <div class="text-left">
                                                     <div class="text-2xl font-bold ${result.score >= 60 ? 'text-green-600' : 'text-red-600'}">${result.score}%</div>
@@ -2362,6 +2536,7 @@
             document.getElementById('teacherPage').classList.add('hidden');
             document.getElementById('studentPage').classList.add('hidden');
             document.getElementById('resultsPage').classList.remove('hidden');
+            document.getElementById('quizCompletedMessage').classList.add('hidden'); // Hide completion message
             renderContent(); // Re-render content for results page
         }
 
